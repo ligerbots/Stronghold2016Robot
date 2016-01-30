@@ -1,5 +1,4 @@
-#ifndef ROBOTMAP_H
-#define ROBOTMAP_H
+#pragma once
 
 #include "WPILib.h"
 
@@ -19,5 +18,3 @@
 // number and the module. For example you with a rangefinder:
 //const int RANGE_FINDER_PORT = 1;
 //const int RANGE_FINDER_MODULE = 1;
-
-#endif

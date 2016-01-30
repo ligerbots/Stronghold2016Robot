@@ -1,5 +1,4 @@
-#ifndef COMMAND_BASE_H
-#define COMMAND_BASE_H
+#pragma once
 
 #include <string>
 #include "Commands/Command.h"
@@ -22,5 +21,3 @@ public:
 	static std::unique_ptr<ExampleSubsystem> examplesubsystem;
 	static std::unique_ptr<OI> oi;
 };
-
-#endif

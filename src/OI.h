@@ -1,8 +1,8 @@
-#ifndef OI_H
-#define OI_H
+#pragma once
 
 #include "WPILib.h"
 
+// cppcheck-suppress noCopyConstructor
 class OI {
 private:
 	typedef std::map<uintptr_t, std::vector<JoystickButton*>> JoystickMap_t;
@@ -17,6 +17,7 @@ public:
 	Joystick* pXboxController;
 	Joystick* pLogitechJoystick;
 	OI();
+
 	/**
 	 * Registers commands to controller buttons
 	 */
@@ -39,5 +40,3 @@ public:
 	void registerButton(Joystick* joystick, int buttonNumber, ButtonEvent when,
 			Command* command);
 };
-
-#endif

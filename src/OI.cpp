@@ -12,14 +12,14 @@ bool OI::joystickButtonPressed(Joystick* pJoystick, int buttonNumber){
 
 	// find the vector to use
 	JoystickPressed_t::iterator buttonsPressedIterator = buttonsPressed.find((uintptr_t) pJoystick);
-	if (buttonsPressedIterator == controllerButtons.end()) {
+	if (buttonsPressedIterator == buttonsPressed.end()) {
 		std::vector<bool> apButtonsPressed;
 		buttonsPressed.insert(
 				std::pair<uintptr_t, std::vector<bool>>(
 						(uintptr_t) pJoystick, apButtonsPressed));
 	}
 
-	buttonsPressedIterator = controllerButtons.find((uintptr_t) pJoystick);
+	buttonsPressedIterator = buttonsPressed.find((uintptr_t) pJoystick);
 
 	// check if index is there
 	if (buttonsPressedIterator->second.at(buttonNumber) != NULL) {

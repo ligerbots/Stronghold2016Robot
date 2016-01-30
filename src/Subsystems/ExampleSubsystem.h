@@ -1,5 +1,4 @@
-#ifndef EXAMPLE_SUBSYSTEM_H
-#define EXAMPLE_SUBSYSTEM_H
+#pragma once
 
 #include "Commands/Subsystem.h"
 #include "WPILib.h"
@@ -13,5 +12,3 @@ public:
 	ExampleSubsystem();
 	void InitDefaultCommand();
 };
-
-#endif

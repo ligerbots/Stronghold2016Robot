@@ -1,5 +1,4 @@
-#ifndef SRC_UTILS_PARAMETER_H_
-#define SRC_UTILS_PARAMETER_H_
+#pragma once
 
 #include <WPILib.h>
 #include "IParameter.h"
@@ -146,5 +145,3 @@ public:
 		return !value;
 	}
 };
-
-#endif /* SRC_UTILS_PARAMETER_H_ */

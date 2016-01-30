@@ -1,12 +1,4 @@
-/*
- * NTUpdater.h
- *
- *  Created on: Jan 16, 2016
- *      Author: Erik
- */
-
-#ifndef SRC_UTILS_NTUPDATER_H_
-#define SRC_UTILS_NTUPDATER_H_
+#pragma once
 
 #include <WPILib.h>
 #include "llvm/StringRef.h"
@@ -33,5 +25,3 @@ public:
 	static void addParameter(std::string key, std::shared_ptr<IParameter> parameter);
 	static void removeParameter(std::string key, std::shared_ptr<IParameter> parameter);
 };
-
-#endif /* SRC_UTILS_NTUPDATER_H_ */

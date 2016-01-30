@@ -1,5 +1,4 @@
-#ifndef EXAMPLE_COMMAND_H
-#define EXAMPLE_COMMAND_H
+#pragma once
 
 #include "../CommandBase.h"
 #include "WPILib.h"
@@ -14,5 +13,3 @@ public:
 	void End();
 	void Interrupted();
 };
-
-#endif

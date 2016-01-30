@@ -1,10 +1,15 @@
 #include <Stronghold2016Robot.h>
 
+Robot* Robot::instance = NULL;
+
 Robot::Robot() {
 	instance = this;
 	pAutonomousModeChooser = new SendableChooser();
 	pOperatorInterface = new OI();
 	ticks = 0;
+}
+
+Robot::~Robot(){
 }
 
 void Robot::RobotInit() {
