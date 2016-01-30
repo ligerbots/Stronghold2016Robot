@@ -1,5 +1,4 @@
-#include "ExampleSubsystem.h"
-#include "../RobotMap.h"
+#include <Stronghold2016Robot.h>
 
 ExampleSubsystem::ExampleSubsystem() :
 		Subsystem("ExampleSubsystem")

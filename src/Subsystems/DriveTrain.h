@@ -12,5 +12,3 @@ public:
 	DriveTrain();
 	void InitDefaultCommand();
 };
-
-#endif
