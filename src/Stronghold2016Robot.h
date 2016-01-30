@@ -17,6 +17,8 @@
 #include <netdb.h>
 #include <WPIErrors.h>
 #include <Utility.h>
+#include <stdlib.h>
+#include <string.h>
 #include "CommandBase.h"
 #include "Commands/ExampleCommand.h"
 #include "Includes.h"
@@ -26,7 +28,10 @@
 #include "Subsystems/CompressorSubsystem.h"
 #include "Subsystems/DriveTrain.h"
 #include "Subsystems/ExampleSubsystem.h"
+#include "Subsystems/VisionSubsystem.h"
 #include "Utils/IParameter.h"
 #include "Utils/LCameraServer.h"
 #include "Utils/NTUpdater.h"
 #include "Utils/Parameter.h"
+#include "Vision/Camera.h"
+#include "Vision/TowerDetect.h"
