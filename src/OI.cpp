@@ -7,31 +7,30 @@ OI::OI() :
 	// TODO: register commands here
 }
 
-bool OI::joystickButtonPressed(Joystick* pJoystick, int buttonNumber){
+bool OI::joystickButtonPressed(Joystick* pJoystick, int buttonNumber) {
 	bool pressed = false;
 
 	// find the vector to use
-	JoystickPressed_t::iterator buttonsPressedIterator = buttonsPressed.find((uintptr_t) pJoystick);
+	JoystickPressed_t::iterator buttonsPressedIterator = buttonsPressed.find(
+			(uintptr_t) pJoystick);
 	if (buttonsPressedIterator == buttonsPressed.end()) {
 		std::vector<bool> apButtonsPressed;
+		for (int i = 0; i < 12; i++) {
+			apButtonsPressed.push_back(false);
+		}
 		buttonsPressed.insert(
-				std::pair<uintptr_t, std::vector<bool>>(
-						(uintptr_t) pJoystick, apButtonsPressed));
+				std::pair<uintptr_t, std::vector<bool>>((uintptr_t) pJoystick,
+						apButtonsPressed));
 	}
 
 	buttonsPressedIterator = buttonsPressed.find((uintptr_t) pJoystick);
 
 	// check if index is there
-	if (buttonsPressedIterator->second.at(buttonNumber) != NULL) {
-		pressed = buttonsPressedIterator->second.at(buttonNumber);
-	} else {
-		pressed = false;
-		buttonsPressedIterator->second.at(buttonNumber) = pressed;
-	}
+	buttonsPressedIterator->second.at(buttonNumber) = pressed;
 
 	bool joystickPressed = pJoystick->GetRawButton(buttonNumber);
 	bool returnValue = false;
-	if(joystickPressed && !pressed){
+	if (joystickPressed && !pressed) {
 		returnValue = true;
 	}
 

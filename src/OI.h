@@ -2,8 +2,7 @@
 
 #include "WPILib.h"
 
-// cppcheck-suppress noCopyConstructor
-class OI {
+class OI { // cppcheck-suppress noCopyConstructor
 private:
 	typedef std::map<uintptr_t, std::vector<JoystickButton*>> JoystickMap_t;
 	typedef std::map<uintptr_t, std::vector<bool>> JoystickPressed_t;
