@@ -3,6 +3,30 @@ Robot program for FRC 2016 Stronghold
 
 ## Documentation ##
 
+### How to turn vision assistant output into something that compiles ###
+Go to the .c file, remove
+
+    #include <stdlib.h>
+    #include <string.h>
+    #include <math.h>
+    #include <nivision.h>
+    #include <nimachinevision.h>
+    #include <windows.h>
+
+and add 
+
+    #include <nivision.h>
+    #include <string.h>
+    #include <stdlib.h>
+    #include <stdio.h>
+    #pragma GCC diagnostic ignore "-Wformat-zero-length"
+    #pragma GCC diagnostic ignore "-Wunused-but-set-variable"
+    #define BOOL int
+
+---
+
+### Notes on various utilities / added functions ###
+
 * LCameraServer
     * Fixes the CameraServer bug which requires opening the Labview dashboard
   * **Important**: Do not ever use CameraServer and LCameraServer at the same. They both attempt to create sockets on the same port

@@ -2,6 +2,7 @@
 
 #include "WPILib.h"
 
+//cppcheck-suppress copyConstructor
 class OI {
 private:
 	typedef std::map<uintptr_t, std::vector<JoystickButton*>> JoystickMap_t;

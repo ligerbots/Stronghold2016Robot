@@ -1,25 +1,17 @@
 #include <Stronghold2016Robot.h>
 
-// Initialize a single static instance of all of your subsystems to NULL
-std::unique_ptr<ExampleSubsystem> CommandBase::examplesubsystem;
-std::unique_ptr<OI> CommandBase::oi;
+std::unique_ptr<VisionSubsystem> CommandBase::visionSubsystem = NULL;
+std::unique_ptr<DriveTrain> CommandBase::driveSubsystem = NULL;
 
 CommandBase::CommandBase(const std::string &name) :
-		Command(name)
-{
+		Command(name) {
 }
 
 CommandBase::CommandBase() :
-		Command()
-{
-
+		Command() {
 }
 
-void CommandBase::init()
-{
-	// Create a single static instance of all of your subsystems. The following
-	// line should be repeated for each subsystem in the project.
-	examplesubsystem.reset(new ExampleSubsystem());
-
-	oi.reset(new OI());
+void CommandBase::init() {
+	driveSubsystem.reset(new DriveTrain());
+	visionSubsystem.reset(new VisionSubsystem());
 }

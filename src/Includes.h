@@ -17,3 +17,5 @@
 #include <netdb.h>
 #include <WPIErrors.h>
 #include <Utility.h>
+#include <stdlib.h>
+#include <string.h>
