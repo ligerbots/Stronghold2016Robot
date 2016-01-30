@@ -7,6 +7,13 @@ OI::OI() :
 	// TODO: register commands here
 }
 
+OI::OI(OI& otherOI){
+	controllerButtons = otherOI.controllerButtons;
+	buttonsPressed = otherOI.buttonsPressed;
+	pXboxController = otherOI.pXboxController;
+	pLogitechJoystick = otherOI.pLogitechJoystick;
+}
+
 bool OI::joystickButtonPressed(Joystick* pJoystick, int buttonNumber) {
 	bool pressed = false;
 
