@@ -22,8 +22,8 @@ void Robot::RobotInit() {
 void Robot::AlwaysPeriodic(){
 	ticks++;
 
-	// send camera images
 	// other stuff
+	CommandBase::visionSubsystem->updateVision(ticks);
 }
 
 void Robot::DisabledInit() {
