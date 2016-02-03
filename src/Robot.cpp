@@ -17,13 +17,31 @@ void Robot::RobotInit() {
 
 	pAutonomousModeChooser->AddDefault("Default Auto", new ExampleCommand());
 	SmartDashboard::PutData("Auto Modes", pAutonomousModeChooser);
+
+	printf("Spamming i2c\n");
+	for(int i=0;i<0xFF;i++){
+		I2C i2c(I2C::kOnboard, i);
+
+		printf("%d\n", i);
+
+		uint8_t bytes[4];
+		bytes[0] = 0;
+		bytes[1] = 65;
+		bytes[2] = 66;
+		bytes[3] = 67;
+		bool res = i2c.WriteBulk(bytes, 4);
+
+		if(res) printf("= true\n");
+		else printf("= false\n");
+	}
+	printf("Done\n");
 }
 
 void Robot::AlwaysPeriodic(){
 	ticks++;
 
-	// send camera images
 	// other stuff
+	CommandBase::visionSubsystem->updateVision(ticks);
 }
 
 void Robot::DisabledInit() {
