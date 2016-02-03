@@ -30,6 +30,10 @@ DriveTrain::DriveTrain() :
 void DriveTrain::InitDefaultCommand() {
 }
 
+void DriveTrain::ZeroMotors(){
+	Drive(0, 0);
+}
+
 void DriveTrain::Drive(double y, double x) {
 	m_robotDrive.ArcadeDrive(y, x);
 }

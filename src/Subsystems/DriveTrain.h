@@ -24,4 +24,5 @@ public:
 	void InitDefaultCommand();
 	void Drive(double y, double x);
 	void DriveSplitJoystick(Joystick* p_accelerationJoystick, Joystick* p_turnJoystick);
+	void ZeroMotors();
 };
