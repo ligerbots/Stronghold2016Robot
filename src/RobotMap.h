@@ -21,4 +21,12 @@
 
 class RobotMap {
 	static constexpr int LED_RING_SPIKE = 0;
+
+	// TODO: set to correct IDs
+	static constexpr int CT_DRIVE_LEFT1 = 2;
+	static constexpr int CT_DRIVE_LEFT2 = 3;
+	static constexpr int CT_DRIVE_LEFT3 = 100;
+	static constexpr int CT_DRIVE_RIGHT1 = 4;
+	static constexpr int CT_DRIVE_RIGHT2 = 5;
+	static constexpr int CT_DRIVE_RIGHT3 = 101;
 };
