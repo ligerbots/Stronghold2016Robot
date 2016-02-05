@@ -141,6 +141,7 @@ unsigned int LCameraServer::GetQuality() {
 }
 
 void LCameraServer::Serve() {
+	printf("LCameraServer: Serve\n");
 	int sock = socket(AF_INET, SOCK_STREAM, 0);
 
 	if (sock == -1) {
@@ -175,6 +176,8 @@ void LCameraServer::Serve() {
 			wpi_setErrnoError();
 			continue;
 		}
+
+		printf("LCameraServer: Got Connection!\n");
 
 		Request req;
 		// the problem with the default implementation of receiving the Request in
