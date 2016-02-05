@@ -20,6 +20,9 @@ void VisionSubsystem::updateVision(int ticks) {
 	if (ticks % 2 == 0)
 		return;
 
+	if (Camera::GetNumberOfCameras() < 1)
+		return;
+
 	Camera::GetCamera(0)->SetExposure(exposure.get());
 	Camera::Feed(ticks);
 
@@ -31,8 +34,9 @@ void VisionSubsystem::updateVision(int ticks) {
 		int numParticles;
 		bool needsConnection = true;
 		imaqCountParticles(image, needsConnection, &numParticles);
-		if(numParticles != 0){
-			imaqMeasureParticle(image, 0, false, IMAQ_MT_CENTER_OF_MASS_X, &frameCenterX);
+		if (numParticles != 0) {
+			imaqMeasureParticle(image, 0, false, IMAQ_MT_CENTER_OF_MASS_X,
+					&frameCenterX);
 		} else {
 			// TODO: make sure that in pid commands you stop if it's 0
 			frameCenterX = NAN;
