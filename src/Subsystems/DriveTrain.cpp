@@ -2,12 +2,24 @@
 
 DriveTrain::DriveTrain() :
 		Subsystem("DriveTrain") {
-	mp_left1 = std::make_unique<CANTalon>(RobotMap::CT_DRIVE_LEFT1);
-	mp_left2 = std::make_unique<CANTalon>(RobotMap::CT_DRIVE_LEFT2);
-	mp_left3 = std::make_unique<CANTalon>(RobotMap::CT_DRIVE_LEFT3);
-	mp_right1 = std::make_unique<CANTalon>(RobotMap::CT_DRIVE_RIGHT1);
-	mp_right2 = std::make_unique<CANTalon>(RobotMap::CT_DRIVE_RIGHT2);
-	mp_right3 = std::make_unique<CANTalon>(RobotMap::CT_DRIVE_RIGHT3);
+	printf("DriveTrain: initialize\n");
+	printf("\tMaster talons\n");
+	mp_left1.reset(new CANTalon(RobotMap::CT_DRIVE_LEFT1));
+	mp_right1.reset(new CANTalon(RobotMap::CT_DRIVE_RIGHT1));
+	printf("\t2nd talons\n");
+	mp_left2.reset(new CANTalon(RobotMap::CT_DRIVE_LEFT2));
+	mp_right2.reset(new CANTalon(RobotMap::CT_DRIVE_RIGHT2));
+	printf("\t3rd talons\n");
+	mp_left3.reset(new CANTalon(RobotMap::CT_DRIVE_LEFT3));
+	mp_right3.reset(new CANTalon(RobotMap::CT_DRIVE_RIGHT3));
+
+	printf("\tTalons: %d %d %d | %d %d %d\n",
+			IsTalonPresent(*mp_left1),
+			IsTalonPresent(*mp_left2),
+			IsTalonPresent(*mp_left3),
+			IsTalonPresent(*mp_right1),
+			IsTalonPresent(*mp_right2),
+			IsTalonPresent(*mp_right3));
 
 	TalonMasterInit(*mp_left1);
 	TalonMasterInit(*mp_right1);
@@ -18,24 +30,29 @@ DriveTrain::DriveTrain() :
 	if (IsTalonPresent(*mp_left3) && IsTalonPresent(*mp_right3)) {
 		TalonSlaveInit(*mp_left3, RobotMap::CT_DRIVE_LEFT1);
 		TalonSlaveInit(*mp_right3, RobotMap::CT_DRIVE_RIGHT1);
+	} else {
+		printf("\tRoadkill detected\n");
 	}
 
-	m_robotDrive(mp_left1, mp_left2);
-	m_robotDrive.SetSafetyEnabled(false);
-	m_robotDrive.SetExpiration(0.1);
-	m_robotDrive.SetSensitivity(0.5);
-	m_robotDrive.SetMaxOutput(1);
+	mp_robotDrive.reset(new RobotDrive(mp_left1.get(), mp_right1.get()));
+	mp_robotDrive->SetSafetyEnabled(false);
+	mp_robotDrive->SetExpiration(0.1);
+	mp_robotDrive->SetSensitivity(0.5);
+	mp_robotDrive->SetMaxOutput(1);
+}
+
+DriveTrain::~DriveTrain() {
 }
 
 void DriveTrain::InitDefaultCommand() {
 }
 
-void DriveTrain::ZeroMotors(){
+void DriveTrain::ZeroMotors() {
 	Drive(0, 0);
 }
 
 void DriveTrain::Drive(double y, double x) {
-	m_robotDrive.ArcadeDrive(y, x);
+	mp_robotDrive->ArcadeDrive(y, x);
 }
 
 void DriveTrain::DriveSplitJoystick(Joystick* p_accelerationJoystick,

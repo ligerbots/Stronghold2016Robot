@@ -236,11 +236,11 @@ IMAQdxError Camera::Stop() {
 	return imaqError;
 }
 
-// Feed video frams from the currently selected camera.
+// Feed video frames from the currently selected camera.
 // Pass in the robot tick count -- it's just wasteful to
 // send a frame every tick if the camera rate is slower
 void Camera::Feed(int ticks) {
-	if (enabled && cameraCount > 0 && ticks % 2 == 0) {
+	if (enabled && cameraCount > 0) {
 		IMAQdxError imaqError = cameras[currentCamera]->GetFrame();
 		if (cameras[currentCamera]->frame != NULL) {
 			if (IMAQdxErrorSuccess == imaqError) {
@@ -267,8 +267,6 @@ void Camera::Feed(int ticks) {
 					imaqDrawLineOnImage(frame, frame, DrawMode::IMAQ_DRAW_VALUE,
 							rightStart, rightEnd, 1.0);
 				}
-				printf("Setting image\n");
-				LCameraServer::GetInstance()->SetImage(cameras[currentCamera]->frame);
 			}
 		}
 	}

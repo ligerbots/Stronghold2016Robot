@@ -4,40 +4,43 @@ Robot* Robot::instance = NULL;
 
 Robot::Robot() {
 	instance = this;
-	pAutonomousModeChooser = new SendableChooser();
-	pOperatorInterface = new OI();
+	mp_autonomousModeChooser = new SendableChooser();
+	mp_operatorInterface = new OI();
 	ticks = 0;
 }
 
-Robot::~Robot(){
+Robot::~Robot() {
 }
 
 void Robot::RobotInit() {
 	CommandBase::init();
+	mp_driveJoystickCommand.reset(new DriveJoystickCommand());
 
-	pAutonomousModeChooser->AddDefault("Default Auto", new ExampleCommand());
-	SmartDashboard::PutData("Auto Modes", pAutonomousModeChooser);
+	CommandBase::visionSubsystem->camerasOn();
 
-	printf("Spamming i2c\n");
-	for(int i=0;i<0xFF;i++){
+	mp_autonomousModeChooser->AddDefault("Default Auto", new ExampleCommand());
+	SmartDashboard::PutData("Auto Modes", mp_autonomousModeChooser);
+
+	printf("Writing i2c\n");
+	for (int i = 3; i < 4; i++) {
 		I2C i2c(I2C::kOnboard, i);
 
 		printf("%d\n", i);
 
-		uint8_t bytes[4];
+		uint8_t bytes[30 * 3 + 2];
 		bytes[0] = 0;
-		bytes[1] = 65;
-		bytes[2] = 66;
-		bytes[3] = 67;
-		bool res = i2c.WriteBulk(bytes, 4);
-
-		if(res) printf("= true\n");
-		else printf("= false\n");
+		for(int j = 1; j < 30 * 3 + 1; j += 3){
+			bytes[j] = j * 2;
+			bytes[j + 1] = j * 2;
+			bytes[j + 2] = j * 2;
+		}
+		bytes[30 * 3 + 1] = 254;
+		i2c.WriteBulk(bytes, sizeof(bytes));
 	}
 	printf("Done\n");
 }
 
-void Robot::AlwaysPeriodic(){
+void Robot::AlwaysPeriodic() {
 	ticks++;
 
 	// other stuff
@@ -45,9 +48,10 @@ void Robot::AlwaysPeriodic(){
 }
 
 void Robot::DisabledInit() {
+	printf("Robot: DisabledInit\n");
 }
 
-void Robot::DisabledPeriodic(){
+void Robot::DisabledPeriodic() {
 	AlwaysPeriodic();
 }
 
@@ -58,7 +62,9 @@ void Robot::AutonomousInit() {
 	 } else {
 	 autonomousCommand.reset(new ExampleCommand());
 	 } */
+	printf("Robot: AutononmousInit\n");
 
+	mp_driveJoystickCommand->Cancel();
 }
 
 void Robot::AutonomousPeriodic() {
@@ -67,10 +73,12 @@ void Robot::AutonomousPeriodic() {
 }
 
 void Robot::TeleopInit() {
+	printf("Robot: TeleopInit\n");
 	// This makes sure that the autonomous stops running when
 	// teleop starts running. If you want the autonomous to
 	// continue until interrupted by another command, remove
 	// this line or comment it out.
+	mp_driveJoystickCommand->Start();
 }
 
 void Robot::TeleopPeriodic() {
