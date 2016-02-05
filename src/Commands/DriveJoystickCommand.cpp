@@ -16,20 +16,20 @@ void DriveJoystickCommand::Initialize() {
 
 void DriveJoystickCommand::Execute() {
 	Joystick* pXboxController =
-			Robot::instance->pOperatorInterface->pXboxController;
+			Robot::instance->mp_operatorInterface->pXboxController;
 
-
-	double y = pXboxController->GetY();
+	//double y = pXboxController->GetY();
 	// there was a 0.7 turnMax variable in the 2015 bot
-	y = clampJoystickValue(y, -TURN_MAX, TURN_MAX);
-	double x = pXboxController->GetX();
+	//y = clampJoystickValue(y, -TURN_MAX, TURN_MAX);
+	//double x = pXboxController->GetX();
 	// roadkill safety
-	x = clampJoystickValue(x, -LINEAR_MAX, LINEAR_MAX);
+	//x = clampJoystickValue(x, -LINEAR_MAX, LINEAR_MAX);
 
-	SmartDashboard::PutNumber("DriveJoystick_x", x);
-	SmartDashboard::PutNumber("DriveJoystick_y", y);
+	//SmartDashboard::PutNumber("DriveJoystick_x", x);
+	//SmartDashboard::PutNumber("DriveJoystick_y", y);
 
-	driveSubsystem->Drive(y, x);
+	driveSubsystem->Drive(pXboxController->GetRawAxis(1),
+			pXboxController->GetRawAxis(4));
 }
 
 bool DriveJoystickCommand::IsFinished() {

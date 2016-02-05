@@ -5,12 +5,12 @@
 
 class Robot: public IterativeRobot {
 public:
-	OI* pOperatorInterface;
 	static Robot* instance;
 
-	SendableChooser *pAutonomousModeChooser;
-
+	OI* mp_operatorInterface;
+	SendableChooser* mp_autonomousModeChooser;
 	int ticks;
+	std::unique_ptr<Command> mp_driveJoystickCommand;
 
 	Robot();
 	virtual ~Robot();

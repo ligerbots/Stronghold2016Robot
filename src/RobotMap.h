@@ -20,13 +20,16 @@
 //const int RANGE_FINDER_MODULE = 1;
 
 class RobotMap {
+public:
 	static constexpr int LED_RING_SPIKE = 0;
 
 	// TODO: set to correct IDs
-	static constexpr int CT_DRIVE_LEFT1 = 2;
+	// left = 1, 3, 5
+	// right = 2, 4, 6
+	static constexpr int CT_DRIVE_LEFT1 = 1;
 	static constexpr int CT_DRIVE_LEFT2 = 3;
-	static constexpr int CT_DRIVE_LEFT3 = 100;
-	static constexpr int CT_DRIVE_RIGHT1 = 4;
-	static constexpr int CT_DRIVE_RIGHT2 = 5;
-	static constexpr int CT_DRIVE_RIGHT3 = 101;
+	static constexpr int CT_DRIVE_LEFT3 = 5;
+	static constexpr int CT_DRIVE_RIGHT1 = 2;
+	static constexpr int CT_DRIVE_RIGHT2 = 4;
+	static constexpr int CT_DRIVE_RIGHT3 = 6;
 };

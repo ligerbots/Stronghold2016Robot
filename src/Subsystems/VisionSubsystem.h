@@ -18,6 +18,7 @@ public:
 	// Subsystem
 	VisionSubsystem();
 	void InitDefaultCommand();
+	void camerasOn();
 	void updateVision(int ticks);
 
 	// PIDSource

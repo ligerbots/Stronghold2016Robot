@@ -1,16 +1,18 @@
 #include <Stronghold2016Robot.h>
 
 VisionSubsystem::VisionSubsystem() :
-		Subsystem("VisionSubsystem"),
-		exposure("VisionSubsystem_exposure"),
-		runVision("VisionSubsystem_runProcessing"),
-		frameCenterX(0) {
-	Camera::EnumerateCameras();
-	Camera::EnableCameras();
+		Subsystem("VisionSubsystem"), exposure("VisionSubsystem_exposure"), runVision(
+				"VisionSubsystem_runProcessing"), frameCenterX(0) {
 }
 
 void VisionSubsystem::InitDefaultCommand() {
 	// TODO: led toggle command
+}
+
+void VisionSubsystem::camerasOn() {
+	printf("VisionSubsystem: camerasOn\n");
+	Camera::EnumerateCameras();
+	Camera::EnableCameras();
 }
 
 void VisionSubsystem::updateVision(int ticks) {
@@ -50,6 +52,6 @@ PIDSourceType VisionSubsystem::GetPIDSourceType() const {
 	return PIDSourceType::kDisplacement;
 }
 
-double VisionSubsystem::PIDGet(){
+double VisionSubsystem::PIDGet() {
 	return frameCenterX;
 }

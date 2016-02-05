@@ -12,7 +12,7 @@ private:
 	std::unique_ptr<CANTalon> mp_right2;
 	std::unique_ptr<CANTalon> mp_right3;
 
-	RobotDrive m_robotDrive;
+	std::unique_ptr<RobotDrive> mp_robotDrive;
 
 protected:
 	void TalonMasterInit(CANTalon& r_talon);
@@ -21,6 +21,7 @@ protected:
 
 public:
 	DriveTrain();
+	virtual ~DriveTrain();
 	void InitDefaultCommand();
 	void Drive(double y, double x);
 	void DriveSplitJoystick(Joystick* p_accelerationJoystick, Joystick* p_turnJoystick);
