@@ -16,11 +16,13 @@ void Robot::RobotInit() {
 	CommandBase::init();
 	mp_driveJoystickCommand.reset(new DriveJoystickCommand());
 
+	CommandBase::visionSubsystem->camerasOn();
+
 	mp_autonomousModeChooser->AddDefault("Default Auto", new ExampleCommand());
 	SmartDashboard::PutData("Auto Modes", mp_autonomousModeChooser);
 
 	printf("Writing i2c\n");
-	for (int i = 3; i <= 4; i++) {
+	for (int i = 3; i < 4; i++) {
 		I2C i2c(I2C::kOnboard, i);
 
 		printf("%d\n", i);
@@ -47,7 +49,6 @@ void Robot::AlwaysPeriodic() {
 
 void Robot::DisabledInit() {
 	printf("Robot: DisabledInit\n");
-	CommandBase::visionSubsystem->camerasOn();
 }
 
 void Robot::DisabledPeriodic() {
