@@ -2,6 +2,7 @@
 
 std::unique_ptr<VisionSubsystem> CommandBase::visionSubsystem = NULL;
 std::unique_ptr<DriveSubsystem> CommandBase::driveSubsystem = NULL;
+std::unique_ptr<NavXSubsystem> CommandBase::navXSubsystem = NULL;
 
 std::unique_ptr<Command> CommandBase::driveJoystickCommand = NULL;
 std::unique_ptr<Command> CommandBase::ledOnCommand = NULL;
@@ -18,6 +19,7 @@ CommandBase::CommandBase() :
 void CommandBase::init() {
 	driveSubsystem.reset(new DriveSubsystem());
 	visionSubsystem.reset(new VisionSubsystem());
+	navXSubsystem.reset(new NavXSubsystem());
 
 	driveJoystickCommand.reset(new DriveJoystickCommand());
 	ledOnCommand.reset(new ToggleLedCommand(true));
