@@ -23,6 +23,11 @@ public:
 	DriveSubsystem();
 	virtual ~DriveSubsystem();
 	void InitDefaultCommand();
-	void Drive(double y, double x);
-	void ZeroMotors();
+	void drive(double y, double x);
+	void zeroMotors();
+	void shiftUp();
+	void shiftDown();
+	double getLeftEncoderPosition();
+	double getRightEncoderPosition();
+
 };

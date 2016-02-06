@@ -108,11 +108,11 @@ DriveSubsystem::~DriveSubsystem() {
 void DriveSubsystem::InitDefaultCommand() {
 }
 
-void DriveSubsystem::ZeroMotors() {
-	Drive(0, 0);
+void DriveSubsystem::zeroMotors() {
+	drive(0, 0);
 }
 
-void DriveSubsystem::Drive(double y, double x) {
+void DriveSubsystem::drive(double y, double x) {
 	if (mp_robotDrive.get() == NULL)
 		return;
 	mp_robotDrive->ArcadeDrive(y, x);

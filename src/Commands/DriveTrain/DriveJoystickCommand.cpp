@@ -28,7 +28,7 @@ void DriveJoystickCommand::Execute() {
 	//SmartDashboard::PutNumber("DriveJoystick_x", x);
 	//SmartDashboard::PutNumber("DriveJoystick_y", y);
 
-	driveSubsystem->Drive(pXboxController->GetRawAxis(1),
+	driveSubsystem->drive(pXboxController->GetRawAxis(1),
 			pXboxController->GetRawAxis(4));
 }
 
@@ -43,7 +43,7 @@ void DriveJoystickCommand::End() {
 
 void DriveJoystickCommand::Interrupted() {
 	printf("DriveJoystickCommand: interrupted\n");
-	driveSubsystem->ZeroMotors();
+	driveSubsystem->zeroMotors();
 }
 
 double DriveJoystickCommand::clampJoystickValue(double value, double min,

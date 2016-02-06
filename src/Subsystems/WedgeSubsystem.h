@@ -11,4 +11,8 @@ private:
 public:
 	WedgeSubsystem();
 	void InitDefaultCommand();
+	void liftWedge();
+	void lowerWedge();
+	bool isClear();
 };
+
