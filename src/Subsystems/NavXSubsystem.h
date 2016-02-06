@@ -3,12 +3,18 @@
 #include "Commands/Subsystem.h"
 #include "WPILib.h"
 
-class NavXSubsystem: public Subsystem
-{
+class NavXSubsystem: public Subsystem, public PIDSource {
 private:
-	// It's desirable that everything possible under private except
-	// for methods that implement subsystem capabilities
+	std::unique_ptr<AHRS> mp_navX;
+
 public:
 	NavXSubsystem();
 	void InitDefaultCommand();
+	double getYaw();
+	void sendValuesToSmartDashboard();
+
+	// PIDSource
+	void SetPIDSourceType(PIDSourceType pidSource);
+	PIDSourceType GetPIDSourceType() const;
+	double PIDGet();
 };

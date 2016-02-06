@@ -15,6 +15,7 @@ private:
 	Image* mp_processingFrame;
 
 	double frameCenterX;
+	Parameter<int> frameCenterXParam;
 
 	// managed hardware object
 	std::unique_ptr<Relay> ledRingSpike;
@@ -27,6 +28,8 @@ public:
 	void InitDefaultCommand();
 	void camerasOn();
 	void updateVision(int ticks);
+	bool isLedRingOn();
+	void setLedRingOn(bool on);
 
 	// PIDSource
 	void SetPIDSourceType(PIDSourceType pidSource);

@@ -2,8 +2,8 @@
 #define SRC_COMMANDS_DRIVEJOYSTICKCOMMAND_H_
 
 #include <WPILib.h>
-#include "../CommandBase.h"
-#include "Robot.h"
+#include <CommandBase.h>
+#include <Robot.h>
 
 class DriveJoystickCommand: public CommandBase
 {

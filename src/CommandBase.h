@@ -1,7 +1,8 @@
 #pragma once
 
-#include <Subsystems/DriveTrain.h>
+#include <Subsystems/DriveSubsystem.h>
 #include <Subsystems/VisionSubsystem.h>
+#include <Subsystems/NavXSubsystem.h>
 
 /**
  * The base for all commands. All atomic commands should subclass CommandBase.
@@ -16,6 +17,12 @@ public:
 	static void init();
 
 	// all subsystems
-	static std::unique_ptr<DriveTrain> driveSubsystem;
+	static std::unique_ptr<DriveSubsystem> driveSubsystem;
 	static std::unique_ptr<VisionSubsystem> visionSubsystem;
+	static std::unique_ptr<NavXSubsystem> navXSubsystem;
+
+	// all commands
+	static std::unique_ptr<Command> driveJoystickCommand;
+	static std::unique_ptr<Command> ledOnCommand;
+	static std::unique_ptr<Command> ledOffCommand;
 };

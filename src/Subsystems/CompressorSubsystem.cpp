@@ -1,12 +1,13 @@
 #include <Stronghold2016Robot.h>
 
 CompressorSubsystem::CompressorSubsystem() :
-		Subsystem("Compressor")
-{
+		Subsystem("Compressor") {
+	mp_compressor.reset(new Compressor(RobotMap::PCM_COMPRESSOR));
 }
 
-void CompressorSubsystem::InitDefaultCommand()
-{
-	// Set the default command for a subsystem here.
-	//SetDefaultCommand(new MySpecialCommand());
+void CompressorSubsystem::InitDefaultCommand() {
+}
+
+void CompressorSubsystem::SetCompressor(bool on){
+	mp_compressor->SetClosedLoopControl(on);
 }

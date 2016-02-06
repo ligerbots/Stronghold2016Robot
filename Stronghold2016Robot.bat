@@ -1,8 +1,10 @@
 @echo off
 rem Set up variables
+IF !%NAVX_LOCATION%==! set PATH=%PATH%;C:\mingw\msys\1.0\bin
 set NAVX_LOCATION=%userprofile%/navx-mxp/cpp/include
 set WPILIB_LOCATION=%userprofile%/wpilib/cpp/current/include
-set PATH=%PATH%;C:\mingw\msys\1.0\bin
+
+IF NOT EXIST %NAVX_LOCATION% echo NavX is not present. Make sure to install on the current user profile
 
 rem Clean up
 IF EXIST "..\src\Stronghold2016Robot.h.gch" (

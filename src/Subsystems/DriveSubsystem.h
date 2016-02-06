@@ -3,7 +3,7 @@
 #include "Commands/Subsystem.h"
 #include "WPILib.h"
 
-class DriveTrain: public Subsystem {
+class DriveSubsystem: public Subsystem {
 private:
 	std::unique_ptr<CANTalon> mp_left1;
 	std::unique_ptr<CANTalon> mp_left2;
@@ -20,10 +20,14 @@ protected:
 	bool IsTalonPresent(CANTalon& r_talon);
 
 public:
-	DriveTrain();
-	virtual ~DriveTrain();
+	DriveSubsystem();
+	virtual ~DriveSubsystem();
 	void InitDefaultCommand();
-	void Drive(double y, double x);
-	void DriveSplitJoystick(Joystick* p_accelerationJoystick, Joystick* p_turnJoystick);
-	void ZeroMotors();
+	void drive(double y, double x);
+	void zeroMotors();
+	void shiftUp();
+	void shiftDown();
+	double getLeftEncoderPosition();
+	double getRightEncoderPosition();
+
 };

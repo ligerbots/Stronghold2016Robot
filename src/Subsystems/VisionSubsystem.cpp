@@ -3,9 +3,11 @@
 VisionSubsystem::VisionSubsystem() :
 		Subsystem("VisionSubsystem"), exposure("VisionSubsystem_exposure"), showVision(
 				"VisionSubsystem_showProcessing"), m_processingThread(
-				&VisionSubsystem::visionProcessingThread, this), frameCenterX(0) {
+				&VisionSubsystem::visionProcessingThread, this), frameCenterX(
+				0), frameCenterXParam("VisionSubsystem_frameCenterX", false) {
 	mp_currentFrame = NULL;
 	mp_processingFrame = NULL;
+	ledRingSpike.reset(new Relay(RobotMap::LED_RING_SPIKE));
 }
 
 void VisionSubsystem::InitDefaultCommand() {
@@ -16,6 +18,18 @@ void VisionSubsystem::camerasOn() {
 	printf("VisionSubsystem: camerasOn\n");
 	Camera::EnumerateCameras();
 	Camera::EnableCameras();
+}
+
+bool VisionSubsystem::isLedRingOn() {
+	return ledRingSpike->Get() != Relay::kOff;
+}
+
+void VisionSubsystem::setLedRingOn(bool on) {
+	if (on) {
+		ledRingSpike->Set(Relay::kForward);
+	} else {
+		ledRingSpike->Set(Relay::kOff);
+	}
 }
 
 void VisionSubsystem::updateVision(int ticks) {
@@ -35,7 +49,6 @@ void VisionSubsystem::updateVision(int ticks) {
 		image = Camera::GetCamera(0)->GetStoredFrame();
 		mp_processingFrame = image;
 	}
-
 	if (!showVision.get() && image != NULL)
 		LCameraServer::GetInstance()->SetImage(image);
 }
@@ -77,8 +90,9 @@ void VisionSubsystem::visionProcessingThread() {
 //			// TODO: make sure that in pid commands you stop if it's NAN
 //			frameCenterX = NAN;
 //		}
+//	frameCenterXParam = frameCenterX;
 
-		if(showVision.get()){
+		if (showVision.get()) {
 			LCameraServer::GetInstance()->SetImage(mp_processingFrame);
 		}
 	}

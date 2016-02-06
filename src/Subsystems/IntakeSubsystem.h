@@ -11,4 +11,11 @@ private:
 public:
 	IntakeSubsystem();
 	void InitDefaultCommand();
+	void rollIn();
+	void rollOut();
+	bool intakeClear();
+	void rollerUp();
+	void rollerDown();
+	double rollerRevolutions();
+	bool haveBall();
 };
