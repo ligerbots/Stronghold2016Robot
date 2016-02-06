@@ -1,8 +1,10 @@
 #include <Stronghold2016Robot.h>
 
 std::string NTUpdater::TABLE_NAME = "Preferences";
+std::string NTUpdater::SMARTDASHBOARD_TABLE_NAME = "SmartDashboard";
 NTUpdater* NTUpdater::instance = NULL;
 std::shared_ptr<NetworkTable> NTUpdater::NETWORK_TABLE;
+std::shared_ptr<NetworkTable> NTUpdater::SMARTDASHBOARD_NETWORK_TABLE;
 std::map<std::string, NTParameterVector_t> NTUpdater::parametersMap;
 std::mutex NTUpdater::lock;
 
@@ -19,6 +21,9 @@ void NTUpdater::registerNTUpdater() {
 	instance = new NTUpdater();
 	NETWORK_TABLE = NetworkTable::GetTable(TABLE_NAME);
 	NETWORK_TABLE->AddTableListener(instance);
+
+	SMARTDASHBOARD_NETWORK_TABLE = NetworkTable::GetTable(SMARTDASHBOARD_TABLE_NAME);
+	SMARTDASHBOARD_NETWORK_TABLE->AddTableListener(instance);
 }
 
 void NTUpdater::addParameter(std::string key,

@@ -8,6 +8,7 @@ class VisionSubsystem: public Subsystem, public PIDSource {
 private:
 	Parameter<int> exposure;
 	Parameter<bool> runVision;
+	Parameter<int> frameCenterXParam;
 
 	double frameCenterX;
 
@@ -20,6 +21,8 @@ public:
 	void InitDefaultCommand();
 	void camerasOn();
 	void updateVision(int ticks);
+	bool isLedRingOn();
+	void setLedRingOn(bool on);
 
 	// PIDSource
 	void SetPIDSourceType(PIDSourceType pidSource);

@@ -4,7 +4,13 @@ OI::OI() :
 		controllerButtons(), buttonsPressed() {
 	pXboxController = new Joystick(0);
 	pLogitechJoystick = new Joystick(1);
-	// TODO: register commands here
+}
+
+void OI::registerCommands() {
+	registerButton(pXboxController, 1, PRESSED,
+			CommandBase::ledOnCommand.get());
+	registerButton(pXboxController, 2, PRESSED,
+			CommandBase::ledOffCommand.get());
 }
 
 bool OI::joystickButtonPressed(Joystick* pJoystick, int buttonNumber) {

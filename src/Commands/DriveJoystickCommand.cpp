@@ -3,7 +3,7 @@
 double DriveJoystickCommand::TURN_MAX = 0.7;
 double DriveJoystickCommand::LINEAR_MAX = 0.6;
 
-DriveJoystickCommand::DriveJoystickCommand() {
+DriveJoystickCommand::DriveJoystickCommand() : CommandBase("DriveJoystickCommand") {
 	printf("DriveJoystickCommand: constructor\n");
 	Requires(driveSubsystem.get());
 }

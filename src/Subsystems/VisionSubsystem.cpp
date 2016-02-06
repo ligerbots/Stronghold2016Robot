@@ -2,7 +2,9 @@
 
 VisionSubsystem::VisionSubsystem() :
 		Subsystem("VisionSubsystem"), exposure("VisionSubsystem_exposure"), runVision(
-				"VisionSubsystem_runProcessing"), frameCenterX(0) {
+				"VisionSubsystem_runProcessing"), frameCenterXParam(
+						"VisionSubsystem_frameCenterX", false), frameCenterX(0) {
+	ledRingSpike.reset(new Relay(RobotMap::LED_RING_SPIKE));
 }
 
 void VisionSubsystem::InitDefaultCommand() {
@@ -13,6 +15,18 @@ void VisionSubsystem::camerasOn() {
 	printf("VisionSubsystem: camerasOn\n");
 	Camera::EnumerateCameras();
 	Camera::EnableCameras();
+}
+
+bool VisionSubsystem::isLedRingOn() {
+	return ledRingSpike->Get() != Relay::kOff;
+}
+
+void VisionSubsystem::setLedRingOn(bool on) {
+	if (on) {
+		ledRingSpike->Set(Relay::kForward);
+	} else {
+		ledRingSpike->Set(Relay::kOff);
+	}
 }
 
 void VisionSubsystem::updateVision(int ticks) {
@@ -44,6 +58,8 @@ void VisionSubsystem::updateVision(int ticks) {
 	} else {
 		frameCenterX = NAN;
 	}
+
+	frameCenterXParam = frameCenterX;
 
 	LCameraServer::GetInstance()->SetImage(image);
 }

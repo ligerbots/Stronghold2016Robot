@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Subsystems/DriveTrain.h>
+#include <Subsystems/DriveSubsystem.h>
 #include <Subsystems/VisionSubsystem.h>
 
 /**
@@ -16,6 +16,11 @@ public:
 	static void init();
 
 	// all subsystems
-	static std::unique_ptr<DriveTrain> driveSubsystem;
+	static std::unique_ptr<DriveSubsystem> driveSubsystem;
 	static std::unique_ptr<VisionSubsystem> visionSubsystem;
+
+	// all commands
+	static std::unique_ptr<Command> driveJoystickCommand;
+	static std::unique_ptr<Command> ledOnCommand;
+	static std::unique_ptr<Command> ledOffCommand;
 };

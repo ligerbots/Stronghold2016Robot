@@ -20,8 +20,9 @@
 template<typename Parameter_Type> class Parameter: public IParameter {
 protected:
 	std::string key;
+	bool persist;
 	Parameter_Type value;
-	void initialize(std::string key) {
+	void initialize(std::string key, bool persist) {
 		printf(("Initializing new parameter for " + key + "\n").c_str());
 		this->key = key;
 		// initialize preferences
@@ -35,15 +36,15 @@ protected:
 	}
 public:
 	Parameter();
-	explicit Parameter(std::string key) :
-			key(key) {
+	explicit Parameter(std::string key, bool persist = true) :
+			key(key), persist(persist) {
 		printf(("Constructing a new Parameter with key " + key + "\n").c_str());
-		initialize(key);
+		initialize(key, persist);
 	}
 
 	explicit Parameter(const Parameter& copyFrom) :
-			key(copyFrom.key) {
-		initialize(key);
+			key(copyFrom.key), persist(copyFrom.persist) {
+		initialize(key, persist);
 	}
 
 	virtual ~Parameter() {
