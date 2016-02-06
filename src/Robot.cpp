@@ -47,6 +47,8 @@ void Robot::AlwaysPeriodic() {
 	// other stuff
 	CommandBase::visionSubsystem->updateVision(ticks);
 
+	CommandBase::navXSubsystem->sendValuesToSmartDashboard();
+
 	if (mp_operatorInterface->joystickButtonPressed(
 			mp_operatorInterface->pXboxController, 3)) {
 		printf("Joystick 0:\n");
