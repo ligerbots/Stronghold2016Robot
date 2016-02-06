@@ -14,6 +14,8 @@ protected:
 public:
 	static std::string TABLE_NAME;
 	static std::shared_ptr<NetworkTable> NETWORK_TABLE;
+	static std::string SMARTDASHBOARD_TABLE_NAME;
+	static std::shared_ptr<NetworkTable> SMARTDASHBOARD_NETWORK_TABLE;
 
 	NTUpdater();
 	virtual ~NTUpdater();

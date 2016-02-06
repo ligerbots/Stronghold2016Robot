@@ -14,7 +14,8 @@ Robot::~Robot() {
 
 void Robot::RobotInit() {
 	CommandBase::init();
-	mp_driveJoystickCommand.reset(new DriveJoystickCommand());
+
+	mp_operatorInterface->registerCommands();
 
 	CommandBase::visionSubsystem->camerasOn();
 
@@ -29,7 +30,7 @@ void Robot::RobotInit() {
 
 		uint8_t bytes[30 * 3 + 2];
 		bytes[0] = 0;
-		for(int j = 1; j < 30 * 3 + 1; j += 3){
+		for (int j = 1; j < 30 * 3 + 1; j += 3) {
 			bytes[j] = j * 2;
 			bytes[j + 1] = j * 2;
 			bytes[j + 2] = j * 2;
@@ -45,6 +46,22 @@ void Robot::AlwaysPeriodic() {
 
 	// other stuff
 	CommandBase::visionSubsystem->updateVision(ticks);
+
+	if (mp_operatorInterface->joystickButtonPressed(
+			mp_operatorInterface->pXboxController, 3)) {
+		printf("Joystick 0:\n");
+		printf("\tName: %s\n",
+				DriverStation::GetInstance().GetJoystickName(0).c_str());
+		printf("\tType: %d\n", DriverStation::GetInstance().GetJoystickType(0));
+		printf("\tIsXbox: %d\n",
+				DriverStation::GetInstance().GetJoystickIsXbox(0));
+		printf("Joystick 1:\n");
+		printf("\tName: %s\n",
+				DriverStation::GetInstance().GetJoystickName(1).c_str());
+		printf("\tType: %d\n", DriverStation::GetInstance().GetJoystickType(1));
+		printf("\tIsXbox: %d\n",
+				DriverStation::GetInstance().GetJoystickIsXbox(1));
+	}
 }
 
 void Robot::DisabledInit() {
@@ -64,7 +81,7 @@ void Robot::AutonomousInit() {
 	 } */
 	printf("Robot: AutononmousInit\n");
 
-	mp_driveJoystickCommand->Cancel();
+	CommandBase::driveJoystickCommand->Cancel();
 }
 
 void Robot::AutonomousPeriodic() {
@@ -78,7 +95,7 @@ void Robot::TeleopInit() {
 	// teleop starts running. If you want the autonomous to
 	// continue until interrupted by another command, remove
 	// this line or comment it out.
-	mp_driveJoystickCommand->Start();
+	CommandBase::driveJoystickCommand->Start();
 }
 
 void Robot::TeleopPeriodic() {

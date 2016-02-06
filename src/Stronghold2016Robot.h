@@ -20,8 +20,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "CommandBase.h"
-#include "Commands/DriveJoystickCommand.h"
+#include "Commands/DriveTrain/DriveJoystickCommand.h"
 #include "Commands/ExampleCommand.h"
+#include "Commands/VisionSubsystem/ToggleLedCommand.h"
 #include "Includes.h"
 #include "OI.h"
 #include "Robot.h"

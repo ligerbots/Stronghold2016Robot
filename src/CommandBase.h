@@ -18,4 +18,9 @@ public:
 	// all subsystems
 	static std::unique_ptr<DriveTrain> driveSubsystem;
 	static std::unique_ptr<VisionSubsystem> visionSubsystem;
+
+	// all commands
+	static std::unique_ptr<Command> driveJoystickCommand;
+	static std::unique_ptr<Command> ledOnCommand;
+	static std::unique_ptr<Command> ledOffCommand;
 };
