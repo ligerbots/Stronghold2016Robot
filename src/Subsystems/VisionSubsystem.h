@@ -7,12 +7,19 @@
 class VisionSubsystem: public Subsystem, public PIDSource {
 private:
 	Parameter<int> exposure;
-	Parameter<bool> runVision;
+	Parameter<bool> showVision;
+
+	std::thread m_processingThread;
+	std::mutex m_frameMutex;
+	Image* mp_currentFrame;
+	Image* mp_processingFrame;
 
 	double frameCenterX;
 
 	// managed hardware object
 	std::unique_ptr<Relay> ledRingSpike;
+
+	void visionProcessingThread();
 
 public:
 	// Subsystem

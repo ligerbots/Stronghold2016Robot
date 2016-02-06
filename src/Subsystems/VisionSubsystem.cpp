@@ -1,8 +1,11 @@
 #include <Stronghold2016Robot.h>
 
 VisionSubsystem::VisionSubsystem() :
-		Subsystem("VisionSubsystem"), exposure("VisionSubsystem_exposure"), runVision(
-				"VisionSubsystem_runProcessing"), frameCenterX(0) {
+		Subsystem("VisionSubsystem"), exposure("VisionSubsystem_exposure"), showVision(
+				"VisionSubsystem_showProcessing"), m_processingThread(
+				&VisionSubsystem::visionProcessingThread, this), frameCenterX(0) {
+	mp_currentFrame = NULL;
+	mp_processingFrame = NULL;
 }
 
 void VisionSubsystem::InitDefaultCommand() {
@@ -24,28 +27,61 @@ void VisionSubsystem::updateVision(int ticks) {
 		return;
 
 	Camera::GetCamera(0)->SetExposure(exposure.get());
-	Camera::Feed(ticks);
 
-	Image* image = Camera::GetCamera(0)->GetStoredFrame();
-
-	if (runVision.get()) {
-		IVA_ProcessImage(image);
-
-		int numParticles;
-		bool needsConnection = true;
-		imaqCountParticles(image, needsConnection, &numParticles);
-		if (numParticles != 0) {
-			imaqMeasureParticle(image, 0, false, IMAQ_MT_CENTER_OF_MASS_X,
-					&frameCenterX);
-		} else {
-			// TODO: make sure that in pid commands you stop if it's 0
-			frameCenterX = NAN;
-		}
-	} else {
-		frameCenterX = NAN;
+	Image* image = NULL;
+	{
+		std::lock_guard<std::mutex> lock(m_frameMutex);
+		Camera::Feed(ticks);
+		image = Camera::GetCamera(0)->GetStoredFrame();
+		mp_processingFrame = image;
 	}
 
-	LCameraServer::GetInstance()->SetImage(image);
+	if (!showVision.get() && image != NULL)
+		LCameraServer::GetInstance()->SetImage(image);
+}
+
+void VisionSubsystem::visionProcessingThread() {
+	printf("VisionSubsystem: Processing thread start\n");
+	while (true) {
+		if (mp_currentFrame == NULL) {
+			// wait for first frame
+			usleep(34000); // 34 ms
+			continue;
+		}
+		if (mp_processingFrame == NULL) {
+			// create our processing frame
+			mp_processingFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
+		}
+
+		{
+			std::lock_guard<std::mutex> lock(m_frameMutex);
+			Rect rect;
+			rect.top = 0;
+			rect.left = 0;
+			imaqGetImageSize(mp_currentFrame, &rect.width, &rect.height);
+			Point pt;
+			pt.x = 0;
+			pt.y = 0;
+			imaqCopyRect(mp_processingFrame, mp_currentFrame, rect, pt);
+		}
+
+		//IVA_ProcessImage (mp_processingFrame); // run vision script
+
+//		int numParticles;
+//		bool needsConnection = true;
+//		imaqCountParticles(mp_processingFrame, needsConnection, &numParticles);
+//		if (numParticles != 0) {
+//			imaqMeasureParticle(mp_processingFrame, 0, false,
+//					IMAQ_MT_CENTER_OF_MASS_X, &frameCenterX);
+//		} else {
+//			// TODO: make sure that in pid commands you stop if it's NAN
+//			frameCenterX = NAN;
+//		}
+
+		if(showVision.get()){
+			LCameraServer::GetInstance()->SetImage(mp_processingFrame);
+		}
+	}
 }
 
 void VisionSubsystem::SetPIDSourceType(PIDSourceType pidSource) {
