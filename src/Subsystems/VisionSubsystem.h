@@ -9,7 +9,6 @@ private:
 	Parameter<int> exposure;
 	Parameter<bool> showVision;
 
-	std::thread m_processingThread;
 	std::mutex m_frameMutex;
 	Image* mp_currentFrame;
 	Image* mp_processingFrame;
@@ -19,6 +18,8 @@ private:
 
 	// managed hardware object
 	std::unique_ptr<Relay> ledRingSpike;
+
+	std::thread m_processingThread;
 
 	void visionProcessingThread();
 

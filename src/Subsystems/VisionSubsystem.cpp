@@ -2,11 +2,10 @@
 
 VisionSubsystem::VisionSubsystem() :
 		Subsystem("VisionSubsystem"), exposure("VisionSubsystem_exposure"), showVision(
-				"VisionSubsystem_showProcessing"), m_processingThread(
-				&VisionSubsystem::visionProcessingThread, this), frameCenterX(
-				0), frameCenterXParam("VisionSubsystem_frameCenterX", false) {
-	mp_currentFrame = NULL;
-	mp_processingFrame = NULL;
+				"VisionSubsystem_showProcessing"), mp_currentFrame(NULL), mp_processingFrame(
+				NULL), frameCenterX(0), frameCenterXParam(
+				"VisionSubsystem_frameCenterX", false), m_processingThread(
+				&VisionSubsystem::visionProcessingThread, this) {
 	ledRingSpike.reset(new Relay(RobotMap::LED_RING_SPIKE));
 }
 
@@ -47,7 +46,7 @@ void VisionSubsystem::updateVision(int ticks) {
 		std::lock_guard<std::mutex> lock(m_frameMutex);
 		Camera::Feed(ticks);
 		image = Camera::GetCamera(0)->GetStoredFrame();
-		mp_processingFrame = image;
+		mp_currentFrame = image;
 	}
 	if (!showVision.get() && image != NULL)
 		LCameraServer::GetInstance()->SetImage(image);
@@ -58,20 +57,30 @@ void VisionSubsystem::visionProcessingThread() {
 	while (true) {
 		if (mp_currentFrame == NULL) {
 			// wait for first frame
+			printf("VisionSubsystem: waiting for first frame\n");
 			usleep(34000); // 34 ms
 			continue;
 		}
 		if (mp_processingFrame == NULL) {
 			// create our processing frame
+			printf("VisionSubsystem: Creating second Image*\n");
 			mp_processingFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
 		}
 
 		{
+			printf(
+					"VisionSubsystem: Copying current frame to processing frame\n");
 			std::lock_guard<std::mutex> lock(m_frameMutex);
 			Rect rect;
 			rect.top = 0;
 			rect.left = 0;
-			imaqGetImageSize(mp_currentFrame, &rect.width, &rect.height);
+			int width;
+			int height;
+			imaqGetImageSize(mp_currentFrame, &width, &height);
+			rect.width = width;
+			rect.height = height;
+			printf("VisionSubsystem: bounding rectangle %d %d %d %d\n",
+					rect.top, rect.left, rect.width, rect.height);
 			Point pt;
 			pt.x = 0;
 			pt.y = 0;
@@ -90,7 +99,7 @@ void VisionSubsystem::visionProcessingThread() {
 //			// TODO: make sure that in pid commands you stop if it's NAN
 //			frameCenterX = NAN;
 //		}
-//	frameCenterXParam = frameCenterX;
+//		frameCenterXParam = frameCenterX;
 
 		if (showVision.get()) {
 			LCameraServer::GetInstance()->SetImage(mp_processingFrame);
