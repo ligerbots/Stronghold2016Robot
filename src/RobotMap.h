@@ -21,6 +21,9 @@
 
 class RobotMap {
 public:
+
+	static constexpr double TICKS_PER_SECOND = 50.0;
+
 	static constexpr int LED_RING_SPIKE = 0;
 
 	// left = 1, 3, 5

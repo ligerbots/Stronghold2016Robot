@@ -35,7 +35,7 @@ and add
     * Internally keeps track of JoystickButton instances. Use this to attach commands to joystick buttons in OI
 
 * `Parameter<type>`
-    * Wrapper around WPILib preferences that automatically sends and receives updates. Use like a normal variable of the type
+    * Wrapper around WPILib preferences that automatically sends and receives updates. Use like a normal variable of the type. The second constructor parameter is true to make it a Preference (default) or false to make it a normal SmartDashboard value (not saved on rio memory)
 
 * Stronghold2016Robot.h and Includes.h
     * In cpp files, use `#include <Stronghold2016Robot.h>` at the top of the file (before comments)
@@ -53,6 +53,7 @@ and add
 
 - `undefined reference to <class member>` The static member is in your header file but you forgot to define it in your cpp file
 - `undefined reference to vtable for <class>` There are virtual methods in that class or one of its superclasses that aren't pure (` = 0`) and aren't implemented. Add a body or make them pure.
+- `Duplicate definition of <xyz>` There are stray .o files, do a build clean
 
 ### Compiler ###
 

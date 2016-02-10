@@ -8,7 +8,6 @@ VisionSubsystem::VisionSubsystem() :
 }
 
 void VisionSubsystem::InitDefaultCommand() {
-	// TODO: led toggle command
 }
 
 void VisionSubsystem::camerasOn() {
