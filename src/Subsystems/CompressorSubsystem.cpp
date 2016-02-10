@@ -2,7 +2,7 @@
 
 CompressorSubsystem::CompressorSubsystem() :
 		Subsystem("Compressor") {
-	mp_compressor.reset(new Compressor(RobotMap::PCM_COMPRESSOR));
+	mp_compressor.reset(new Compressor(RobotMap::PCM_CAN));
 }
 
 void CompressorSubsystem::InitDefaultCommand() {

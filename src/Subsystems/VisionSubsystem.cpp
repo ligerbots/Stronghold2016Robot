@@ -4,7 +4,7 @@ VisionSubsystem::VisionSubsystem() :
 		Subsystem("VisionSubsystem"), exposure("VisionSubsystem_exposure"), runVision(
 				"VisionSubsystem_runProcessing"), frameCenterXParam(
 						"VisionSubsystem_frameCenterX", false), frameCenterX(0) {
-	ledRingSpike.reset(new Relay(RobotMap::LED_RING_SPIKE));
+	ledRingSpike.reset(new Relay(RobotMap::RELAY_LED_RING_SPIKE));
 }
 
 void VisionSubsystem::InitDefaultCommand() {
