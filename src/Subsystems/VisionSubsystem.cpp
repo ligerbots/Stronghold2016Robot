@@ -6,11 +6,10 @@ VisionSubsystem::VisionSubsystem() :
 				NULL), frameCenterX(0), frameCenterXParam(
 				"VisionSubsystem_frameCenterX", false), m_processingThread(
 				&VisionSubsystem::visionProcessingThread, this) {
-	ledRingSpike.reset(new Relay(RobotMap::LED_RING_SPIKE));
+	ledRingSpike.reset(new Relay(RobotMap::RELAY_LED_RING_SPIKE));
 }
 
 void VisionSubsystem::InitDefaultCommand() {
-	// TODO: led toggle command
 }
 
 void VisionSubsystem::camerasOn() {

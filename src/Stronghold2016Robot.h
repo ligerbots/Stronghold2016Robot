@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "CommandBase.h"
+#include "Commands/DelayCommand.h"
 #include "Commands/DriveJoystickCommand.h"
 #include "Commands/ExampleCommand.h"
 #include "Commands/ToggleLedCommand.h"
@@ -28,6 +29,7 @@
 #include "Robot.h"
 #include "RobotMap.h"
 #include "Subsystems/CompressorSubsystem.h"
+#include "Subsystems/Delay.h"
 #include "Subsystems/DriveSubsystem.h"
 #include "Subsystems/ExampleSubsystem.h"
 #include "Subsystems/IntakeSubsystem.h"

@@ -6,8 +6,9 @@
 class ShooterSubsystem: public Subsystem
 {
 private:
-	// It's desirable that everything possible under private except
-	// for methods that implement subsystem capabilities
+	std::unique_ptr<DoubleSolenoid> mp_shooterSolenoid;
+	std::unique_ptr<Servo> mp_leftFlap;
+	std::unique_ptr<Servo> mp_rightFlap;
 public:
 	ShooterSubsystem();
 	void InitDefaultCommand();
@@ -15,5 +16,4 @@ public:
 	void flapUp();
 	void flapDown();
 	void varyFlaps(int leftDirection, int rightDirection);
-
 };

@@ -6,8 +6,10 @@
 class IntakeSubsystem: public Subsystem
 {
 private:
-	// It's desirable that everything possible under private except
-	// for methods that implement subsystem capabilities
+	std::unique_ptr<DoubleSolenoid> mp_intakeArmSolenoid;
+	std::unique_ptr<CANTalon> mp_rollers;
+	std::unique_ptr<DigitalInput> mp_intakeUpSwitch;
+	std::unique_ptr<DigitalInput> mp_intakeDownSwitch;
 public:
 	IntakeSubsystem();
 	void InitDefaultCommand();

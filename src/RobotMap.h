@@ -21,7 +21,12 @@
 
 class RobotMap {
 public:
-	static constexpr int LED_RING_SPIKE = 0;
+
+	static constexpr double TICKS_PER_SECOND = 50.0;
+
+	static constexpr int RELAY_LED_RING_SPIKE = 0;
+
+	static constexpr int PDP_CAN = 0;
 
 	// left = 1, 3, 5
 	// right = 2, 4, 6
@@ -32,5 +37,21 @@ public:
 	static constexpr int CT_DRIVE_RIGHT2 = 4;
 	static constexpr int CT_DRIVE_RIGHT3 = 6;
 
-	static constexpr int PCM_COMPRESSOR = 7;
+	static constexpr int PCM_CAN = 7;
+
+	static constexpr int CT_INTAKE_ROLLER = 8;
+
+
+	static constexpr int PCM_SHIFTER_LOW_GEAR = 0;
+	static constexpr int PCM_SHIFTER_HIGH_GEAR = 1;
+	static constexpr int PCM_SHOOTER_FIRE = 2;
+	static constexpr int PCM_SHOOTER_RETRACT = 3;
+	static constexpr int PCM_INTAKE_UP = 4;
+	static constexpr int PCM_INTAKE_DOWN = 5;
+	static constexpr int PCM_WEDGES_UP = 6;
+	static constexpr int PCM_WEDGES_DOWN = 7;
+
+	static constexpr int LIMIT_SWITCH_INTAKE_UP = 0;
+	static constexpr int LIMIT_SWITCH_INTAKE_DOWN = 1;
+	static constexpr int LIMIT_SWITCH_WEGDE_DOWN = 2;
 };

@@ -3,6 +3,8 @@
 DriveSubsystem::DriveSubsystem() :
 		Subsystem("DriveSubsystem") {
 	printf("DriveSubsystem: initialize\n");
+	// create all the CANTalon objects we need
+	// we'll check if we can use them later
 	printf("\tMaster talons\n");
 	mp_left1.reset(new CANTalon(RobotMap::CT_DRIVE_LEFT1));
 	mp_right1.reset(new CANTalon(RobotMap::CT_DRIVE_RIGHT1));
@@ -13,6 +15,7 @@ DriveSubsystem::DriveSubsystem() :
 	mp_left3.reset(new CANTalon(RobotMap::CT_DRIVE_LEFT3));
 	mp_right3.reset(new CANTalon(RobotMap::CT_DRIVE_RIGHT3));
 
+	// these arrays depend on the CAN IDs being 1-6
 	CANTalon* talonPtrs[7];
 	talonPtrs[RobotMap::CT_DRIVE_LEFT1] = mp_left1.get();
 	talonPtrs[RobotMap::CT_DRIVE_LEFT2] = mp_left2.get();
@@ -21,6 +24,7 @@ DriveSubsystem::DriveSubsystem() :
 	talonPtrs[RobotMap::CT_DRIVE_RIGHT2] = mp_right2.get();
 	talonPtrs[RobotMap::CT_DRIVE_RIGHT3] = mp_right3.get();
 
+	// check if all the talons are present by trying to get output voltage
 	bool talonsPresent[7];
 	talonsPresent[RobotMap::CT_DRIVE_LEFT1] = IsTalonPresent(*mp_left1);
 	talonsPresent[RobotMap::CT_DRIVE_LEFT2] = IsTalonPresent(*mp_left2);
@@ -45,6 +49,7 @@ DriveSubsystem::DriveSubsystem() :
 	int slave2Left;
 	int slave2Right;
 
+	// find which talons are present and can be used as master talons
 	if (talonsPresent[RobotMap::CT_DRIVE_LEFT1]) {
 		masterLeft = RobotMap::CT_DRIVE_LEFT1;
 		slave1Left = RobotMap::CT_DRIVE_LEFT2;
@@ -82,6 +87,7 @@ DriveSubsystem::DriveSubsystem() :
 	TalonMasterInit(*(talonPtrs[masterLeft]));
 	TalonMasterInit(*(talonPtrs[masterRight]));
 
+	// set the other talons to slave talons
 	if (talonsPresent[slave1Left]) {
 		TalonSlaveInit(*(talonPtrs[slave1Left]), masterLeft);
 	}
@@ -95,11 +101,14 @@ DriveSubsystem::DriveSubsystem() :
 		TalonSlaveInit(*(talonPtrs[slave2Right]), masterRight);
 	}
 
+	// the object that actually handles setting talons from Arcade Drive input
 	mp_robotDrive.reset(new RobotDrive(masterLeft, masterRight));
 	mp_robotDrive->SetSafetyEnabled(false);
 	mp_robotDrive->SetExpiration(0.1);
 	mp_robotDrive->SetSensitivity(0.5);
 	mp_robotDrive->SetMaxOutput(1);
+
+	// TODO: initialize mp_shifterSolenoid here
 }
 
 DriveSubsystem::~DriveSubsystem() {
@@ -118,6 +127,30 @@ void DriveSubsystem::drive(double y, double x) {
 	mp_robotDrive->ArcadeDrive(y, x);
 }
 
+double DriveSubsystem::getLeftEncoderPosition(){
+	if(IsEncoderPresent(*mp_left1)){
+		return mp_left1->GetPosition();
+	} else if(IsEncoderPresent(*mp_left2)){
+		return mp_left2->GetPosition();
+	} else if(IsEncoderPresent(*mp_left3)){
+		return mp_left3->GetPosition();
+	} else {
+		return NAN;
+	}
+}
+
+double DriveSubsystem::getRightEncoderPosition(){
+	if(IsEncoderPresent(*mp_right1)){
+		return mp_right1->GetPosition();
+	} else if(IsEncoderPresent(*mp_right2)){
+		return mp_right2->GetPosition();
+	} else if(IsEncoderPresent(*mp_right3)){
+		return mp_right3->GetPosition();
+	} else {
+		return NAN;
+	}
+}
+
 void DriveSubsystem::TalonMasterInit(CANTalon& r_talon) {
 	r_talon.SetControlMode(CANTalon::kPercentVbus);
 }
@@ -130,5 +163,11 @@ void DriveSubsystem::TalonSlaveInit(CANTalon& r_slaveTalon, int masterId) {
 
 bool DriveSubsystem::IsTalonPresent(CANTalon& r_talon) {
 	r_talon.GetOutputVoltage();
+	return r_talon.GetError().GetCode() == 0;
+}
+
+bool DriveSubsystem::IsEncoderPresent(CANTalon& r_talon){
+	r_talon.ClearError();
+	r_talon.GetPosition();
 	return r_talon.GetError().GetCode() == 0;
 }
