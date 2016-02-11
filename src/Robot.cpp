@@ -48,6 +48,7 @@ void Robot::AlwaysPeriodic() {
 	CommandBase::visionSubsystem->updateVision(ticks);
 
 	CommandBase::navXSubsystem->sendValuesToSmartDashboard();
+	CommandBase::driveSubsystem->sendValuesToSmartDashboard();
 
 	if (mp_operatorInterface->joystickButtonPressed(
 			mp_operatorInterface->pXboxController, 3)) {
