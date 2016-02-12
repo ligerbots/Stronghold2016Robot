@@ -56,7 +56,6 @@ void VisionSubsystem::visionProcessingThread() {
 
 	timeval startTime;
 	timeval endTime;
-
 	while (true) {
 		if (mp_currentFrame == NULL) {
 			// wait for first frame
