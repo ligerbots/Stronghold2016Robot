@@ -19,9 +19,13 @@ and add
     #include <string.h>
     #include <stdlib.h>
     #include <stdio.h>
-    #pragma GCC diagnostic ignore "-Wformat-zero-length"
-    #pragma GCC diagnostic ignore "-Wunused-but-set-variable"
+    #pragma GCC diagnostic ignored "-Wformat-zero-length"
+    #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
     #define BOOL int
+
+then in the .h file remove
+
+    #include <nimachinevision.h>
 
 ---
 
