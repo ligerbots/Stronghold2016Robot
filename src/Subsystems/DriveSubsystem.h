@@ -16,6 +16,9 @@ private:
 
 	std::unique_ptr<DoubleSolenoid> mp_shifterSolenoid;
 
+	CANTalon* talonPtrs[7];
+	bool talonsPresent[7];
+
 protected:
 	/**
 	 * Initialize a talon as a master
@@ -54,4 +57,6 @@ public:
 	void shiftDown();
 	double getLeftEncoderPosition();
 	double getRightEncoderPosition();
+
+	void sendValuesToSmartDashboard();
 };

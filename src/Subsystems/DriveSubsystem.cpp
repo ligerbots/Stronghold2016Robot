@@ -16,7 +16,6 @@ DriveSubsystem::DriveSubsystem() :
 	mp_right3.reset(new CANTalon(RobotMap::CT_DRIVE_RIGHT3));
 
 	// these arrays depend on the CAN IDs being 1-6
-	CANTalon* talonPtrs[7];
 	talonPtrs[RobotMap::CT_DRIVE_LEFT1] = mp_left1.get();
 	talonPtrs[RobotMap::CT_DRIVE_LEFT2] = mp_left2.get();
 	talonPtrs[RobotMap::CT_DRIVE_LEFT3] = mp_left3.get();
@@ -25,7 +24,6 @@ DriveSubsystem::DriveSubsystem() :
 	talonPtrs[RobotMap::CT_DRIVE_RIGHT3] = mp_right3.get();
 
 	// check if all the talons are present by trying to get output voltage
-	bool talonsPresent[7];
 	talonsPresent[RobotMap::CT_DRIVE_LEFT1] = IsTalonPresent(*mp_left1);
 	talonsPresent[RobotMap::CT_DRIVE_LEFT2] = IsTalonPresent(*mp_left2);
 	talonsPresent[RobotMap::CT_DRIVE_LEFT3] = IsTalonPresent(*mp_left3);
@@ -127,24 +125,24 @@ void DriveSubsystem::drive(double y, double x) {
 	mp_robotDrive->ArcadeDrive(y, x);
 }
 
-double DriveSubsystem::getLeftEncoderPosition(){
-	if(IsEncoderPresent(*mp_left1)){
+double DriveSubsystem::getLeftEncoderPosition() {
+	if (IsEncoderPresent(*mp_left1)) {
 		return mp_left1->GetPosition();
-	} else if(IsEncoderPresent(*mp_left2)){
+	} else if (IsEncoderPresent(*mp_left2)) {
 		return mp_left2->GetPosition();
-	} else if(IsEncoderPresent(*mp_left3)){
+	} else if (IsEncoderPresent(*mp_left3)) {
 		return mp_left3->GetPosition();
 	} else {
 		return NAN;
 	}
 }
 
-double DriveSubsystem::getRightEncoderPosition(){
-	if(IsEncoderPresent(*mp_right1)){
+double DriveSubsystem::getRightEncoderPosition() {
+	if (IsEncoderPresent(*mp_right1)) {
 		return mp_right1->GetPosition();
-	} else if(IsEncoderPresent(*mp_right2)){
+	} else if (IsEncoderPresent(*mp_right2)) {
 		return mp_right2->GetPosition();
-	} else if(IsEncoderPresent(*mp_right3)){
+	} else if (IsEncoderPresent(*mp_right3)) {
 		return mp_right3->GetPosition();
 	} else {
 		return NAN;
@@ -166,8 +164,23 @@ bool DriveSubsystem::IsTalonPresent(CANTalon& r_talon) {
 	return r_talon.GetError().GetCode() == 0;
 }
 
-bool DriveSubsystem::IsEncoderPresent(CANTalon& r_talon){
+bool DriveSubsystem::IsEncoderPresent(CANTalon& r_talon) {
 	r_talon.ClearError();
 	r_talon.GetPosition();
 	return r_talon.GetError().GetCode() == 0;
+}
+
+void DriveSubsystem::sendValuesToSmartDashboard() {
+	for (int i = 1; i < 7; i++) {
+		std::string key = "Drive/Talon_";
+		key += std::to_string(i);
+		key += "/";
+		SmartDashboard::PutBoolean(key + "/Status", talonsPresent[i]);
+		// put zero watts if the talon isn't present
+		SmartDashboard::PutNumber(key + "/Watts",
+				talonsPresent[i] ?
+						talonPtrs[i]->GetOutputCurrent()
+								* talonPtrs[i]->GetOutputVoltage() :
+						0);
+	}
 }
