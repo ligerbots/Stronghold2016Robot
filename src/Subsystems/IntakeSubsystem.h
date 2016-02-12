@@ -10,14 +10,19 @@ private:
 	std::unique_ptr<CANTalon> mp_rollers;
 	std::unique_ptr<DigitalInput> mp_intakeUpSwitch;
 	std::unique_ptr<DigitalInput> mp_intakeDownSwitch;
+
+	static constexpr double ROLLER_SPEED = 1;
 public:
 	IntakeSubsystem();
 	void InitDefaultCommand();
 	void rollIn();
 	void rollOut();
-	bool intakeClear();
-	void rollerUp();
-	void rollerDown();
+	void rollStop();
 	double rollerRevolutions();
+	bool isIntakeClear();
+	void intakeArmUp();
+	void intakeArmDown();
 	bool haveBall();
+
+	void sendValuesToSmartDashboard();
 };

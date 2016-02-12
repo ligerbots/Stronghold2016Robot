@@ -176,8 +176,11 @@ void DriveSubsystem::sendValuesToSmartDashboard() {
 		key += std::to_string(i);
 		key += "/";
 		SmartDashboard::PutBoolean(key + "/Status", talonsPresent[i]);
+		// put zero watts if the talon isn't present
 		SmartDashboard::PutNumber(key + "/Watts",
-				talonPtrs[i]->GetOutputCurrent()
-						* talonPtrs[i]->GetOutputVoltage());
+				talonsPresent[i] ?
+						talonPtrs[i]->GetOutputCurrent()
+								* talonPtrs[i]->GetOutputVoltage() :
+						0);
 	}
 }

@@ -13,7 +13,7 @@ public:
 	ShooterSubsystem();
 	void InitDefaultCommand();
 	void shoot();
-	void flapUp();
-	void flapDown();
-	void varyFlaps(int leftDirection, int rightDirection);
+
+	void setLeftFlap(double angle);
+	void setRightFlap(double angle);
 };

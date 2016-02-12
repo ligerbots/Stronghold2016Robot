@@ -104,6 +104,9 @@ void Robot::TeleopInit() {
 void Robot::TeleopPeriodic() {
 	AlwaysPeriodic();
 	Scheduler::GetInstance()->Run();
+
+	CommandBase::shooterSubystem->setLeftFlap(SmartDashboard::GetNumber("Shooter_Angle", 0));
+	CommandBase::shooterSubystem->setRightFlap(SmartDashboard::GetNumber("Shooter_Angle", 0));
 }
 
 void Robot::TestPeriodic() {
