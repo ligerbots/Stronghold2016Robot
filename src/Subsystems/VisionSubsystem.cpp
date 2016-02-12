@@ -3,7 +3,7 @@
 VisionSubsystem::VisionSubsystem() :
 		Subsystem("VisionSubsystem"), exposure("VisionSubsystem_exposure"), showVision(
 				"VisionSubsystem_showProcessing"), mp_currentFrame(NULL), mp_processingFrame(
-				NULL), frameCenterX(0), frameCenterXParam(
+		NULL), frameCenterX(0), frameCenterXParam(
 				"VisionSubsystem_frameCenterX", false), m_processingThread(
 				&VisionSubsystem::visionProcessingThread, this) {
 	ledRingSpike.reset(new Relay(RobotMap::RELAY_LED_RING_SPIKE));
@@ -53,10 +53,13 @@ void VisionSubsystem::updateVision(int ticks) {
 
 void VisionSubsystem::visionProcessingThread() {
 	printf("VisionSubsystem: Processing thread start\n");
+
+	timeval startTime;
+	timeval endTime;
+
 	while (true) {
 		if (mp_currentFrame == NULL) {
 			// wait for first frame
-			printf("VisionSubsystem: waiting for first frame\n");
 			usleep(34000); // 34 ms
 			continue;
 		}
@@ -66,9 +69,9 @@ void VisionSubsystem::visionProcessingThread() {
 			mp_processingFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
 		}
 
+		gettimeofday(&startTime, 0);
+
 		{
-			printf(
-					"VisionSubsystem: Copying current frame to processing frame\n");
 			std::lock_guard<std::mutex> lock(m_frameMutex);
 			Rect rect;
 			rect.top = 0;
@@ -76,33 +79,43 @@ void VisionSubsystem::visionProcessingThread() {
 			int width;
 			int height;
 			imaqGetImageSize(mp_currentFrame, &width, &height);
+			imaqSetImageSize(mp_processingFrame, width, height);
+			unsigned int bitDepth;
+			imaqGetBitDepth(mp_currentFrame, &bitDepth);
+			imaqSetBitDepth(mp_processingFrame, bitDepth);
 			rect.width = width;
 			rect.height = height;
-			printf("VisionSubsystem: bounding rectangle %d %d %d %d\n",
-					rect.top, rect.left, rect.width, rect.height);
 			Point pt;
 			pt.x = 0;
 			pt.y = 0;
 			imaqCopyRect(mp_processingFrame, mp_currentFrame, rect, pt);
 		}
 
-		//IVA_ProcessImage (mp_processingFrame); // run vision script
+		IVA_ProcessImage(mp_processingFrame); // run vision script
 
-//		int numParticles;
-//		bool needsConnection = true;
-//		imaqCountParticles(mp_processingFrame, needsConnection, &numParticles);
-//		if (numParticles != 0) {
-//			imaqMeasureParticle(mp_processingFrame, 0, false,
-//					IMAQ_MT_CENTER_OF_MASS_X, &frameCenterX);
-//		} else {
-//			// TODO: make sure that in pid commands you stop if it's NAN
-//			frameCenterX = NAN;
-//		}
-//		frameCenterXParam = frameCenterX;
+		int numParticles;
+		bool needsConnection = true;
+		imaqCountParticles(mp_processingFrame, needsConnection, &numParticles);
+		if (numParticles != 0) {
+			imaqMeasureParticle(mp_processingFrame, 0, false,
+					IMAQ_MT_CENTER_OF_MASS_X, &frameCenterX);
+		} else {
+			// TODO: make sure that in pid commands you stop if it's NAN
+			frameCenterX = NAN;
+		}
+		frameCenterXParam = frameCenterX;
 
 		if (showVision.get()) {
 			LCameraServer::GetInstance()->SetImage(mp_processingFrame);
 		}
+
+		gettimeofday(&endTime, 0);
+
+		__suseconds_t diff = endTime.tv_usec - startTime.tv_usec;
+		if (diff > -50000)
+			SmartDashboard::PutNumber("Vision_processingTime", diff);
+
+		usleep(33000);
 	}
 }
 
