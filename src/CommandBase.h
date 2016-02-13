@@ -5,6 +5,8 @@
 #include <Subsystems/NavXSubsystem.h>
 #include <Subsystems/Delay.h>
 #include <Subsystems/ShooterSubsystem.h>
+#include <Subsystems/PDPSubsystem.h>
+#include <Subsystems/CompressorSubsystem.h>
 
 /**
  * The base for all commands. All atomic commands should subclass CommandBase.
@@ -24,6 +26,8 @@ public:
 	static std::unique_ptr<NavXSubsystem> navXSubsystem;
 	static std::unique_ptr<Delay> delaySubsystem;
 	static std::unique_ptr<ShooterSubsystem> shooterSubystem;
+	static std::unique_ptr<PDPSubsystem> pdpSubystem;
+	static std::unique_ptr<CompressorSubsystem> compressorSubystem;
 
 	// all commands
 	static std::unique_ptr<Command> driveJoystickCommand;

@@ -22,6 +22,8 @@ void Robot::RobotInit() {
 	mp_autonomousModeChooser->AddDefault("Default Auto", new ExampleCommand());
 	SmartDashboard::PutData("Auto Modes", mp_autonomousModeChooser);
 
+	CommandBase::compressorSubystem->SetCompressor(true);
+
 	printf("Writing i2c\n");
 	for (int i = 3; i < 4; i++) {
 		I2C i2c(I2C::kOnboard, i);
@@ -49,6 +51,12 @@ void Robot::AlwaysPeriodic() {
 
 	CommandBase::navXSubsystem->sendValuesToSmartDashboard();
 	CommandBase::driveSubsystem->sendValuesToSmartDashboard();
+	CommandBase::pdpSubystem->sendValuesToSmartDashboard();
+
+	if (mp_operatorInterface->joystickButtonPressed(
+				mp_operatorInterface->pXboxController, 4)){
+		CommandBase::compressorSubystem->SetCompressor(!CommandBase::compressorSubystem->IsCompressorOn());
+	}
 
 	if (mp_operatorInterface->joystickButtonPressed(
 			mp_operatorInterface->pXboxController, 3)) {

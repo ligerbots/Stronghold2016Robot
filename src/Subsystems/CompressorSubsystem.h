@@ -12,4 +12,6 @@ public:
 	void InitDefaultCommand();
 
 	void SetCompressor(bool on);
+	bool IsCompressorOn();
+	bool IsPressureSwitchTriggered();
 };

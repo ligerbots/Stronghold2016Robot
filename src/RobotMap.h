@@ -56,5 +56,5 @@ public:
 	static constexpr int LIMIT_SWITCH_WEGDE_DOWN = 2;
 
 	static constexpr int PWM_SERVO_SHOOTER_LEFT = 0;
-	static constexpr int PWM_SERVO_SHOOTER_RIGHT = 0;
+	static constexpr int PWM_SERVO_SHOOTER_RIGHT = 1;
 };

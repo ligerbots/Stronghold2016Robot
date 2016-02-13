@@ -21,11 +21,13 @@ private:
 	IMAQdxError imaqError;
 	uInt32 camera;
 	bool firstTime;
+	bool verticalFlip;
 	static bool enabled;
 	static bool overlay;
 
 public:
 	explicit Camera(uInt32 i);
+	void SetVerticalFlip(bool flip);
 	void DumpAttrs();
 	void DumpModes();
 	IMAQdxError SetMode();

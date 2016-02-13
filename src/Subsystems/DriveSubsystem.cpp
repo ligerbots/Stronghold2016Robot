@@ -100,7 +100,8 @@ DriveSubsystem::DriveSubsystem() :
 	}
 
 	// the object that actually handles setting talons from Arcade Drive input
-	mp_robotDrive.reset(new RobotDrive(masterLeft, masterRight));
+	mp_robotDrive.reset(
+			new RobotDrive(talonPtrs[masterLeft], talonPtrs[masterRight]));
 	mp_robotDrive->SetSafetyEnabled(false);
 	mp_robotDrive->SetExpiration(0.1);
 	mp_robotDrive->SetSensitivity(0.5);
@@ -172,15 +173,15 @@ bool DriveSubsystem::IsEncoderPresent(CANTalon& r_talon) {
 
 void DriveSubsystem::sendValuesToSmartDashboard() {
 	for (int i = 1; i < 7; i++) {
-		std::string key = "Drive/Talon_";
+		std::string key = "Drive/Talon";
 		key += std::to_string(i);
 		key += "/";
-		SmartDashboard::PutBoolean(key + "/Status", talonsPresent[i]);
+		SmartDashboard::PutBoolean(key + "Status", talonsPresent[i]);
 		// put zero watts if the talon isn't present
-		SmartDashboard::PutNumber(key + "/Watts",
+		SmartDashboard::PutNumber(key + "Watts",
 				talonsPresent[i] ?
 						talonPtrs[i]->GetOutputCurrent()
 								* talonPtrs[i]->GetOutputVoltage() :
-						0);
+						0.0);
 	}
 }

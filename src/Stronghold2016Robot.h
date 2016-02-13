@@ -35,6 +35,7 @@
 #include "Subsystems/ExampleSubsystem.h"
 #include "Subsystems/IntakeSubsystem.h"
 #include "Subsystems/NavXSubsystem.h"
+#include "Subsystems/PDPSubsystem.h"
 #include "Subsystems/ShooterSubsystem.h"
 #include "Subsystems/SubsystemBase.h"
 #include "Subsystems/VisionSubsystem.h"
