@@ -7,12 +7,12 @@
 
 SmartDashboard 2.0 doesn't like being launched from DriverStation, so following the WPILib screensteps instructions won't work.
 
-1. Put this in `%userprofile%\wpilib\tools\sfx.bat`
+Put this in `%userprofile%\wpilib\tools\sfx.bat`
 
     java -jar "%userprofile%\tools\sfx.jar" "<your workspace path>\Stronghold2016Robot\Dashboard\Stronghold2016.fxsdash"
 
-2. In `C:\Users\Public\Documents\FRC\FRC DS Data Storage.ini` set `DashboardCmdLine` as
+In `C:\Users\Public\Documents\FRC\FRC DS Data Storage.ini` set `DashboardCmdLine` as
 
     DashboardCmdLine = ""<absolute path to your user profile folder>\\wpilib\\tools\\sfx.bat""
 
-Double quotes and double slashes are necessary. Using `%userprofile%` doesn't work.
+Double quotes and double slashes are necessary. Using `%userprofile%` doesn't work (the path has to be absolute or DS won't launch it).
