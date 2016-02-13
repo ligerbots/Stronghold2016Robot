@@ -22,6 +22,8 @@ private:
 	uInt32 camera;
 	bool firstTime;
 	bool verticalFlip;
+	int frameWidth;
+	int frameHeight;
 	static bool enabled;
 	static bool overlay;
 
@@ -33,6 +35,8 @@ public:
 	IMAQdxError SetMode();
 	bool SetVideoMode(unsigned int x, unsigned int y, unsigned int fps, bool useJpeg);
 	void SetExposure(int percent);
+	int GetWidth() const;
+	int GetHeight() const;
 	void DumpExposureSettings();
 	static Camera* GetCamera(int number);
 	static int GetNumberOfCameras();

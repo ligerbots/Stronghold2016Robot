@@ -3,7 +3,6 @@
 #include <Subsystems/DriveSubsystem.h>
 #include <Subsystems/VisionSubsystem.h>
 #include <Subsystems/NavXSubsystem.h>
-#include <Subsystems/Delay.h>
 #include <Subsystems/ShooterSubsystem.h>
 #include <Subsystems/PDPSubsystem.h>
 #include <Subsystems/CompressorSubsystem.h>
@@ -24,7 +23,6 @@ public:
 	static std::unique_ptr<DriveSubsystem> driveSubsystem;
 	static std::unique_ptr<VisionSubsystem> visionSubsystem;
 	static std::unique_ptr<NavXSubsystem> navXSubsystem;
-	static std::unique_ptr<Delay> delaySubsystem;
 	static std::unique_ptr<ShooterSubsystem> shooterSubystem;
 	static std::unique_ptr<PDPSubsystem> pdpSubystem;
 	static std::unique_ptr<CompressorSubsystem> compressorSubystem;

@@ -1,12 +1,11 @@
 #pragma once
 
 #include "WPILib.h"
-#include "../Subsystems/Delay.h"
 
 /**
  * Command for use in chaining that delays for the specified number of seconds
  */
-class DelayCommand: public Command {
+class DelayCommand: public CommandBase {
 public:
 	explicit DelayCommand(double delaySeconds);
 	virtual void Initialize();

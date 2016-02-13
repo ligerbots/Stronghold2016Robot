@@ -26,7 +26,7 @@ arm-frc-linux-gnueabi-g++ -std=c++1y "-I..\\src" "-I%NAVX_LOCATION%" "-I%WPILIB_
 
 rem If it exists, use cppcheck to check code
 IF EXIST "C:\Program Files\Cppcheck\cppcheck.exe" (
-"C:\Program Files\Cppcheck\cppcheck.exe" --enable=warning,style,performance,portability,unusedFunction -I ..\src --inconclusive -rp=..\ -q -v --inline-suppr --template={file}:{line},{severity},{id},{message} ..\src
+"C:\Program Files\Cppcheck\cppcheck.exe" --enable=warning,style,performance,portability,unusedFunction -I ..\src -i ..\src\Vision\ImageProcessing.c --inconclusive -rp=..\ -q -v --inline-suppr --template={file}:{line},{severity},{id},{message} ..\src
 ) ELSE (
 echo No cppcheck, skipping code analysis
 )

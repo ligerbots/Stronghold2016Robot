@@ -1,5 +1,4 @@
-#ifndef PDPSubsystem_H
-#define PDPSubsystem_H
+#pragma once
 
 #include "Commands/Subsystem.h"
 #include "WPILib.h"
@@ -13,5 +12,3 @@ public:
 	void InitDefaultCommand();
 	void sendValuesToSmartDashboard();
 };
-
-#endif

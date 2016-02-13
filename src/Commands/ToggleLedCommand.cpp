@@ -1,6 +1,7 @@
 #include <Stronghold2016Robot.h>
 
-ToggleLedCommand::ToggleLedCommand(bool on) : CommandBase("ToggleLedCommand_" + on) {
+ToggleLedCommand::ToggleLedCommand(bool on) :
+		CommandBase("ToggleLedCommand_" + std::to_string(on)) {
 	Requires(visionSubsystem.get());
 	this->on = on;
 }

@@ -32,6 +32,8 @@ public:
 	bool isLedRingOn();
 	void setLedRingOn(bool on);
 
+	double getFrameCenter();
+
 	// PIDSource
 	void SetPIDSourceType(PIDSourceType pidSource);
 	PIDSourceType GetPIDSourceType() const;

@@ -54,6 +54,8 @@ Camera::Camera(uInt32 i) :
 	frame = NULL;
 	session = ULONG_MAX;
 	verticalFlip = false;
+	frameWidth = 0;
+	frameHeight = 0;
 }
 
 Image* Camera::GetStoredFrame() {
@@ -62,6 +64,14 @@ Image* Camera::GetStoredFrame() {
 
 void Camera::SetVerticalFlip(bool flip){
 	verticalFlip = flip;
+}
+
+int Camera::GetWidth() const {
+	return frameWidth;
+}
+
+int Camera::GetHeight() const {
+	return frameHeight;
 }
 
 void Camera::SetExposure(int percent) {
@@ -453,6 +463,8 @@ IMAQdxError Camera::GetFrame() {
 			imaqGetImageSize(frame, &xRes, &yRes);
 			printf("Camera: first image grab is %d x %d frame=%x\n", xRes, yRes,
 					(unsigned int) frame);
+			frameWidth = xRes;
+			frameHeight = xRes;
 		}
 		firstTime = false;
 		if (verticalFlip) // in imaq, vertical is "horizontal"

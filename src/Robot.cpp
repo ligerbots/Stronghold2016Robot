@@ -19,7 +19,7 @@ void Robot::RobotInit() {
 
 	CommandBase::visionSubsystem->camerasOn();
 
-	mp_autonomousModeChooser->AddDefault("Default Auto", new ExampleCommand());
+//	mp_autonomousModeChooser->AddDefault("Default Auto", new ExampleCommand());
 	SmartDashboard::PutData("Auto Modes", mp_autonomousModeChooser);
 
 	CommandBase::compressorSubystem->SetCompressor(true);

@@ -52,7 +52,7 @@ public:
 	static constexpr int PCM_WEDGES_DOWN = 7;
 
 	static constexpr int LIMIT_SWITCH_INTAKE_UP = 0;
-	static constexpr int LIMIT_SWITCH_INTAKE_DOWN = 1;
+	static constexpr int LIMIT_SWITCH_INTAKE_BALL_IN = 1;
 	static constexpr int LIMIT_SWITCH_WEGDE_DOWN = 2;
 
 	static constexpr int PWM_SERVO_SHOOTER_LEFT = 0;

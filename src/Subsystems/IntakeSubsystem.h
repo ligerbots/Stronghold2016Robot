@@ -9,7 +9,9 @@ private:
 	std::unique_ptr<DoubleSolenoid> mp_intakeArmSolenoid;
 	std::unique_ptr<CANTalon> mp_rollers;
 	std::unique_ptr<DigitalInput> mp_intakeUpSwitch;
-	std::unique_ptr<DigitalInput> mp_intakeDownSwitch;
+	std::unique_ptr<DigitalInput> mp_ballInSwitch;
+
+	bool rollerTalonPresent;
 
 	static constexpr double ROLLER_SPEED = 1;
 public:
@@ -18,11 +20,12 @@ public:
 	void rollIn();
 	void rollOut();
 	void rollStop();
-	double rollerRevolutions();
-	bool isIntakeClear();
-	void intakeArmUp();
-	void intakeArmDown();
-	bool haveBall();
+	double getRollerRevolutions();
+	bool isIntakeArmUp();
+	bool isBallInPosition();
+	bool isIntakeReadyToFire();
+	void setIntakeArmUp();
+	void setIntakeArmDown();
 
 	void sendValuesToSmartDashboard();
 };

@@ -1,7 +1,8 @@
 #include <Stronghold2016Robot.h>
 
 DelayCommand::DelayCommand(double delaySeconds) :
-		m_ticks(0), m_delaySeconds(delaySeconds) {
+		CommandBase("DelayCommand_" + std::to_string(delaySeconds)), m_ticks(0), m_delaySeconds(
+				delaySeconds) {
 //	Requires (delaySubsystem);
 	// why is delaysubsystem necessary?
 }

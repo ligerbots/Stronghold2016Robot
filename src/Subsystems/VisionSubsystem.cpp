@@ -118,6 +118,18 @@ void VisionSubsystem::visionProcessingThread() {
 	}
 }
 
+double VisionSubsystem::getFrameCenter() {
+	if (Camera::GetNumberOfCameras() < 1)
+		return NAN;
+	else {
+		int width = Camera::GetCamera(0)->GetWidth();
+		if (width == 0)
+			return NAN; // no frame captured yet
+		else
+			return width / 2.0;
+	}
+}
+
 void VisionSubsystem::SetPIDSourceType(PIDSourceType pidSource) {
 	// do nothing
 }
@@ -129,3 +141,4 @@ PIDSourceType VisionSubsystem::GetPIDSourceType() const {
 double VisionSubsystem::PIDGet() {
 	return frameCenterX;
 }
+

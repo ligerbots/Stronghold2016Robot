@@ -16,10 +16,21 @@ private:
 
 	std::unique_ptr<DoubleSolenoid> mp_shifterSolenoid;
 
-	CANTalon* talonPtrs[7];
-	bool talonsPresent[7];
+	CANTalon* talonPtrs[7];bool talonsPresent[7];
 
 protected:
+	class DriveTurnPIDOutput: public PIDOutput {
+	protected:
+		DriveSubsystem& mr_parent;
+	public:
+		explicit DriveTurnPIDOutput(DriveSubsystem& r_parent) :
+			mr_parent(r_parent) {
+		}
+		void PIDWrite(float pidOutput) {
+			mr_parent.drive(0, pidOutput); // turn
+		}
+	};
+
 	/**
 	 * Initialize a talon as a master
 	 * @param r_talon The talon
@@ -36,8 +47,8 @@ protected:
 	 * @param r_talon The talon to check
 	 * @return True if the talon is present, false otherwise
 	 */
-	bool IsTalonPresent(CANTalon& r_talon);
-	bool IsEncoderPresent(CANTalon& r_talon);
+	bool IsTalonPresent(CANTalon& r_talon);bool IsEncoderPresent(
+			CANTalon& r_talon);
 
 public:
 	DriveSubsystem();
@@ -57,6 +68,11 @@ public:
 	void shiftDown();
 	double getLeftEncoderPosition();
 	double getRightEncoderPosition();
+
+	/**
+	 * PIDOutput instance to use for turning
+	 */
+	std::shared_ptr<DriveTurnPIDOutput> turnPIDOutput;
 
 	void sendValuesToSmartDashboard();
 };
