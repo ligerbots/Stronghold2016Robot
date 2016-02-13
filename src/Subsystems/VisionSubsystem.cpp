@@ -72,25 +72,27 @@ void VisionSubsystem::visionProcessingThread() {
 
 		{
 			std::lock_guard<std::mutex> lock(m_frameMutex);
-			Rect rect;
-			rect.top = 0;
-			rect.left = 0;
-			int width;
-			int height;
-			imaqGetImageSize(mp_currentFrame, &width, &height);
-			imaqSetImageSize(mp_processingFrame, width, height);
-			unsigned int bitDepth;
-			imaqGetBitDepth(mp_currentFrame, &bitDepth);
-			imaqSetBitDepth(mp_processingFrame, bitDepth);
-			rect.width = width;
-			rect.height = height;
-			Point pt;
-			pt.x = 0;
-			pt.y = 0;
-			imaqCopyRect(mp_processingFrame, mp_currentFrame, rect, pt);
+//			Rect rect;
+//			rect.top = 0;
+//			rect.left = 0;
+//			int width;
+//			int height;
+//			imaqGetImageSize(mp_currentFrame, &width, &height);
+//			imaqSetImageSize(mp_processingFrame, width, height);
+//			unsigned int bitDepth;
+//			imaqGetBitDepth(mp_currentFrame, &bitDepth);
+//			imaqSetBitDepth(mp_processingFrame, bitDepth);
+//			rect.width = width;
+//			rect.height = height;
+//			Point pt;
+//			pt.x = 0;
+//			pt.y = 0;
+//			imaqCopyRect(mp_processingFrame, mp_currentFrame, rect, pt);
+			imaqDuplicate(mp_processingFrame, mp_currentFrame);
 		}
 
-		IVA_ProcessImage(mp_processingFrame); // run vision script
+		int err = IVA_ProcessImage(mp_processingFrame); // run vision script
+		SmartDashboard::PutNumber("VisionSubsystem_imaq_err", err);
 
 		int numParticles;
 		bool needsConnection = true;
@@ -100,7 +102,7 @@ void VisionSubsystem::visionProcessingThread() {
 					IMAQ_MT_CENTER_OF_MASS_X, &frameCenterX);
 		} else {
 			// TODO: make sure that in pid commands you stop if it's NAN
-			frameCenterX = NAN;
+//			frameCenterX = NAN;
 		}
 		frameCenterXParam = frameCenterX;
 
@@ -120,11 +122,11 @@ void VisionSubsystem::visionProcessingThread() {
 
 double VisionSubsystem::getFrameCenter() {
 	if (Camera::GetNumberOfCameras() < 1)
-		return NAN;
+		return 0;
 	else {
 		int width = Camera::GetCamera(0)->GetWidth();
 		if (width == 0)
-			return NAN; // no frame captured yet
+			return 0; // no frame captured yet
 		else
 			return width / 2.0;
 	}
@@ -139,6 +141,6 @@ PIDSourceType VisionSubsystem::GetPIDSourceType() const {
 }
 
 double VisionSubsystem::PIDGet() {
-	return frameCenterX;
+	return frameCenterX / (getFrameCenter() * 2);
 }
 

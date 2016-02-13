@@ -31,4 +31,5 @@ public:
 	static std::unique_ptr<Command> driveJoystickCommand;
 	static std::unique_ptr<Command> ledOnCommand;
 	static std::unique_ptr<Command> ledOffCommand;
+	static std::unique_ptr<Command> centerOnTargetCommand;
 };

@@ -11,6 +11,8 @@ void OI::registerCommands() {
 			CommandBase::ledOnCommand.get());
 	registerButton(pXboxController, 2, PRESSED,
 			CommandBase::ledOffCommand.get());
+	registerButton(pXboxController, 3, PRESSED, CommandBase::centerOnTargetCommand.get());
+
 }
 
 bool OI::joystickButtonPressed(Joystick* pJoystick, int buttonNumber) {

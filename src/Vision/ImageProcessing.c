@@ -83,18 +83,19 @@ int IVA_ProcessImage(Image *image)
 {
 	int success = 1;
     IVA_Data *ivaData;
-    int pKernel[9] = {0,1,0,1,1,1,0,1,0};
-    StructuringElement structElem;
     int pParameter[1] = {20};
     float plower[1] = {50};
     float pUpper[1] = {1500};
     int pCalibrated[1] = {0};
     int pExclude[1] = {0};
+    int pKernel[9] = {0,1,0,1,1,1,0,1,0};
+    StructuringElement structElem;
     int pPixelMeasurements[3] = {26,27,51};
     int *pCalibratedMeasurements = 0;
+    ImageType imageType;
 
     // Initializes internal data (buffers and array of points for caliper measurements)
-    VisionErrChk(ivaData = IVA_InitData(6, 0));
+    VisionErrChk(ivaData = IVA_InitData(7, 0));
 
 	VisionErrChk(IVA_CLRThreshold(image, 104, 136, 119, 255, 35, 155, 
 		IMAQ_HSI));
@@ -104,7 +105,10 @@ int IVA_ProcessImage(Image *image)
     //-------------------------------------------------------------------//
 
     // Fills holes in particles.
-    VisionErrChk(imaqFillHoles(image, image, TRUE));
+    VisionErrChk(imaqFillHoles(image, image, FALSE));
+
+	VisionErrChk(IVA_ParticleFilter(image, pParameter, plower, pUpper, 
+		pCalibrated, pExclude, 1, FALSE, TRUE));
 
     //-------------------------------------------------------------------//
     //                          Basic Morphology                         //
@@ -119,11 +123,16 @@ int IVA_ProcessImage(Image *image)
     // Applies a morphological transformation to the binary image.
     VisionErrChk(imaqMorphology(image, image, IMAQ_DILATE, &structElem));
 
-    VisionErrChk(IVA_ParticleFilter(image, pParameter, plower, pUpper,
-		pCalibrated, pExclude, 1, FALSE, TRUE));
-
-	VisionErrChk(IVA_Particle(image, TRUE, pPixelMeasurements, 3,
+	VisionErrChk(IVA_Particle(image, TRUE, pPixelMeasurements, 3, 
 		pCalibratedMeasurements, 0, ivaData, 5));
+
+    //-------------------------------------------------------------------//
+    //                       Lookup Table: Equalize                      //
+    //-------------------------------------------------------------------//
+    // Calculates the histogram of the image and redistributes pixel values across
+    // the desired range to maintain the same pixel value distribution.
+    VisionErrChk(imaqGetImageType(image, &imageType));
+    VisionErrChk(imaqEqualize(image, image, 0, (imageType == IMAQ_IMAGE_U8 ? 255 : 0), NULL));
 
     // Releases the memory allocated in the IVA_Data structure.
     IVA_DisposeData(ivaData);
@@ -328,7 +337,6 @@ static int IVA_Particle(Image* image,
     VisionErrChk(imaqGetVisionInfoTypes(image, &visionInfo));
 
     // If the image is calibrated, we also need to log the calibrated position (x and y)
-    //cppcheck-suppress clarifyCalculation
     ivaData->stepResults[stepIndex].numResults = (visionInfo & IMAQ_VISIONINFO_CALIBRATION ?
                                                   numParticles * 4 + 1 : numParticles * 2 + 1);
     ivaData->stepResults[stepIndex].results = malloc (sizeof(IVA_Result) * ivaData->stepResults[stepIndex].numResults);

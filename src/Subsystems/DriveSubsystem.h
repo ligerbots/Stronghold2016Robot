@@ -27,6 +27,8 @@ protected:
 			mr_parent(r_parent) {
 		}
 		void PIDWrite(float pidOutput) {
+			printf("TurnPIDOutput %f\n", pidOutput);
+			if(pidOutput > 0.7) pidOutput = 0.7;
 			mr_parent.drive(0, pidOutput); // turn
 		}
 	};

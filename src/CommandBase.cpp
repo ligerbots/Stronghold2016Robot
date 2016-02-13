@@ -10,6 +10,7 @@ std::unique_ptr<CompressorSubsystem> CommandBase::compressorSubystem = NULL;
 std::unique_ptr<Command> CommandBase::driveJoystickCommand = NULL;
 std::unique_ptr<Command> CommandBase::ledOnCommand = NULL;
 std::unique_ptr<Command> CommandBase::ledOffCommand = NULL;
+std::unique_ptr<Command> CommandBase::centerOnTargetCommand = NULL;
 
 CommandBase::CommandBase(const std::string &name) :
 		Command(name) {
@@ -25,9 +26,10 @@ void CommandBase::init() {
 	navXSubsystem.reset(new NavXSubsystem());
 	shooterSubystem.reset(new ShooterSubsystem());
 	pdpSubystem.reset(new PDPSubsystem());
-	compressorSubystem.reset(new CompressorSubsystem());
+//	compressorSubystem.reset(new CompressorSubsystem());
 
 	driveJoystickCommand.reset(new DriveJoystickCommand());
 	ledOnCommand.reset(new ToggleLedCommand(true));
 	ledOffCommand.reset(new ToggleLedCommand(false));
+	centerOnTargetCommand.reset(new CenterOnTargetCommand());
 }
