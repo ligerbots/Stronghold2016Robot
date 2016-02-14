@@ -9,7 +9,7 @@ SmartDashboard 2.0 doesn't like being launched from DriverStation, so following 
 
 Put this in `%userprofile%\wpilib\tools\sfx.bat`
 
-    java -jar "%userprofile%\tools\sfx.jar" "<your workspace path>\Stronghold2016Robot\Dashboard\Stronghold2016.fxsdash"
+    java -jar "%userprofile%\wpilib\tools\sfx.jar" "<your workspace path>\Stronghold2016Robot\Dashboard\Stronghold2016.fxsdash"
 
 In `C:\Users\Public\Documents\FRC\FRC DS Data Storage.ini` set `DashboardCmdLine` as
 
