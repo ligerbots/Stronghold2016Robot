@@ -100,6 +100,30 @@ DriveSubsystem::DriveSubsystem() :
 		TalonSlaveInit(*(talonPtrs[slave2Right]), masterRight);
 	}
 
+	// Figure out where the encoders are
+	// Left
+	if ( IsEncoderPresent(*mp_left1) ) {
+		mp_leftEncoder = mp_left1.get();
+	} else if (IsEncoderPresent(*mp_left2)) {
+		mp_leftEncoder = mp_left2.get();
+	} else if (IsEncoderPresent(*mp_left3)) {
+		mp_leftEncoder = mp_left3.get();
+	} else {
+		printf( "Warning: No left drive encoder found\n" );
+		mp_leftEncoder = NULL;
+	}
+	// Right
+	if ( IsEncoderPresent(*mp_right1) ) {
+		mp_rightEncoder = mp_right1.get();
+	} else if (IsEncoderPresent(*mp_right2)) {
+		mp_rightEncoder = mp_right2.get();
+	} else if (IsEncoderPresent(*mp_right3)) {
+		mp_rightEncoder = mp_right3.get();
+	} else {
+		printf( "Warning: No right drive encoder found\n" );
+		mp_rightEncoder = NULL;
+	}
+
 	// the object that actually handles setting talons from Arcade Drive input
 	mp_robotDrive.reset(
 			new RobotDrive(talonPtrs[masterLeft], talonPtrs[masterRight]));
@@ -128,27 +152,19 @@ void DriveSubsystem::drive(double y, double x) {
 }
 
 double DriveSubsystem::getLeftEncoderPosition() {
-	if (IsEncoderPresent(*mp_left1)) {
-		return mp_left1->GetPosition();
-	} else if (IsEncoderPresent(*mp_left2)) {
-		return mp_left2->GetPosition();
-	} else if (IsEncoderPresent(*mp_left3)) {
-		return mp_left3->GetPosition();
-	} else {
-		return NAN;
+	if ( mp_leftEncoder != NULL ) {
+		double pos = mp_leftEncoder->GetPosition();
+		if ( mp_leftEncoder->GetError().GetCode() == 0 ) return pos;
 	}
+	return NAN;
 }
 
 double DriveSubsystem::getRightEncoderPosition() {
-	if (IsEncoderPresent(*mp_right1)) {
-		return mp_right1->GetPosition();
-	} else if (IsEncoderPresent(*mp_right2)) {
-		return mp_right2->GetPosition();
-	} else if (IsEncoderPresent(*mp_right3)) {
-		return mp_right3->GetPosition();
-	} else {
-		return NAN;
+	if ( mp_rightEncoder != NULL ) {
+		double pos = mp_rightEncoder->GetPosition();
+		if ( mp_rightEncoder->GetError().GetCode() == 0 ) return pos;
 	}
+	return NAN;
 }
 
 void DriveSubsystem::TalonMasterInit(CANTalon& r_talon) {
