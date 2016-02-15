@@ -23,13 +23,15 @@ public:
 	static std::unique_ptr<DriveSubsystem> driveSubsystem;
 	static std::unique_ptr<VisionSubsystem> visionSubsystem;
 	static std::unique_ptr<NavXSubsystem> navXSubsystem;
-	static std::unique_ptr<ShooterSubsystem> shooterSubystem;
-	static std::unique_ptr<PDPSubsystem> pdpSubystem;
-	static std::unique_ptr<CompressorSubsystem> compressorSubystem;
+	static std::unique_ptr<ShooterSubsystem> shooterSubsystem;
+	static std::unique_ptr<PDPSubsystem> pdpSubsystem;
+	static std::unique_ptr<CompressorSubsystem> compressorSubsystem;
 
 	// all commands
 	static std::unique_ptr<Command> driveJoystickCommand;
 	static std::unique_ptr<Command> ledOnCommand;
 	static std::unique_ptr<Command> ledOffCommand;
 	static std::unique_ptr<Command> centerOnTargetCommand;
+	static std::unique_ptr<Command> leftFlapTestCommand;
+
 };

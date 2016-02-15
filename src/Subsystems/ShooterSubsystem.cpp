@@ -18,3 +18,8 @@ void ShooterSubsystem::setLeftFlap(double angle){
 void ShooterSubsystem::setRightFlap(double angle){
 	mp_rightFlap->SetAngle(angle);
 }
+
+void ShooterSubsystem::sendValuesToSmartDashboard(){
+	SmartDashboard::PutNumber("Shooter/LeftFlapAngle", mp_leftFlap->GetAngle());
+	SmartDashboard::PutNumber("Shooter/RightFlapAngle", mp_rightFlap->GetAngle());
+}

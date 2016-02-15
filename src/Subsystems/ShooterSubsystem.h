@@ -13,6 +13,7 @@ public:
 	ShooterSubsystem();
 	void InitDefaultCommand();
 	void shoot();
+	void sendValuesToSmartDashboard();
 
 	void setLeftFlap(double angle);
 	void setRightFlap(double angle);

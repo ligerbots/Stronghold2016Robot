@@ -51,7 +51,10 @@ void Robot::AlwaysPeriodic() {
 
 	CommandBase::navXSubsystem->sendValuesToSmartDashboard();
 	CommandBase::driveSubsystem->sendValuesToSmartDashboard();
-	CommandBase::pdpSubystem->sendValuesToSmartDashboard();
+	CommandBase::pdpSubsystem->sendValuesToSmartDashboard();
+
+	CommandBase::shooterSubsystem->setLeftFlap(SmartDashboard::GetNumber("LShooter_Angle", 0));
+	CommandBase::shooterSubsystem->setRightFlap(SmartDashboard::GetNumber("RShooter_Angle", 0));
 
 //	if (mp_operatorInterface->joystickButtonPressed(
 //				mp_operatorInterface->pXboxController, 4)){
@@ -113,8 +116,7 @@ void Robot::TeleopPeriodic() {
 	AlwaysPeriodic();
 	Scheduler::GetInstance()->Run();
 
-	CommandBase::shooterSubystem->setLeftFlap(SmartDashboard::GetNumber("Shooter_Angle", 0));
-	CommandBase::shooterSubystem->setRightFlap(SmartDashboard::GetNumber("Shooter_Angle", 0));
+
 }
 
 void Robot::TestPeriodic() {

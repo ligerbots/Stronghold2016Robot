@@ -24,6 +24,7 @@
 #include "Commands/CenterOnTargetCommand.h"
 #include "Commands/DelayCommand.h"
 #include "Commands/DriveJoystickCommand.h"
+#include "Commands/LeftFlapTestCommand.h"
 #include "Commands/ToggleLedCommand.h"
 #include "Includes.h"
 #include "OI.h"
