@@ -16,7 +16,7 @@ void LeftFlapTestCommand::Initialize() {
 
 void LeftFlapTestCommand::Execute() {
 	if (m_ticks++>=100) {
-		shooterSubsystem->setLeftFlap(100);
+		shooterSubsystem->setLeftFlap(80);
 		printf("LeftFlap set to 1\n");
 		done = true;
 	}
