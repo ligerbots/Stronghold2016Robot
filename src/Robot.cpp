@@ -51,7 +51,8 @@ void Robot::AlwaysPeriodic() {
 
 	CommandBase::navXSubsystem->sendValuesToSmartDashboard();
 	CommandBase::driveSubsystem->sendValuesToSmartDashboard();
-	CommandBase::pdpSubsystem->sendValuesToSmartDashboard();
+	// pdpSubsystem started spitting out errors. Debug this later - cbf 2016.02.15
+	//CommandBase::pdpSubystem->sendValuesToSmartDashboard();
 
 	CommandBase::shooterSubsystem->setLeftFlap(SmartDashboard::GetNumber("LShooter_Angle", 0));
 	CommandBase::shooterSubsystem->setRightFlap(SmartDashboard::GetNumber("RShooter_Angle", 0));

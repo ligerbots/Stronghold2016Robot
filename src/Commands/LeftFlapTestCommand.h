@@ -8,7 +8,7 @@
  */
 class LeftFlapTestCommand: public CommandBase {
 protected:
-	int ticks;
+	int m_ticks;
 	bool done;
 public:
 	explicit LeftFlapTestCommand();
