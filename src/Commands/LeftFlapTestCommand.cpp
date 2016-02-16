@@ -9,18 +9,27 @@ LeftFlapTestCommand::LeftFlapTestCommand() :
 
 void LeftFlapTestCommand::Initialize() {
 	printf("FlapTest initialized\n");
-	m_ticks = 0;
-	shooterSubsystem->setLeftFlap(0.3);
-	printf("LeftFlap set to 0\n");
+//	m_ticks = 0;
+	shooterSubsystem->setFlaps(1+(-1*(shooterSubsystem->getLeftPosition())));
+	printf("Flaps inverted");
+	done = true;
 }
 
 void LeftFlapTestCommand::Execute() {
-	if (m_ticks++>=100) {
-		shooterSubsystem->setLeftFlap(80);
-		printf("LeftFlap set to 1\n");
-		done = true;
-	}
-	printf("1 cycle of the command run\n");
+//	m_ticks++;
+//	if (m_ticks == 50) {
+//		shooterSubsystem->setFlaps(0.0);
+//		printf("LeftFlap at %3.2f\n", shooterSubsystem->getLeftPosition());
+//		printf("RightFlap at %3.2f\n", shooterSubsystem->getRightPosition());
+//		printf("Flaps set to 0\n");
+//	}
+//	if (m_ticks == 100) {
+//		shooterSubsystem->setFlaps(1.0);
+//		printf("LeftFlap at %3.2f\n", shooterSubsystem->getLeftPosition());
+//		printf("RightFlap at %3.2f\n", shooterSubsystem->getRightPosition());
+//		printf("Flaps set to 1\n");
+//		m_ticks = 0;
+//	}
 }
 
 bool LeftFlapTestCommand::IsFinished() {
@@ -28,7 +37,9 @@ bool LeftFlapTestCommand::IsFinished() {
 }
 
 void LeftFlapTestCommand::End() {
+	printf("Flap Test Done\n");
 }
 
 void LeftFlapTestCommand::Interrupted() {
+	printf("FlapTest Interrupted");
 }

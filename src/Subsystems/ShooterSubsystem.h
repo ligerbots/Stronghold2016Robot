@@ -15,6 +15,9 @@ public:
 	void shoot();
 	void sendValuesToSmartDashboard();
 
-	void setLeftFlap(double angle);
-	void setRightFlap(double angle);
+	void setLeftFlap(double extent);
+	void setRightFlap(double extent);
+	void setFlaps(double extent);
+	double getRightPosition();
+	double getLeftPosition();
 };

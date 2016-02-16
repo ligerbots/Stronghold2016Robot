@@ -11,15 +11,28 @@ void ShooterSubsystem::InitDefaultCommand() {
 	//SetDefaultCommand(new MySpecialCommand());
 }
 
-void ShooterSubsystem::setLeftFlap(double angle){
-	mp_leftFlap->SetAngle(angle);
+void ShooterSubsystem::setLeftFlap(double extent){
+	mp_leftFlap->Set(extent);
 }
 
-void ShooterSubsystem::setRightFlap(double angle){
-	mp_rightFlap->SetAngle(angle);
+void ShooterSubsystem::setRightFlap(double extent){
+	mp_rightFlap->Set(extent);
+}
+
+void ShooterSubsystem::setFlaps(double extent) {
+	mp_leftFlap->Set(extent);
+	mp_rightFlap->Set(extent);
+}
+
+double ShooterSubsystem::getLeftPosition() {
+	return mp_leftFlap->Get();
+}
+
+double ShooterSubsystem::getRightPosition() {
+	return mp_rightFlap->Get();
 }
 
 void ShooterSubsystem::sendValuesToSmartDashboard(){
-	SmartDashboard::PutNumber("Shooter/LeftFlapAngle", mp_leftFlap->GetAngle());
-	SmartDashboard::PutNumber("Shooter/RightFlapAngle", mp_rightFlap->GetAngle());
+	SmartDashboard::PutNumber("Shooter/LeftFlapAngle", mp_leftFlap->Get());
+	SmartDashboard::PutNumber("Shooter/RightFlapAngle", mp_rightFlap->Get());
 }
