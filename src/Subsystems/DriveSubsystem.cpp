@@ -132,7 +132,8 @@ DriveSubsystem::DriveSubsystem() :
 	mp_robotDrive->SetSensitivity(0.5);
 	mp_robotDrive->SetMaxOutput(1);
 
-	// TODO: initialize mp_shifterSolenoid here
+	// initializes the shifter solenoid - forward for high gear, reverse for low
+	mp_shifterSolenoid.reset(new DoubleSolenoid(RobotMap::PCM_SHIFTER_HIGH_GEAR, RobotMap::PCM_SHIFTER_LOW_GEAR));
 }
 
 DriveSubsystem::~DriveSubsystem() {
@@ -143,6 +144,14 @@ void DriveSubsystem::InitDefaultCommand() {
 
 void DriveSubsystem::zeroMotors() {
 	drive(0, 0);
+}
+
+void DriveSubsystem::shiftUp() {
+	mp_shifterSolenoid->Set(DoubleSolenoid::kForward);
+}
+
+void DriveSubsystem::shiftDown() {
+	mp_shifterSolenoid->Set(DoubleSolenoid::kReverse);
 }
 
 void DriveSubsystem::drive(double y, double x) {

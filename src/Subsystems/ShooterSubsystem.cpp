@@ -30,7 +30,7 @@ void ShooterSubsystem::setRightFlap(double extent){
 
 void ShooterSubsystem::setFlaps(double extent) {
 	mp_leftFlap->Set(extent);
-	mp_rightFlap->Set(extent);
+	mp_rightFlap->Set(-extent);
 }
 
 double ShooterSubsystem::getLeftPosition() {

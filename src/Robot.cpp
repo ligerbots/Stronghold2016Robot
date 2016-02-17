@@ -54,9 +54,6 @@ void Robot::AlwaysPeriodic() {
 	// pdpSubsystem started spitting out errors. Debug this later - cbf 2016.02.15
 	//CommandBase::pdpSubystem->sendValuesToSmartDashboard();
 
-	CommandBase::shooterSubsystem->setLeftFlap(SmartDashboard::GetNumber("LShooter_Angle", 0));
-	CommandBase::shooterSubsystem->setRightFlap(SmartDashboard::GetNumber("RShooter_Angle", 0));
-
 //	if (mp_operatorInterface->joystickButtonPressed(
 //				mp_operatorInterface->pXboxController, 4)){
 //		CommandBase::compressorSubystem->SetCompressor(!CommandBase::compressorSubystem->IsCompressorOn());

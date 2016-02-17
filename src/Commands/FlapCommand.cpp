@@ -1,7 +1,7 @@
 #include <Stronghold2016Robot.h>
 
 FlapCommand::FlapCommand() :
-		CommandBase("LeftFlapTestCommand_") {
+		CommandBase("FlapCommand_") {
 	Requires(shooterSubsystem.get());
 	m_ticks = 0;
 	m_position = 0.3;
@@ -13,16 +13,12 @@ void FlapCommand::Initialize() {
 	printf("FlapTest initialized\n");
 	m_ticks = 0;
 	done = false;
-	shooterSubsystem->setFlaps(m_position);
+	shooterSubsystem->setFlaps(1-m_position);
 	printf("Flaps inverted %f\n", m_position);
+	done = true;
 }
 
 void FlapCommand::Execute() {
-	m_ticks++;
-	if (m_ticks < 50) {
-		shooterSubsystem->setFlaps(m_position);
-	}
-	else done = true;
 }
 
 bool FlapCommand::IsFinished() {
