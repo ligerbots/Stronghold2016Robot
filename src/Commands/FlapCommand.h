@@ -6,12 +6,13 @@
 /**
  * Toggles the LED ring around the front camera
  */
-class LeftFlapTestCommand: public CommandBase {
+class FlapCommand: public CommandBase {
 protected:
 	int m_ticks;
+	double m_position;
 	bool done;
 public:
-	explicit LeftFlapTestCommand();
+	explicit FlapCommand();
 	void Initialize();
 	void Execute();
 

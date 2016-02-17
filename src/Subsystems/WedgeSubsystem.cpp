@@ -12,6 +12,9 @@ void WedgeSubsystem::InitDefaultCommand()
 	//SetDefaultCommand(new MySpecialCommand());
 }
 
+bool WedgeSubsystem::isWedgeDown() {
+	return mp_wedgeDownSwitch->Get();
+}
 // Put methods for controlling this subsystem
 // here. Call these from Commands.
 

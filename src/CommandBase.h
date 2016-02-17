@@ -6,6 +6,8 @@
 #include <Subsystems/ShooterSubsystem.h>
 #include <Subsystems/PDPSubsystem.h>
 #include <Subsystems/CompressorSubsystem.h>
+#include <Subsystems/WedgeSubsystem.h>
+#include <Subsystems/IntakeSubsystem.h>
 
 /**
  * The base for all commands. All atomic commands should subclass CommandBase.
@@ -26,12 +28,16 @@ public:
 	static std::unique_ptr<ShooterSubsystem> shooterSubsystem;
 	static std::unique_ptr<PDPSubsystem> pdpSubsystem;
 	static std::unique_ptr<CompressorSubsystem> compressorSubsystem;
+	static std::unique_ptr<WedgeSubsystem> wedgeSubsystem;
+	static std::unique_ptr<IntakeSubsystem> intakeSubsystem;
 
 	// all commands
 	static std::unique_ptr<Command> driveJoystickCommand;
 	static std::unique_ptr<Command> ledOnCommand;
 	static std::unique_ptr<Command> ledOffCommand;
 	static std::unique_ptr<Command> centerOnTargetCommand;
-	static std::unique_ptr<Command> leftFlapTestCommand;
+	static std::unique_ptr<Command> flapCommand;
+	static std::unique_ptr<Command> tabulaRasaCommand;
+	static std::unique_ptr<Command> shootCommand;
 
 };

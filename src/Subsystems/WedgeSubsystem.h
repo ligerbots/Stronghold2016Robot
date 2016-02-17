@@ -13,6 +13,6 @@ public:
 	void InitDefaultCommand();
 	void liftWedge();
 	void lowerWedge();
-	bool isClear();
+	bool isWedgeDown();
 };
 

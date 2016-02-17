@@ -12,7 +12,8 @@ private:
 public:
 	ShooterSubsystem();
 	void InitDefaultCommand();
-	void shoot();
+	void firePistons();
+	void retractPistons();
 	void sendValuesToSmartDashboard();
 
 	void setLeftFlap(double extent);

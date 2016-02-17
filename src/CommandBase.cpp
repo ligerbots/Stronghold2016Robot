@@ -6,12 +6,16 @@ std::unique_ptr<NavXSubsystem> CommandBase::navXSubsystem = NULL;
 std::unique_ptr<ShooterSubsystem> CommandBase::shooterSubsystem = NULL;
 std::unique_ptr<PDPSubsystem> CommandBase::pdpSubsystem = NULL;
 std::unique_ptr<CompressorSubsystem> CommandBase::compressorSubsystem = NULL;
+std::unique_ptr<WedgeSubsystem> CommandBase::wedgeSubsystem = NULL;
+std::unique_ptr<IntakeSubsystem> CommandBase::intakeSubsystem = NULL;
 
 std::unique_ptr<Command> CommandBase::driveJoystickCommand = NULL;
 std::unique_ptr<Command> CommandBase::ledOnCommand = NULL;
 std::unique_ptr<Command> CommandBase::ledOffCommand = NULL;
 std::unique_ptr<Command> CommandBase::centerOnTargetCommand = NULL;
-std::unique_ptr<Command> CommandBase::leftFlapTestCommand = NULL;
+std::unique_ptr<Command> CommandBase::flapCommand = NULL;
+std::unique_ptr<Command> CommandBase::tabulaRasaCommand = NULL;
+std::unique_ptr<Command> CommandBase::shootCommand = NULL;
 
 CommandBase::CommandBase(const std::string &name) :
 		Command(name) {
@@ -27,12 +31,16 @@ void CommandBase::init() {
 	navXSubsystem.reset(new NavXSubsystem());
 	shooterSubsystem.reset(new ShooterSubsystem());
 	pdpSubsystem.reset(new PDPSubsystem());
-//	compressorSubystem.reset(new CompressorSubsystem());
+	wedgeSubsystem.reset(new WedgeSubsystem());
+	intakeSubsystem.reset(new IntakeSubsystem());
+	compressorSubsystem.reset(new CompressorSubsystem());
 
 	driveJoystickCommand.reset(new DriveJoystickCommand());
 	ledOnCommand.reset(new ToggleLedCommand(true));
 	ledOffCommand.reset(new ToggleLedCommand(false));
 	centerOnTargetCommand.reset(new CenterOnTargetCommand());
-	leftFlapTestCommand.reset(new LeftFlapTestCommand());
+	flapCommand.reset(new FlapCommand());
+	tabulaRasaCommand.reset(new TabulaRasaCommand());
+	shootCommand.reset(new ShootCommand());
 
 }
