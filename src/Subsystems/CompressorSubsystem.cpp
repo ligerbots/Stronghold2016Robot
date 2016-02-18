@@ -8,14 +8,18 @@ CompressorSubsystem::CompressorSubsystem() :
 void CompressorSubsystem::InitDefaultCommand() {
 }
 
-void CompressorSubsystem::SetCompressor(bool on){
+void CompressorSubsystem::setCompressor(bool on){
 	mp_compressor->SetClosedLoopControl(on);
 }
 
-bool CompressorSubsystem::IsCompressorOn(){
+bool CompressorSubsystem::isCompressorOn(){
 	return mp_compressor->GetClosedLoopControl();
 }
 
-bool CompressorSubsystem::IsPressureSwitchTriggered(){
+bool CompressorSubsystem::isPressureSwitchTriggered(){
 	return mp_compressor->GetPressureSwitchValue();
+}
+
+void CompressorSubsystem::toggleCompressor() {
+	setCompressor(not(isCompressorOn()));
 }

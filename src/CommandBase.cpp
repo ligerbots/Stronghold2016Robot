@@ -16,6 +16,7 @@ std::unique_ptr<Command> CommandBase::centerOnTargetCommand = NULL;
 std::unique_ptr<Command> CommandBase::flapCommand = NULL;
 std::unique_ptr<Command> CommandBase::tabulaRasaCommand = NULL;
 std::unique_ptr<Command> CommandBase::shootCommand = NULL;
+std::unique_ptr<Command> CommandBase::toggleCompressorCommand = NULL;
 
 CommandBase::CommandBase(const std::string &name) :
 		Command(name) {
@@ -42,5 +43,6 @@ void CommandBase::init() {
 	flapCommand.reset(new FlapCommand());
 	tabulaRasaCommand.reset(new TabulaRasaCommand());
 	shootCommand.reset(new ShootCommand());
+	toggleCompressorCommand.reset(new ToggleCompressorCommand());
 
 }

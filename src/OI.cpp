@@ -15,6 +15,8 @@ void OI::registerCommands() {
 			CommandBase::centerOnTargetCommand.get());  */
 	registerButton(pXboxController, 4, PRESSED,
 			CommandBase::flapCommand.get());
+	registerButton(pXboxController, 8, PRESSED,
+			CommandBase::toggleCompressorCommand.get());
 
 }
 

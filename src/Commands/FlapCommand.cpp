@@ -4,21 +4,24 @@ FlapCommand::FlapCommand() :
 		CommandBase("FlapCommand_") {
 	Requires(shooterSubsystem.get());
 	m_ticks = 0;
-	m_position = 0.3;
-	printf("Flaps %f\n", m_position);
+	m_position = 0.2;
     done = false;
 }
 
 void FlapCommand::Initialize() {
 	printf("FlapTest initialized\n");
 	m_ticks = 0;
+	shooterSubsystem->setFlaps(0.0);
+	printf("Flaps to 0\n");
 	done = false;
-	shooterSubsystem->setFlaps(1-m_position);
-	printf("Flaps inverted %f\n", m_position);
-	done = true;
 }
 
 void FlapCommand::Execute() {
+	if (m_ticks++==100) {
+		shooterSubsystem->setFlaps(0.9);
+		printf("Flaps to 1\n");
+		done = true;
+	}
 }
 
 bool FlapCommand::IsFinished() {

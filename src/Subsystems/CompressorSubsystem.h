@@ -11,7 +11,8 @@ public:
 	CompressorSubsystem();
 	void InitDefaultCommand();
 
-	void SetCompressor(bool on);
-	bool IsCompressorOn();
-	bool IsPressureSwitchTriggered();
+	void setCompressor(bool on);
+	bool isCompressorOn();
+	bool isPressureSwitchTriggered();
+	void toggleCompressor();
 };

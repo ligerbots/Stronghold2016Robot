@@ -27,6 +27,7 @@
 #include "Commands/FlapCommand.h"
 #include "Commands/ShootCommand.h"
 #include "Commands/TabulaRasaCommand.h"
+#include "Commands/ToggleCompressorCommand.h"
 #include "Commands/ToggleLedCommand.h"
 #include "Includes.h"
 #include "OI.h"
