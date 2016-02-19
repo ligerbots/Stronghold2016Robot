@@ -18,8 +18,8 @@ void FlapSubsystem::InitDefaultCommand() {
 }
 
 void FlapSubsystem::sendValuesToSmartDashboard() {
-	SmartDashboard::PutNumber("Shooter/LeftFlapAngle", mp_leftFlap->GetAngle());
-	SmartDashboard::PutNumber("Shooter/RightFlapAngle", mp_rightFlap->GetAngle());
+	SmartDashboard::PutNumber("LeftFlapAngle", mp_leftFlap->GetAngle());
+	SmartDashboard::PutNumber("RightFlapAngle", mp_rightFlap->GetAngle());
 }
 
 void FlapSubsystem::setLeftFlapAngle(double angle) {

@@ -54,13 +54,8 @@ void Robot::AlwaysPeriodic() {
 	CommandBase::navXSubsystem->sendValuesToSmartDashboard();
 	CommandBase::driveSubsystem->sendValuesToSmartDashboard();
 	CommandBase::flapSubsystem->sendValuesToSmartDashboard();
-	// interrogating the PDP subsystem seems to make the robot unstable
-	// CommandBase::pdpSubsystem->sendValuesToSmartDashboard();
-
-//	if (mp_operatorInterface->joystickButtonPressed(
-//				mp_operatorInterface->pXboxController, 4)){
-//		CommandBase::compressorSubystem->SetCompressor(!CommandBase::compressorSubystem->IsCompressorOn());
-//	}
+	// interrogating the PDP subsystem seems to make the robot unstable?
+	CommandBase::pdpSubsystem->sendValuesToSmartDashboard();
 
 	if (mp_operatorInterface->joystickButtonPressed(
 			mp_operatorInterface->pXboxController, 3)) {
