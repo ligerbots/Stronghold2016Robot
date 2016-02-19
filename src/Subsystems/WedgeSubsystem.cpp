@@ -27,3 +27,7 @@ void WedgeSubsystem::liftWedge() {
 void WedgeSubsystem::lowerWedge() {
 	mp_wedgeArmSolenoid->Set(DoubleSolenoid::kForward);
 }
+
+void WedgeSubsystem::sendValuesToSmartDashboard() {
+	SmartDashboard::PutBoolean("Wedge_Clear", isWedgeDown());
+}

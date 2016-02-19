@@ -65,7 +65,7 @@ bool IntakeSubsystem::isIntakeReadyToFire() {
 }
 
 void IntakeSubsystem::sendValuesToSmartDashboard() {
-	SmartDashboard::PutBoolean("Intake/Arm_Up", isIntakeArmUp());
+	SmartDashboard::PutBoolean("Intake/Arm_Clear", isIntakeArmUp());
 	SmartDashboard::PutBoolean("Intake/Ball_In", isBallInPosition());
 	SmartDashboard::PutNumber("Intake/Roller_Revolutions",
 			getRollerRevolutions());

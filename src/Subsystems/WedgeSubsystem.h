@@ -14,5 +14,6 @@ public:
 	void liftWedge();
 	void lowerWedge();
 	bool isWedgeDown();
+	void sendValuesToSmartDashboard();
 };
 
