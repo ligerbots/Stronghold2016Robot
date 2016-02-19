@@ -6,10 +6,11 @@
 class Robot: public IterativeRobot {
 public:
 	static Robot* instance;
+	static int ticks;		// make this globally available
 
 	OI* mp_operatorInterface;
 	SendableChooser* mp_autonomousModeChooser;
-	int ticks;
+
 
 	Robot();
 	virtual ~Robot();

@@ -4,6 +4,7 @@
 #include <Subsystems/VisionSubsystem.h>
 #include <Subsystems/NavXSubsystem.h>
 #include <Subsystems/ShooterSubsystem.h>
+#include <Subsystems/FlapSubsystem.h>
 #include <Subsystems/PDPSubsystem.h>
 #include <Subsystems/CompressorSubsystem.h>
 #include <Subsystems/WedgeSubsystem.h>
@@ -26,6 +27,7 @@ public:
 	static std::unique_ptr<VisionSubsystem> visionSubsystem;
 	static std::unique_ptr<NavXSubsystem> navXSubsystem;
 	static std::unique_ptr<ShooterSubsystem> shooterSubsystem;
+	static std::unique_ptr<FlapSubsystem> flapSubsystem;
 	static std::unique_ptr<PDPSubsystem> pdpSubsystem;
 	static std::unique_ptr<CompressorSubsystem> compressorSubsystem;
 	static std::unique_ptr<WedgeSubsystem> wedgeSubsystem;

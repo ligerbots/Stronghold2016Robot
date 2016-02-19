@@ -39,6 +39,7 @@
 #include "Subsystems/NavXSubsystem.h"
 #include "Subsystems/PDPSubsystem.h"
 #include "Subsystems/ShooterSubsystem.h"
+#include "Subsystems/FlapSubsystem.h"
 #include "Subsystems/SubsystemBase.h"
 #include "Subsystems/VisionSubsystem.h"
 #include "Subsystems/WedgeSubsystem.h"

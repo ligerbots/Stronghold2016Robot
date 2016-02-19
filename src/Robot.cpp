@@ -1,6 +1,8 @@
 #include <Stronghold2016Robot.h>
 
+// Robot wide globals whose definitions live in the Robot class
 Robot* Robot::instance = NULL;
+int Robot::ticks;
 
 Robot::Robot() {
 	instance = this;
@@ -47,12 +49,13 @@ void Robot::AlwaysPeriodic() {
 	ticks++;
 
 	// other stuff
-	CommandBase::visionSubsystem->updateVision(ticks);
+	CommandBase::visionSubsystem->updateVision(Robot::ticks);
 
 	CommandBase::navXSubsystem->sendValuesToSmartDashboard();
 	CommandBase::driveSubsystem->sendValuesToSmartDashboard();
-	// pdpSubsystem started spitting out errors. Debug this later - cbf 2016.02.15
-	//CommandBase::pdpSubystem->sendValuesToSmartDashboard();
+	CommandBase::flapSubsystem->sendValuesToSmartDashboard();
+	// interrogating the PDP subsystem seems to make the robot unstable
+	// CommandBase::pdpSubsystem->sendValuesToSmartDashboard();
 
 //	if (mp_operatorInterface->joystickButtonPressed(
 //				mp_operatorInterface->pXboxController, 4)){

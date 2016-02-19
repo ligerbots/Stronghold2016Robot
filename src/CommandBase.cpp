@@ -4,6 +4,7 @@ std::unique_ptr<VisionSubsystem> CommandBase::visionSubsystem = NULL;
 std::unique_ptr<DriveSubsystem> CommandBase::driveSubsystem = NULL;
 std::unique_ptr<NavXSubsystem> CommandBase::navXSubsystem = NULL;
 std::unique_ptr<ShooterSubsystem> CommandBase::shooterSubsystem = NULL;
+std::unique_ptr<FlapSubsystem> CommandBase::flapSubsystem = NULL;
 std::unique_ptr<PDPSubsystem> CommandBase::pdpSubsystem = NULL;
 std::unique_ptr<CompressorSubsystem> CommandBase::compressorSubsystem = NULL;
 std::unique_ptr<WedgeSubsystem> CommandBase::wedgeSubsystem = NULL;
@@ -31,6 +32,7 @@ void CommandBase::init() {
 	visionSubsystem.reset(new VisionSubsystem());
 	navXSubsystem.reset(new NavXSubsystem());
 	shooterSubsystem.reset(new ShooterSubsystem());
+	flapSubsystem.reset(new FlapSubsystem());
 	pdpSubsystem.reset(new PDPSubsystem());
 	wedgeSubsystem.reset(new WedgeSubsystem());
 	intakeSubsystem.reset(new IntakeSubsystem());
