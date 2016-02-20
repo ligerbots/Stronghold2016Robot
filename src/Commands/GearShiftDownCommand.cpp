@@ -2,7 +2,7 @@
 
 GearShiftDownCommand::GearShiftDownCommand() :
 		CommandBase("GearShiftDownCommand_") {
-	Requires(driveSubsystem.get());
+//	Requires(driveSubsystem.get());
 }
 
 void GearShiftDownCommand::Initialize() {

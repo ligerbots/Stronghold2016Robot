@@ -15,7 +15,7 @@ void FlapSubsystem::sendValuesToSmartDashboard() {
 }
 
 void FlapSubsystem::setLeftFlapAngle(double angle) {
-	mp_leftFlap->SetAngle(angle);
+	mp_leftFlap->SetAngle(180 - angle);
 }
 
 void FlapSubsystem::setRightFlapAngle(double angle) {
