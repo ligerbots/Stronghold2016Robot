@@ -9,9 +9,8 @@
  */
 class ToggleLedCommand: public CommandBase {
 protected:
-	bool on;
 public:
-	explicit ToggleLedCommand(bool on);
+	explicit ToggleLedCommand();
 	void Initialize();
 	void Execute();
 

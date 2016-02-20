@@ -35,13 +35,12 @@ public:
 
 	// all commands
 	static std::unique_ptr<Command> driveJoystickCommand;
-	static std::unique_ptr<Command> ledOnCommand;
-	static std::unique_ptr<Command> ledOffCommand;
 	static std::unique_ptr<Command> centerOnTargetCommand;
 	static std::unique_ptr<Command> flapCommand;
 	static std::unique_ptr<Command> tabulaRasaCommand;
 	static std::unique_ptr<Command> shootCommand;
 	static std::unique_ptr<Command> toggleCompressorCommand;
+	static std::unique_ptr<Command> toggleLedCommand;
 	static std::unique_ptr<Command> wedgeToggleCommand;
 	static std::unique_ptr<Command> intakeToggleCommand;
 	static std::unique_ptr<Command> gearShiftDownCommand;

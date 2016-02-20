@@ -7,14 +7,16 @@ ShootCommand::ShootCommand() :
 	Requires(shooterSubsystem.get());
 	Requires(wedgeSubsystem.get());
 	Requires(intakeSubsystem.get());
+	SetInterruptible(false);
 }
 
 void ShootCommand::Initialize() {
 	done = false;
 	m_ticks = 0;
-	if (not (wedgeSubsystem->isWedgeDown() && intakeSubsystem->isIntakeReadyToFire())) {
+	if (!wedgeSubsystem->isWedgeDown() && intakeSubsystem->isIntakeReadyToFire()) {
 		done = true;
 	}
+	SetInterruptible(false);
 }
 
 void ShootCommand::Execute() {
@@ -22,7 +24,7 @@ void ShootCommand::Execute() {
 	if (wedgeSubsystem->isWedgeDown() && intakeSubsystem->isIntakeReadyToFire() && m_ticks == 1) {
 			shooterSubsystem->firePistons();
 		}
-	// equivalent to: not (wedgeSubsystem->isWedgeDown() && intakeSubsystem->isIntakeReadyToFire())
+	// equivalent to: !wedgeSubsystem->isWedgeDown() && intakeSubsystem->isIntakeReadyToFire()
 	else if (m_ticks == 1) {
 		done = true;
 	}
@@ -37,9 +39,9 @@ bool ShootCommand::IsFinished() {
 }
 
 void ShootCommand::End() {
-
+	shooterSubsystem->retractPistons();
 }
 
 void ShootCommand::Interrupted() {
-
+	//NO
 }

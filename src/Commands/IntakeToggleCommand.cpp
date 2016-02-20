@@ -7,7 +7,7 @@ IntakeToggleCommand::IntakeToggleCommand() :
 }
 
 void IntakeToggleCommand::Initialize() {
-	intakeDown = not (intakeSubsystem -> isIntakeArmUp());
+	intakeDown = !intakeSubsystem->isIntakeArmUp();
 }
 
 void IntakeToggleCommand::Execute() {

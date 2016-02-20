@@ -8,16 +8,19 @@ OI::OI() :
 
 void OI::registerCommands() {
 	registerButton(pXboxController, 1, PRESSED,
-			CommandBase::ledOnCommand.get());
-	registerButton(pXboxController, 2, PRESSED,
-			CommandBase::ledOffCommand.get());
-/*	registerButton(pXboxController, 3, PRESSED,
-			CommandBase::centerOnTargetCommand.get());  */
+			CommandBase::gearShiftDownCommand.get());
+	registerButton(pXboxController, 3, PRESSED,
+				CommandBase::shootCommand.get());
 	registerButton(pXboxController, 4, PRESSED,
-			CommandBase::flapCommand.get());
+				CommandBase::gearShiftUpCommand.get());
+	registerButton(pXboxController, 5, PRESSED,
+				CommandBase::intakeToggleCommand.get());
+	registerButton(pXboxController, 6, PRESSED,
+				CommandBase::wedgeToggleCommand.get());
+	registerButton(pXboxController, 7, PRESSED,
+				CommandBase::toggleLedCommand.get());
 	registerButton(pXboxController, 8, PRESSED,
-			CommandBase::toggleCompressorCommand.get());
-
+				CommandBase::toggleCompressorCommand.get());
 }
 
 bool OI::joystickButtonPressed(Joystick* pJoystick, int buttonNumber) {

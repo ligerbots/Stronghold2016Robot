@@ -1,16 +1,15 @@
 #include <Stronghold2016Robot.h>
 
-ToggleLedCommand::ToggleLedCommand(bool on) :
-		CommandBase("ToggleLedCommand_" + std::to_string(on)) {
+ToggleLedCommand::ToggleLedCommand() :
+		CommandBase("ToggleLedCommand_") {
 	Requires(visionSubsystem.get());
-	this->on = on;
 }
 
 void ToggleLedCommand::Initialize() {
 }
 
 void ToggleLedCommand::Execute() {
-	visionSubsystem->setLedRingOn(on);
+	visionSubsystem->setLedRingOn(!visionSubsystem->isLedRingOn());
 }
 
 bool ToggleLedCommand::IsFinished() {
