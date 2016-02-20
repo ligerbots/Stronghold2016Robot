@@ -16,6 +16,8 @@ void IntakeRollerCommand::Execute() {
 			Robot::instance->mp_operatorInterface->pXboxController->GetRawAxis(2);
 	if(fabs(speed) > 0.1)
 		intakeSubsystem->setRollSpeed(speed);
+	else
+		intakeSubsystem->rollStop();
 }
 
 bool IntakeRollerCommand::IsFinished() {

@@ -9,8 +9,11 @@ OI::OI() :
 void OI::registerCommands() {
 	registerButton(pXboxController, 1, PRESSED,
 			CommandBase::gearShiftDownCommand.get());
+	// safety
 	registerButton(pXboxController, 3, PRESSED,
 				CommandBase::shootCommand.get());
+	registerButton(pXboxController, 2, PRESSED,
+					CommandBase::flapCommand.get());
 	registerButton(pXboxController, 4, PRESSED,
 				CommandBase::gearShiftUpCommand.get());
 	registerButton(pXboxController, 5, PRESSED,

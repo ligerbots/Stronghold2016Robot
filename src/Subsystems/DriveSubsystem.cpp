@@ -134,7 +134,7 @@ DriveSubsystem::DriveSubsystem() :
 
 	// initializes the shifter solenoid - forward for high gear, reverse for low
 	mp_shifterSolenoid.reset(
-			new DoubleSolenoid(RobotMap::PCM_SHIFTER_HIGH_GEAR,
+			new DoubleSolenoid(RobotMap::PCM_CAN, RobotMap::PCM_SHIFTER_HIGH_GEAR,
 					RobotMap::PCM_SHIFTER_LOW_GEAR));
 }
 

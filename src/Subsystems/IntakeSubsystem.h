@@ -23,6 +23,7 @@ public:
 	void setRollSpeed(double speed);
 	double getRollerRevolutions();
 	bool isIntakeArmUp();
+	DoubleSolenoid::Value getIntakeArmValue();
 	bool isBallInPosition();
 	bool isIntakeReadyToFire();
 	void setIntakeArmUp();

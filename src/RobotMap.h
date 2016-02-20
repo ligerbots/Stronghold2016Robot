@@ -44,12 +44,12 @@ public:
 
 	static constexpr int PCM_SHIFTER_LOW_GEAR = 0;
 	static constexpr int PCM_SHIFTER_HIGH_GEAR = 1;
-	static constexpr int PCM_SHOOTER_FIRE = 2;
-	static constexpr int PCM_SHOOTER_RETRACT = 3;
+	static constexpr int PCM_SHOOTER_FIRE = 6;
+	static constexpr int PCM_SHOOTER_RETRACT = 7;
 	static constexpr int PCM_INTAKE_UP = 4;
 	static constexpr int PCM_INTAKE_DOWN = 5;
-	static constexpr int PCM_WEDGES_UP = 6;
-	static constexpr int PCM_WEDGES_DOWN = 7;
+	static constexpr int PCM_WEDGES_UP = 2;
+	static constexpr int PCM_WEDGES_DOWN = 3;
 
 	static constexpr int LIMIT_SWITCH_INTAKE_UP = 0;
 	static constexpr int LIMIT_SWITCH_INTAKE_BALL_IN = 1;

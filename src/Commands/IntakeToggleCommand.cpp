@@ -11,7 +11,7 @@ void IntakeToggleCommand::Initialize() {
 }
 
 void IntakeToggleCommand::Execute() {
-	if (intakeDown) {
+	if (/*intakeDown*/ intakeSubsystem->getIntakeArmValue() != DoubleSolenoid::kReverse) {
 		intakeSubsystem -> setIntakeArmUp();
 	}
 	else {
@@ -26,7 +26,7 @@ bool IntakeToggleCommand::IsFinished() {
 }
 
 void IntakeToggleCommand::End() {
-
+CommandBase::intakeRollerCommand->Start();
 }
 
 void IntakeToggleCommand::Interrupted() {

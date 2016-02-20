@@ -14,6 +14,7 @@ public:
 	void liftWedge();
 	void lowerWedge();
 	bool isWedgeDown();
+	DoubleSolenoid::Value getWedgeValue();
 	void sendValuesToSmartDashboard();
 };
 

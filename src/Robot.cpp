@@ -56,7 +56,7 @@ void Robot::AlwaysPeriodic() {
 	CommandBase::navXSubsystem->sendValuesToSmartDashboard();
 	CommandBase::shooterSubsystem->sendValuesToSmartDashboard();
 	CommandBase::flapSubsystem->sendValuesToSmartDashboard();
-	CommandBase::pdpSubsystem->sendValuesToSmartDashboard();
+	//CommandBase::pdpSubsystem->sendValuesToSmartDashboard();
 	CommandBase::compressorSubsystem->sendValuesToSmartDashboard();
 	CommandBase::wedgeSubsystem->sendValuesToSmartDashboard();
 	CommandBase::intakeSubsystem->sendValuesToSmartDashboard();

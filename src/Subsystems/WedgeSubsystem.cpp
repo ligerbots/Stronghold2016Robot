@@ -4,7 +4,7 @@ WedgeSubsystem::WedgeSubsystem() :
 		Subsystem("WedgeSubsystem") {
 	// forward to lower, reverse to lift
 	mp_wedgeArmSolenoid.reset(
-			new DoubleSolenoid(RobotMap::PCM_WEDGES_DOWN,
+			new DoubleSolenoid(RobotMap::PCM_CAN, RobotMap::PCM_WEDGES_DOWN,
 					RobotMap::PCM_WEDGES_UP));
 	mp_wedgeDownSwitch.reset(
 			new DigitalInput(RobotMap::LIMIT_SWITCH_WEGDE_DOWN));
@@ -22,6 +22,10 @@ bool WedgeSubsystem::isWedgeDown() {
 
 // Put methods for controlling this subsystem
 // here. Call these from Commands.
+
+DoubleSolenoid::Value WedgeSubsystem::getWedgeValue(){
+	return mp_wedgeArmSolenoid->Get();
+}
 
 void WedgeSubsystem::liftWedge() {
 	mp_wedgeArmSolenoid->Set(DoubleSolenoid::kReverse);

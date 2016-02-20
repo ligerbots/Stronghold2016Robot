@@ -56,6 +56,10 @@ void IntakeSubsystem::setIntakeArmDown() {
 	mp_intakeArmSolenoid->Set(DoubleSolenoid::kForward);
 }
 
+DoubleSolenoid::Value IntakeSubsystem::getIntakeArmValue(){
+	return mp_intakeArmSolenoid->Get();
+}
+
 bool IntakeSubsystem::isIntakeArmUp() {
 	// flip value so that it's false if it's not connected
 	return !mp_intakeUpSwitch->Get();

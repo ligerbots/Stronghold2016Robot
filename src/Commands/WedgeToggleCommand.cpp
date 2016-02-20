@@ -11,7 +11,7 @@ void WedgeToggleCommand::Initialize() {
 }
 
 void WedgeToggleCommand::Execute() {
-	if (wedgeDown) {
+	if (/*wedgeDown*/ wedgeSubsystem->getWedgeValue() != DoubleSolenoid::kReverse) {
 		wedgeSubsystem -> liftWedge();
 	}
 	else {
