@@ -159,6 +159,8 @@ void DriveSubsystem::shiftDown() {
 void DriveSubsystem::drive(double y, double x) {
 	if (mp_robotDrive.get() == NULL)
 		return;
+	SmartDashboard::PutNumber("x", x);
+	SmartDashboard::PutNumber("y", y);
 	mp_robotDrive->ArcadeDrive(y, x);
 }
 

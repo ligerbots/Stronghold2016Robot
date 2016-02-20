@@ -16,6 +16,8 @@ private:
 	double frameCenterX;
 	Parameter<int> frameCenterXParam;
 
+	int activeCamera;
+
 	// managed hardware object
 	std::unique_ptr<Relay> ledRingSpike;
 
@@ -31,6 +33,7 @@ public:
 	void updateVision(int ticks);
 	bool isLedRingOn();
 	void setLedRingOn(bool on);
+	void toggleCameraFeed();
 
 	double getFrameCenter();
 

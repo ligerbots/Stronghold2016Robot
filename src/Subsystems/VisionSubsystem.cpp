@@ -6,6 +6,7 @@ VisionSubsystem::VisionSubsystem() :
 		NULL), frameCenterX(0), frameCenterXParam(
 				"Vision/frameCenterX", false), m_processingThread(
 				&VisionSubsystem::visionProcessingThread, this) {
+	activeCamera = 0;
 	ledRingSpike.reset(new Relay(RobotMap::RELAY_LED_RING_SPIKE));
 }
 
@@ -44,11 +45,19 @@ void VisionSubsystem::updateVision(int ticks) {
 	{
 		std::lock_guard<std::mutex> lock(m_frameMutex);
 		Camera::Feed(ticks);
-		image = Camera::GetCamera(0)->GetStoredFrame();
-		mp_currentFrame = image;
+		image = Camera::GetCamera(activeCamera)->GetStoredFrame();
+		mp_currentFrame = Camera::GetCamera(0)->GetStoredFrame();
 	}
 	if (!showVision.get() && image != NULL)
 		LCameraServer::GetInstance()->SetImage(image);
+}
+
+void VisionSubsystem::toggleCameraFeed(){
+	if (Camera::GetNumberOfCameras() > 1){
+		activeCamera = 1 - activeCamera; // 1 -> 0; 0 -> 1
+	} else {
+		activeCamera = 0;
+	}
 }
 
 void VisionSubsystem::visionProcessingThread() {
