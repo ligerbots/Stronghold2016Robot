@@ -14,7 +14,8 @@ void IntakeRollerCommand::Execute() {
 	double speed =
 			Robot::instance->mp_operatorInterface->pXboxController->GetRawAxis(3) -
 			Robot::instance->mp_operatorInterface->pXboxController->GetRawAxis(2);
-	intakeSubsystem->setRollSpeed(speed);
+	if(fabs(speed) > 0.1)
+		intakeSubsystem->setRollSpeed(speed);
 }
 
 bool IntakeRollerCommand::IsFinished() {

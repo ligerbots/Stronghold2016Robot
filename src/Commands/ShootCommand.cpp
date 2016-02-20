@@ -40,6 +40,7 @@ bool ShootCommand::IsFinished() {
 
 void ShootCommand::End() {
 	shooterSubsystem->retractPistons();
+	CommandBase::intakeRollerCommand->Start();
 }
 
 void ShootCommand::Interrupted() {
