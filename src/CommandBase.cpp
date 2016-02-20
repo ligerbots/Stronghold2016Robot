@@ -20,6 +20,8 @@ std::unique_ptr<Command> CommandBase::shootCommand = NULL;
 std::unique_ptr<Command> CommandBase::toggleCompressorCommand = NULL;
 std::unique_ptr<Command> CommandBase::wedgeToggleCommand = NULL;
 std::unique_ptr<Command> CommandBase::intakeToggleCommand = NULL;
+std::unique_ptr<Command> CommandBase::gearShiftDownCommand = NULL;
+std::unique_ptr<Command> CommandBase::gearShiftUpCommand = NULL;
 
 CommandBase::CommandBase(const std::string &name) :
 		Command(name) {
@@ -49,6 +51,8 @@ void CommandBase::init() {
 	shootCommand.reset(new ShootCommand());
 	toggleCompressorCommand.reset(new ToggleCompressorCommand());
 	wedgeToggleCommand.reset(new WedgeToggleCommand());
-	wedgeToggleCommand.reset(new IntakeToggleCommand());
+	intakeToggleCommand.reset(new IntakeToggleCommand());
+	gearShiftDownCommand.reset(new GearShiftDownCommand());
+	gearShiftUpCommand.reset(new GearShiftUpCommand());
 
 }

@@ -25,6 +25,8 @@
 #include "Commands/DelayCommand.h"
 #include "Commands/DriveJoystickCommand.h"
 #include "Commands/FlapCommand.h"
+#include "Commands/GearShiftDownCommand.h"
+#include "Commands/GearShiftUpCommand.h"
 #include "Commands/IntakeToggleCommand.h"
 #include "Commands/ShootCommand.h"
 #include "Commands/TabulaRasaCommand.h"

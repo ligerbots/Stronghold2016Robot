@@ -44,5 +44,7 @@ public:
 	static std::unique_ptr<Command> toggleCompressorCommand;
 	static std::unique_ptr<Command> wedgeToggleCommand;
 	static std::unique_ptr<Command> intakeToggleCommand;
+	static std::unique_ptr<Command> gearShiftDownCommand;
+	static std::unique_ptr<Command> gearShiftUpCommand;
 
 };
