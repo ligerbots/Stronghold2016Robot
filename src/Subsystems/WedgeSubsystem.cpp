@@ -15,7 +15,8 @@ void WedgeSubsystem::InitDefaultCommand()
 }
 
 bool WedgeSubsystem::isWedgeDown() {
-	return mp_wedgeDownSwitch->Get();
+	// flip value so that it's false if it's not connected
+	return !mp_wedgeDownSwitch->Get();
 }
 
 // Put methods for controlling this subsystem

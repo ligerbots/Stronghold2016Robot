@@ -53,11 +53,13 @@ void IntakeSubsystem::setIntakeArmDown() {
 }
 
 bool IntakeSubsystem::isIntakeArmUp() {
-	return mp_intakeUpSwitch->Get();
+	// flip value so that it's false if it's not connected
+	return !mp_intakeUpSwitch->Get();
 }
 
 bool IntakeSubsystem::isBallInPosition() {
-	return mp_ballInSwitch->Get();
+	// flip value so that it's false if it's not connected
+	return !mp_ballInSwitch->Get();
 }
 
 bool IntakeSubsystem::isIntakeReadyToFire() {
@@ -68,7 +70,7 @@ void IntakeSubsystem::sendValuesToSmartDashboard() {
 	SmartDashboard::PutBoolean("Intake/Arm_Clear", isIntakeArmUp());
 	SmartDashboard::PutBoolean("Intake/Ball_In", isBallInPosition());
 	SmartDashboard::PutNumber("Intake/Roller_Revolutions",
-			getRollerRevolutions());
+			rollerTalonPresent ? getRollerRevolutions() : 0);
 
 	SmartDashboard::PutBoolean("Intake/RollerStatus", rollerTalonPresent);
 	SmartDashboard::PutNumber("Intake/RollerWatts",

@@ -56,7 +56,8 @@ void Robot::AlwaysPeriodic() {
 	CommandBase::flapSubsystem->sendValuesToSmartDashboard();
 	// interrogating the PDP subsystem seems to make the robot unstable?
 	CommandBase::pdpSubsystem->sendValuesToSmartDashboard();
-	//CommandBase::wedgeSubsystem->sendValuesToSmartDashboard();
+	CommandBase::wedgeSubsystem->sendValuesToSmartDashboard();
+	CommandBase::intakeSubsystem->sendValuesToSmartDashboard();
 
 	if (mp_operatorInterface->joystickButtonPressed(
 			mp_operatorInterface->pXboxController, 3)) {

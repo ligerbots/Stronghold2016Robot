@@ -16,3 +16,8 @@ In `C:\Users\Public\Documents\FRC\FRC DS Data Storage.ini` set `DashboardCmdLine
     DashboardCmdLine = ""<absolute path to your user profile folder>\\wpilib\\tools\\sfx.bat""
 
 Double quotes and double slashes are necessary. Using `%userprofile%` doesn't work (the path has to be absolute or DS won't launch it).
+
+
+## Screen size we have for SmartDashboard ##
+
+`1440x690`
