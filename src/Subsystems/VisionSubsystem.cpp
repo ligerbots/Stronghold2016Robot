@@ -4,7 +4,7 @@ VisionSubsystem::VisionSubsystem() :
 		Subsystem("VisionSubsystem"), exposure("VisionSubsystem_exposure"), showVision(
 				"VisionSubsystem_showProcessing"), mp_currentFrame(NULL), mp_processingFrame(
 		NULL), frameCenterX(0), frameCenterXParam(
-				"VisionSubsystem/frameCenterX", false), m_processingThread(
+				"Vision/frameCenterX", false), m_processingThread(
 				&VisionSubsystem::visionProcessingThread, this) {
 	ledRingSpike.reset(new Relay(RobotMap::RELAY_LED_RING_SPIKE));
 }

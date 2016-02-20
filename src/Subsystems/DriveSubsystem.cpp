@@ -1,7 +1,7 @@
 #include <Stronghold2016Robot.h>
 
 DriveSubsystem::DriveSubsystem() :
-		Subsystem("DriveSubsystem")  {
+		Subsystem("DriveSubsystem") {
 	printf("DriveSubsystem: initialize\n");
 	turnPIDOutput.reset(new DriveTurnPIDOutput(*this));
 	// create all the CANTalon objects we need
@@ -102,25 +102,25 @@ DriveSubsystem::DriveSubsystem() :
 
 	// Figure out where the encoders are
 	// Left
-	if ( IsEncoderPresent(*mp_left1) ) {
+	if (IsEncoderPresent(*mp_left1)) {
 		mp_leftEncoder = mp_left1.get();
 	} else if (IsEncoderPresent(*mp_left2)) {
 		mp_leftEncoder = mp_left2.get();
 	} else if (IsEncoderPresent(*mp_left3)) {
 		mp_leftEncoder = mp_left3.get();
 	} else {
-		printf( "Warning: No left drive encoder found\n" );
+		printf("Warning: No left drive encoder found\n");
 		mp_leftEncoder = NULL;
 	}
 	// Right
-	if ( IsEncoderPresent(*mp_right1) ) {
+	if (IsEncoderPresent(*mp_right1)) {
 		mp_rightEncoder = mp_right1.get();
 	} else if (IsEncoderPresent(*mp_right2)) {
 		mp_rightEncoder = mp_right2.get();
 	} else if (IsEncoderPresent(*mp_right3)) {
 		mp_rightEncoder = mp_right3.get();
 	} else {
-		printf( "Warning: No right drive encoder found\n" );
+		printf("Warning: No right drive encoder found\n");
 		mp_rightEncoder = NULL;
 	}
 
@@ -133,7 +133,9 @@ DriveSubsystem::DriveSubsystem() :
 	mp_robotDrive->SetMaxOutput(1);
 
 	// initializes the shifter solenoid - forward for high gear, reverse for low
-	mp_shifterSolenoid.reset(new DoubleSolenoid(RobotMap::PCM_SHIFTER_HIGH_GEAR, RobotMap::PCM_SHIFTER_LOW_GEAR));
+	mp_shifterSolenoid.reset(
+			new DoubleSolenoid(RobotMap::PCM_SHIFTER_HIGH_GEAR,
+					RobotMap::PCM_SHIFTER_LOW_GEAR));
 }
 
 DriveSubsystem::~DriveSubsystem() {
@@ -161,17 +163,19 @@ void DriveSubsystem::drive(double y, double x) {
 }
 
 double DriveSubsystem::getLeftEncoderPosition() {
-	if ( mp_leftEncoder != NULL ) {
+	if (mp_leftEncoder != NULL) {
 		double pos = mp_leftEncoder->GetPosition();
-		if ( mp_leftEncoder->GetError().GetCode() == 0 ) return pos;
+		if (mp_leftEncoder->GetError().GetCode() == 0)
+			return pos;
 	}
 	return NAN;
 }
 
 double DriveSubsystem::getRightEncoderPosition() {
-	if ( mp_rightEncoder != NULL ) {
+	if (mp_rightEncoder != NULL) {
 		double pos = mp_rightEncoder->GetPosition();
-		if ( mp_rightEncoder->GetError().GetCode() == 0 ) return pos;
+		if (mp_rightEncoder->GetError().GetCode() == 0)
+			return pos;
 	}
 	return NAN;
 }
@@ -198,7 +202,7 @@ bool DriveSubsystem::IsEncoderPresent(CANTalon& r_talon) {
 }
 
 void DriveSubsystem::sendValuesToSmartDashboard() {
-	if (Robot::ticks%2) {
+	if (Robot::ticks % 2) {
 		for (int i = 1; i < 7; i++) {
 			std::string key = "Drive/Talon";
 			key += std::to_string(i);
@@ -210,6 +214,22 @@ void DriveSubsystem::sendValuesToSmartDashboard() {
 							talonPtrs[i]->GetOutputCurrent()
 									* talonPtrs[i]->GetOutputVoltage() :
 							0.0);
+		}
+
+		SmartDashboard::PutNumber("Drive/LeftPosition", getLeftEncoderPosition());
+		SmartDashboard::PutNumber("Drive/RightPosition", getRightEncoderPosition());
+
+		if (mp_shifterSolenoid->GetError().GetCode() != 0) {
+			SmartDashboard::PutString("Drive/Shifter", "Not Present");
+		} else {
+			DoubleSolenoid::Value val = mp_shifterSolenoid->Get();
+			if (val == DoubleSolenoid::kOff) {
+				SmartDashboard::PutString("Drive/Shifter", "Off");
+			} else if (val == DoubleSolenoid::kForward) {
+				SmartDashboard::PutString("Drive/Shifter", "High Gear");
+			} else if (val == DoubleSolenoid::kReverse) {
+				SmartDashboard::PutString("Drive/Shifter", "Low Gear");
+			}
 		}
 	}
 }
