@@ -1,12 +1,4 @@
-/*
- * ServoSubsystem.cpp
- *
- *  Created on: Feb 18, 2016
- *      Author: Ligerbots
- */
-#include <Subsystems/FlapSubsystem.h>
-#include "WPILib.h"
-#include <RobotMap.h>
+#include <Stronghold2016Robot.h>
 
 FlapSubsystem::FlapSubsystem() : Subsystem("FlapSubsystem") {
 	mp_leftFlap.reset(new Servo(RobotMap::PWM_SERVO_SHOOTER_LEFT));

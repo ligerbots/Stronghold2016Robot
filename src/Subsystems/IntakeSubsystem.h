@@ -20,6 +20,7 @@ public:
 	void rollIn();
 	void rollOut();
 	void rollStop();
+	void setRollSpeed(double speed);
 	double getRollerRevolutions();
 	bool isIntakeArmUp();
 	bool isBallInPosition();

@@ -40,6 +40,10 @@ void IntakeSubsystem::rollStop() {
 	mp_rollers->Set(0);
 }
 
+void IntakeSubsystem::setRollSpeed(double speed){
+	mp_rollers->Set(speed);
+}
+
 double IntakeSubsystem::getRollerRevolutions() {
 	return mp_rollers->GetPosition();
 }

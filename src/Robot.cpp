@@ -94,6 +94,7 @@ void Robot::AutonomousInit() {
 	printf("Robot: AutononmousInit\n");
 
 	CommandBase::driveJoystickCommand->Cancel();
+	CommandBase::intakeRollerCommand->Cancel();
 }
 
 void Robot::AutonomousPeriodic() {
@@ -109,6 +110,7 @@ void Robot::TeleopInit() {
 	// continue until interrupted by another command, remove
 	// this line or comment it out.
 	CommandBase::driveJoystickCommand->Start();
+	CommandBase::intakeRollerCommand->Start();
 }
 
 void Robot::TeleopPeriodic() {
