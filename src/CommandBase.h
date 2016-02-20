@@ -42,5 +42,7 @@ public:
 	static std::unique_ptr<Command> tabulaRasaCommand;
 	static std::unique_ptr<Command> shootCommand;
 	static std::unique_ptr<Command> toggleCompressorCommand;
+	static std::unique_ptr<Command> wedgeToggleCommand;
+	static std::unique_ptr<Command> intakeToggleCommand;
 
 };
