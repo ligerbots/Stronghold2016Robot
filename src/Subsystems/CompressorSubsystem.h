@@ -15,4 +15,5 @@ public:
 	bool isCompressorOn();
 	bool isPressureSwitchTriggered();
 	void toggleCompressor();
+	void sendValuesToSmartDashboard();
 };

@@ -1,15 +1,16 @@
 #include <Stronghold2016Robot.h>
 
 WedgeSubsystem::WedgeSubsystem() :
-		Subsystem("WedgeSubsystem")
-{
+		Subsystem("WedgeSubsystem") {
 	// forward to lower, reverse to lift
-	mp_wedgeArmSolenoid.reset(new DoubleSolenoid(RobotMap::PCM_WEDGES_DOWN, RobotMap::PCM_WEDGES_UP));
-	mp_wedgeDownSwitch.reset(new DigitalInput(RobotMap::LIMIT_SWITCH_WEGDE_DOWN));
+	mp_wedgeArmSolenoid.reset(
+			new DoubleSolenoid(RobotMap::PCM_WEDGES_DOWN,
+					RobotMap::PCM_WEDGES_UP));
+	mp_wedgeDownSwitch.reset(
+			new DigitalInput(RobotMap::LIMIT_SWITCH_WEGDE_DOWN));
 }
 
-void WedgeSubsystem::InitDefaultCommand()
-{
+void WedgeSubsystem::InitDefaultCommand() {
 	// Set the default command for a subsystem here.
 	//SetDefaultCommand(new MySpecialCommand());
 }
@@ -32,4 +33,17 @@ void WedgeSubsystem::lowerWedge() {
 
 void WedgeSubsystem::sendValuesToSmartDashboard() {
 	SmartDashboard::PutBoolean("Wedge_Clear", isWedgeDown());
+	SmartDashboard::PutBoolean("Wedge/IsClear", isWedgeDown());
+	if (mp_wedgeArmSolenoid->GetError().GetCode() != 0) {
+		SmartDashboard::PutString("Wedge/Solenoid", "Not Present");
+	} else {
+		DoubleSolenoid::Value val = mp_wedgeArmSolenoid->Get();
+		if (val == DoubleSolenoid::kOff) {
+			SmartDashboard::PutString("Wedge/Solenoid", "Off");
+		} else if (val == DoubleSolenoid::kForward) {
+			SmartDashboard::PutString("Wedge/Solenoid", "Forward/Down");
+		} else if (val == DoubleSolenoid::kReverse) {
+			SmartDashboard::PutString("Wedge/Solenoid", "Reverse/Up");
+		}
+	}
 }

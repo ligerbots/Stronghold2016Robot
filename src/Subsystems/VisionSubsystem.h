@@ -34,6 +34,8 @@ public:
 
 	double getFrameCenter();
 
+	void sendValuesToSmartDashboard();
+
 	// PIDSource
 	void SetPIDSourceType(PIDSourceType pidSource);
 	PIDSourceType GetPIDSourceType() const;

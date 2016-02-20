@@ -2,7 +2,9 @@
 
 ShooterSubsystem::ShooterSubsystem() :
 		Subsystem("ShooterSubsystem") {
-	mp_shooterSolenoid.reset(new DoubleSolenoid(RobotMap::PCM_SHOOTER_FIRE, RobotMap::PCM_SHOOTER_RETRACT));
+	mp_shooterSolenoid.reset(
+			new DoubleSolenoid(RobotMap::PCM_SHOOTER_FIRE,
+					RobotMap::PCM_SHOOTER_RETRACT));
 }
 
 void ShooterSubsystem::InitDefaultCommand() {
@@ -18,6 +20,17 @@ void ShooterSubsystem::retractPistons() {
 	mp_shooterSolenoid->Set(DoubleSolenoid::kReverse);
 }
 
-void ShooterSubsystem::sendValuesToSmartDashboard(){
-
+void ShooterSubsystem::sendValuesToSmartDashboard() {
+	if (mp_shooterSolenoid->GetError().GetCode() != 0) {
+		SmartDashboard::PutString("Shooter/Solenoid", "Not Present");
+	} else {
+		DoubleSolenoid::Value val = mp_shooterSolenoid->Get();
+		if (val == DoubleSolenoid::kOff) {
+			SmartDashboard::PutString("Shooter/Solenoid", "Off");
+		} else if (val == DoubleSolenoid::kForward) {
+			SmartDashboard::PutString("Shooter/Solenoid", "Forward/Fire");
+		} else if (val == DoubleSolenoid::kReverse) {
+			SmartDashboard::PutString("Shooter/Solenoid", "Reverse/Retract");
+		}
+	}
 }

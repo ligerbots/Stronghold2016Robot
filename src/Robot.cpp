@@ -51,11 +51,13 @@ void Robot::AlwaysPeriodic() {
 	// other stuff
 	CommandBase::visionSubsystem->updateVision(Robot::ticks);
 
-	CommandBase::navXSubsystem->sendValuesToSmartDashboard();
+	CommandBase::visionSubsystem->sendValuesToSmartDashboard();
 	CommandBase::driveSubsystem->sendValuesToSmartDashboard();
+	CommandBase::navXSubsystem->sendValuesToSmartDashboard();
+	CommandBase::shooterSubsystem->sendValuesToSmartDashboard();
 	CommandBase::flapSubsystem->sendValuesToSmartDashboard();
-	// interrogating the PDP subsystem seems to make the robot unstable?
 	CommandBase::pdpSubsystem->sendValuesToSmartDashboard();
+	CommandBase::compressorSubsystem->sendValuesToSmartDashboard();
 	CommandBase::wedgeSubsystem->sendValuesToSmartDashboard();
 	CommandBase::intakeSubsystem->sendValuesToSmartDashboard();
 

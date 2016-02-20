@@ -83,15 +83,15 @@ void IntakeSubsystem::sendValuesToSmartDashboard() {
 							* mp_rollers->GetOutputCurrent() :
 					0);
 	if (mp_intakeArmSolenoid->GetError().GetCode() != 0) {
-		SmartDashboard::PutBoolean("Intake/Solenoid", "Not Present");
+		SmartDashboard::PutString("Intake/Solenoid", "Not Present");
 	} else {
 		DoubleSolenoid::Value val = mp_intakeArmSolenoid->Get();
 		if (val == DoubleSolenoid::kOff) {
-			SmartDashboard::PutBoolean("Intake/Solenoid", "Off");
+			SmartDashboard::PutString("Intake/Solenoid", "Off");
 		} else if (val == DoubleSolenoid::kForward) {
-			SmartDashboard::PutBoolean("Intake/Solenoid", "Forward/Down");
+			SmartDashboard::PutString("Intake/Solenoid", "Forward/Down");
 		} else if (val == DoubleSolenoid::kReverse) {
-			SmartDashboard::PutBoolean("Intake/Solenoid", "Reverse/Up");
+			SmartDashboard::PutString("Intake/Solenoid", "Reverse/Up");
 		}
 	}
 }

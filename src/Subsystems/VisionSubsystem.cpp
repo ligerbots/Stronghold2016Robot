@@ -4,7 +4,7 @@ VisionSubsystem::VisionSubsystem() :
 		Subsystem("VisionSubsystem"), exposure("VisionSubsystem_exposure"), showVision(
 				"VisionSubsystem_showProcessing"), mp_currentFrame(NULL), mp_processingFrame(
 		NULL), frameCenterX(0), frameCenterXParam(
-				"VisionSubsystem_frameCenterX", false), m_processingThread(
+				"VisionSubsystem/frameCenterX", false), m_processingThread(
 				&VisionSubsystem::visionProcessingThread, this) {
 	ledRingSpike.reset(new Relay(RobotMap::RELAY_LED_RING_SPIKE));
 }
@@ -92,7 +92,7 @@ void VisionSubsystem::visionProcessingThread() {
 		}
 
 		int err = IVA_ProcessImage(mp_processingFrame); // run vision script
-		SmartDashboard::PutNumber("VisionSubsystem_imaq_err", err);
+		SmartDashboard::PutNumber("Vision/imaq_err", err);
 
 		int numParticles;
 		bool needsConnection = true;
@@ -114,7 +114,7 @@ void VisionSubsystem::visionProcessingThread() {
 
 		__suseconds_t diff = endTime.tv_usec - startTime.tv_usec;
 		if (diff > -50000)
-			SmartDashboard::PutNumber("Vision_processingTime", diff);
+			SmartDashboard::PutNumber("Vision/processingTime", diff);
 
 		usleep(33000);
 	}
@@ -130,6 +130,25 @@ double VisionSubsystem::getFrameCenter() {
 		else
 			return width / 2.0;
 	}
+}
+
+void VisionSubsystem::sendValuesToSmartDashboard() {
+	if (ledRingSpike->GetError().GetCode() != 0) {
+		SmartDashboard::PutString("Vision/LED", "Not Present");
+	} else {
+		Relay::Value val = ledRingSpike->Get();
+		if (val == Relay::kOff) {
+			SmartDashboard::PutString("Vision/LED", "Off");
+		} else if (val == Relay::kForward) {
+			SmartDashboard::PutString("Vision/LED", "Forward");
+		} else if (val == Relay::kReverse) {
+			SmartDashboard::PutString("Vision/LED", "Reverse");
+		}
+	}
+
+	SmartDashboard::PutNumber("Vision/CamerasCount", Camera::GetNumberOfCameras());
+	SmartDashboard::PutBoolean("Vision/CamerasEnabled", Camera::IsEnabled());
+	SmartDashboard::PutBoolean("Vision/CamerasOpen", Camera::IsOpen());
 }
 
 void VisionSubsystem::SetPIDSourceType(PIDSourceType pidSource) {

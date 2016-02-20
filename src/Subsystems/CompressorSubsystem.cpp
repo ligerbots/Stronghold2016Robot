@@ -8,18 +8,25 @@ CompressorSubsystem::CompressorSubsystem() :
 void CompressorSubsystem::InitDefaultCommand() {
 }
 
-void CompressorSubsystem::setCompressor(bool on){
+void CompressorSubsystem::setCompressor(bool on) {
 	mp_compressor->SetClosedLoopControl(on);
 }
 
-bool CompressorSubsystem::isCompressorOn(){
+bool CompressorSubsystem::isCompressorOn() {
 	return mp_compressor->GetClosedLoopControl();
 }
 
-bool CompressorSubsystem::isPressureSwitchTriggered(){
+bool CompressorSubsystem::isPressureSwitchTriggered() {
 	return mp_compressor->GetPressureSwitchValue();
 }
 
 void CompressorSubsystem::toggleCompressor() {
-	setCompressor(not(isCompressorOn()));
+	setCompressor(not (isCompressorOn()));
+}
+
+void CompressorSubsystem::sendValuesToSmartDashboard() {
+	SmartDashboard::PutBoolean("Compressor/On", isCompressorOn());
+	if (Robot::ticks % 50 == 12) // don't spam the can bus and stagger with other polling
+		SmartDashboard::PutBoolean("Compressor/PressureSwitch",
+				isPressureSwitchTriggered());
 }
