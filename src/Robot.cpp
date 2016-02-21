@@ -3,6 +3,7 @@
 // Robot wide globals whose definitions live in the Robot class
 Robot* Robot::instance = NULL;
 int Robot::ticks;
+bool Robot::isRoadkill = false;
 
 Robot::Robot() {
 	instance = this;
@@ -24,7 +25,10 @@ void Robot::RobotInit() {
 //	mp_autonomousModeChooser->AddDefault("Default Auto", new ExampleCommand());
 	SmartDashboard::PutData("Auto Modes", mp_autonomousModeChooser);
 
-//	CommandBase::compressorSubystem->SetCompressor(true);
+	if (!isRoadkill)
+		CommandBase::compressorSubsystem->setCompressor(true);
+	else
+		CommandBase::compressorSubsystem->setCompressor(false);
 
 	printf("Writing i2c\n");
 	for (int i = 3; i < 4; i++) {
@@ -61,21 +65,21 @@ void Robot::AlwaysPeriodic() {
 	CommandBase::wedgeSubsystem->sendValuesToSmartDashboard();
 	CommandBase::intakeSubsystem->sendValuesToSmartDashboard();
 
-	if (mp_operatorInterface->joystickButtonPressed(
-			mp_operatorInterface->pXboxController, 3)) {
-		printf("Joystick 0:\n");
-		printf("\tName: %s\n",
-				DriverStation::GetInstance().GetJoystickName(0).c_str());
-		printf("\tType: %d\n", DriverStation::GetInstance().GetJoystickType(0));
-		printf("\tIsXbox: %d\n",
-				DriverStation::GetInstance().GetJoystickIsXbox(0));
-		printf("Joystick 1:\n");
-		printf("\tName: %s\n",
-				DriverStation::GetInstance().GetJoystickName(1).c_str());
-		printf("\tType: %d\n", DriverStation::GetInstance().GetJoystickType(1));
-		printf("\tIsXbox: %d\n",
-				DriverStation::GetInstance().GetJoystickIsXbox(1));
-	}
+//	if (mp_operatorInterface->joystickButtonPressed(
+//			mp_operatorInterface->pXboxController, 3)) {
+//		printf("Joystick 0:\n");
+//		printf("\tName: %s\n",
+//				DriverStation::GetInstance().GetJoystickName(0).c_str());
+//		printf("\tType: %d\n", DriverStation::GetInstance().GetJoystickType(0));
+//		printf("\tIsXbox: %d\n",
+//				DriverStation::GetInstance().GetJoystickIsXbox(0));
+//		printf("Joystick 1:\n");
+//		printf("\tName: %s\n",
+//				DriverStation::GetInstance().GetJoystickName(1).c_str());
+//		printf("\tType: %d\n", DriverStation::GetInstance().GetJoystickType(1));
+//		printf("\tIsXbox: %d\n",
+//				DriverStation::GetInstance().GetJoystickIsXbox(1));
+//	}
 }
 
 void Robot::DisabledInit() {

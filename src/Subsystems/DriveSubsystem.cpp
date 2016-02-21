@@ -100,14 +100,18 @@ DriveSubsystem::DriveSubsystem() :
 		TalonSlaveInit(*(talonPtrs[slave2Right]), masterRight);
 	}
 
+	/*
 	// Figure out where the encoders are
 	// Left
 	if (IsEncoderPresent(*mp_left1)) {
 		mp_leftEncoder = mp_left1.get();
+		printf("Left is 1\n");
 	} else if (IsEncoderPresent(*mp_left2)) {
 		mp_leftEncoder = mp_left2.get();
+		printf("Left is 2\n");
 	} else if (IsEncoderPresent(*mp_left3)) {
 		mp_leftEncoder = mp_left3.get();
+		printf("Left is 3\n");
 	} else {
 		printf("Warning: No left drive encoder found\n");
 		mp_leftEncoder = NULL;
@@ -115,14 +119,20 @@ DriveSubsystem::DriveSubsystem() :
 	// Right
 	if (IsEncoderPresent(*mp_right1)) {
 		mp_rightEncoder = mp_right1.get();
+		printf("Right is 1\n");
 	} else if (IsEncoderPresent(*mp_right2)) {
 		mp_rightEncoder = mp_right2.get();
+		printf("Right is 2\n");
 	} else if (IsEncoderPresent(*mp_right3)) {
 		mp_rightEncoder = mp_right3.get();
+		printf("Right is 3\n");
 	} else {
 		printf("Warning: No right drive encoder found\n");
 		mp_rightEncoder = NULL;
-	}
+	}*/
+
+	mp_leftEncoder = talonPtrs[RobotMap::CT_DRIVE_LEFT1];
+	mp_rightEncoder = talonPtrs[RobotMap::CT_DRIVE_RIGHT3];
 
 	// the object that actually handles setting talons from Arcade Drive input
 	mp_robotDrive.reset(
@@ -134,8 +144,17 @@ DriveSubsystem::DriveSubsystem() :
 
 	// initializes the shifter solenoid - forward for high gear, reverse for low
 	mp_shifterSolenoid.reset(
-			new DoubleSolenoid(RobotMap::PCM_CAN, RobotMap::PCM_SHIFTER_HIGH_GEAR,
+			new DoubleSolenoid(RobotMap::PCM_CAN,
+					RobotMap::PCM_SHIFTER_HIGH_GEAR,
 					RobotMap::PCM_SHIFTER_LOW_GEAR));
+
+	// detect roadkill if both 3rd talons are missing
+	if(!talonsPresent[RobotMap::CT_DRIVE_LEFT3]
+			&& !talonsPresent[RobotMap::CT_DRIVE_RIGHT3]){
+		Robot::isRoadkill = true;
+		printf("Roadkill detected\n");
+	}
+	printf("Drive init done\n");
 }
 
 DriveSubsystem::~DriveSubsystem() {
@@ -162,6 +181,10 @@ void DriveSubsystem::drive(double y, double x) {
 	SmartDashboard::PutNumber("x", x);
 	SmartDashboard::PutNumber("y", y);
 	mp_robotDrive->ArcadeDrive(y, x);
+}
+
+void DriveSubsystem::driveDirect(double left, double right){
+	mp_robotDrive->SetLeftRightMotorOutputs(left, right);
 }
 
 double DriveSubsystem::getLeftEncoderPosition() {
@@ -218,8 +241,10 @@ void DriveSubsystem::sendValuesToSmartDashboard() {
 							0.0);
 		}
 
-		SmartDashboard::PutNumber("Drive/LeftPosition", getLeftEncoderPosition());
-		SmartDashboard::PutNumber("Drive/RightPosition", getRightEncoderPosition());
+		SmartDashboard::PutNumber("Drive/LeftPosition",
+				getLeftEncoderPosition());
+		SmartDashboard::PutNumber("Drive/RightPosition",
+				getRightEncoderPosition());
 
 		if (mp_shifterSolenoid->GetError().GetCode() != 0) {
 			SmartDashboard::PutString("Drive/Shifter", "Not Present");

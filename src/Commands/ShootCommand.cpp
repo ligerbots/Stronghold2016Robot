@@ -13,23 +13,25 @@ ShootCommand::ShootCommand() :
 void ShootCommand::Initialize() {
 	done = false;
 	m_ticks = 0;
-	if (!wedgeSubsystem->isWedgeDown() && intakeSubsystem->isIntakeReadyToFire()) {
+	if (/*!wedgeSubsystem->isWedgeDown()
+			&& */!intakeSubsystem->isIntakeArmUp()) {
 		done = true;
+		printf("ShooterCommand: not safe to fire\n");
 	}
 	SetInterruptible(false);
 }
 
 void ShootCommand::Execute() {
 	m_ticks++;
-	if (wedgeSubsystem->isWedgeDown() && intakeSubsystem->isIntakeReadyToFire() && m_ticks == 1) {
-			shooterSubsystem->firePistons();
-		}
-	// equivalent to: !wedgeSubsystem->isWedgeDown() && intakeSubsystem->isIntakeReadyToFire()
-	else if (m_ticks == 1) {
+	if (/*wedgeSubsystem->isWedgeDown() &&*/ intakeSubsystem->isIntakeArmUp()
+			&& m_ticks == 1) {
+		printf("ShooterCommand: firing\n");
+		shooterSubsystem->firePistons();
+	} else if (m_ticks == 1) { // // equivalent to: !wedgeSubsystem->isWedgeDown() && intakeSubsystem->isIntakeReadyToFire()
 		done = true;
+		printf("ShooterCommand: not safe to fire\n");
 	}
 	if (m_ticks == 100) {
-		shooterSubsystem->retractPistons();
 		done = true;
 	}
 }

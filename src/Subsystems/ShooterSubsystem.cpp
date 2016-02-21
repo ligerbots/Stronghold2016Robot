@@ -3,7 +3,7 @@
 ShooterSubsystem::ShooterSubsystem() :
 		Subsystem("ShooterSubsystem") {
 	mp_shooterSolenoid.reset(
-			new DoubleSolenoid(RobotMap::PCM_CAN, RobotMap::PCM_SHOOTER_FIRE,
+			new DoubleSolenoid(RobotMap::PCM_HIGH_FLOW_CAN, RobotMap::PCM_SHOOTER_FIRE,
 					RobotMap::PCM_SHOOTER_RETRACT));
 }
 

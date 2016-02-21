@@ -2,6 +2,7 @@
 
 #include "Commands/Subsystem.h"
 #include "WPILib.h"
+#include <AHRS.h>
 
 class NavXSubsystem: public Subsystem, public PIDSource {
 private:

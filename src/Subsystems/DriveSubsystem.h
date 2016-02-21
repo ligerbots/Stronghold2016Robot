@@ -66,6 +66,7 @@ public:
 	 * @param x Rotation, [0, 1]
 	 */
 	void drive(double y, double x);
+	void driveDirect(double left, double right);
 	/**
 	 * Zeroes the motors. Use at the end of autonomous commands that use DriveSubsystem
 	 */

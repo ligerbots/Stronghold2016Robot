@@ -23,6 +23,7 @@
 #include "CommandBase.h"
 #include "Commands/CenterOnTargetCommand.h"
 #include "Commands/DelayCommand.h"
+#include "Commands/DriveDistanceCommand.h"
 #include "Commands/DriveJoystickCommand.h"
 #include "Commands/FlapCommand.h"
 #include "Commands/GearShiftDownCommand.h"

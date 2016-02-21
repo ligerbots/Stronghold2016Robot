@@ -7,6 +7,11 @@ class Robot: public IterativeRobot {
 public:
 	static Robot* instance;
 	static int ticks;		// make this globally available
+	/**
+	 * True if the program is currently running on roadkill
+	 * Only useful after CommandBase::init()
+	 */
+	static bool isRoadkill;
 
 	OI* mp_operatorInterface;
 	SendableChooser* mp_autonomousModeChooser;
