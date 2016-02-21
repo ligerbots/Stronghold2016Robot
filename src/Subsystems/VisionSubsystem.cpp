@@ -122,7 +122,7 @@ void VisionSubsystem::visionProcessingThread() {
 		if (showVision.get()) {
 			LCameraServer::GetInstance()->SetImage(mp_processingFrame);
 		}
-		else {
+		else if (numParticles != 0) {
 			int x = (int) frameCenterX;
 			int y = (int) frameCenterY;
 			int centerX = width/2;
