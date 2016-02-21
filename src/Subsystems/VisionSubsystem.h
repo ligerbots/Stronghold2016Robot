@@ -14,6 +14,7 @@ private:
 	Image* mp_processingFrame;
 
 	double frameCenterX;
+	double frameCenterY;
 	Parameter<int> frameCenterXParam;
 
 	int activeCamera;

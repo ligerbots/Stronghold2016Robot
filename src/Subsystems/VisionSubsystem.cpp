@@ -63,6 +63,7 @@ void VisionSubsystem::toggleCameraFeed(){
 void VisionSubsystem::visionProcessingThread() {
 	printf("VisionSubsystem: Processing thread start\n");
 
+	int width, height;
 	timeval startTime;
 	timeval endTime;
 	while (true) {
@@ -107,8 +108,11 @@ void VisionSubsystem::visionProcessingThread() {
 		bool needsConnection = true;
 		imaqCountParticles(mp_processingFrame, needsConnection, &numParticles);
 		if (numParticles != 0) {
+			imaqGetImageSize(mp_currentFrame, &width, &height);
 			imaqMeasureParticle(mp_processingFrame, 0, false,
 					IMAQ_MT_CENTER_OF_MASS_X, &frameCenterX);
+			imaqMeasureParticle(mp_processingFrame, 0, false,
+					IMAQ_MT_CENTER_OF_MASS_Y, &frameCenterY);
 		} else {
 			// TODO: make sure that in pid commands you stop if it's NAN
 //			frameCenterX = NAN;
@@ -117,6 +121,22 @@ void VisionSubsystem::visionProcessingThread() {
 
 		if (showVision.get()) {
 			LCameraServer::GetInstance()->SetImage(mp_processingFrame);
+		}
+		else {
+			int x = (int) frameCenterX;
+			int y = (int) frameCenterY;
+			int centerX = width/2;
+			bool centered = (centerX < x+5) && (centerX > y -5);
+			int top, left, rectheight, rectwidth;
+			top = y + 5;
+			left = x + 5;
+			rectheight = 10;
+			rectwidth = 10;
+
+			RGBValue rgbColor = centered ? IMAQ_RGB_GREEN : IMAQ_RGB_RED;
+			RGBValue *pColor = &rgbColor;
+
+			imaqOverlayOval(mp_currentFrame, {top, left, rectheight, rectwidth}, pColor, IMAQ_DRAW_VALUE, NULL);
 		}
 
 		gettimeofday(&endTime, 0);
