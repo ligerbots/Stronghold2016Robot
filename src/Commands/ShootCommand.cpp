@@ -31,7 +31,7 @@ void ShootCommand::Execute() {
 		done = true;
 		printf("ShooterCommand: not safe to fire\n");
 	}
-	if (m_ticks == 100) {
+	if (m_ticks == 25) {
 		done = true;
 	}
 }

@@ -53,7 +53,7 @@ Camera::Camera(uInt32 i) :
 	firstTime = true;
 	frame = NULL;
 	session = ULONG_MAX;
-	verticalFlip = false;
+	verticalFlip = true;
 	frameWidth = 0;
 	frameHeight = 0;
 }
@@ -62,7 +62,7 @@ Image* Camera::GetStoredFrame() {
 	return frame;
 }
 
-void Camera::SetVerticalFlip(bool flip){
+void Camera::SetVerticalFlip(bool flip) {
 	verticalFlip = flip;
 }
 
@@ -468,7 +468,7 @@ IMAQdxError Camera::GetFrame() {
 		}
 		firstTime = false;
 		if (verticalFlip) // in imaq, vertical is "horizontal"
-			imaqFlip(frame, frame, FlipAxis::IMAQ_HORIZONTAL_AXIS);
+			imaqFlip(frame, frame, FlipAxis::IMAQ_CENTER_AXIS);
 	}
 	return imaqError;
 }
