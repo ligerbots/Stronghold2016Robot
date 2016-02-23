@@ -13,9 +13,9 @@ IntakeSubsystem::IntakeSubsystem() :
 	mp_rollers->GetOutputVoltage();
 	if (mp_rollers->GetError().GetCode() != 0) {
 		printf("Intake: Roller talon not present!\n");
-		rollerTalonPresent = false;
+		m_rollerTalonPresent = false;
 	} else {
-		rollerTalonPresent = true;
+		m_rollerTalonPresent = true;
 	}
 
 	mp_ballInSwitch.reset(
@@ -29,34 +29,36 @@ void IntakeSubsystem::InitDefaultCommand() {
 }
 
 void IntakeSubsystem::rollIn() {
-	mp_rollers->Set(ROLLER_SPEED);
+	if (m_rollerTalonPresent) mp_rollers->Set(ROLLER_SPEED);
 }
 
 void IntakeSubsystem::rollOut() {
-	mp_rollers->Set(-ROLLER_SPEED);
+	if (m_rollerTalonPresent) mp_rollers->Set(-ROLLER_SPEED);
 }
 
 void IntakeSubsystem::rollStop() {
-	mp_rollers->Set(0);
+	if (m_rollerTalonPresent) mp_rollers->Set(0);
 }
 
 void IntakeSubsystem::setRollSpeed(double speed){
-	mp_rollers->Set(speed);
+	if (m_rollerTalonPresent) mp_rollers->Set(speed);
 }
 
 double IntakeSubsystem::getRollerRevolutions() {
+	if (m_rollerTalonPresent) return 0.0;
 	return mp_rollers->GetPosition();
 }
 
 void IntakeSubsystem::setIntakeArmUp() {
-	mp_intakeArmSolenoid->Set(DoubleSolenoid::kReverse);
+	if (m_rollerTalonPresent) mp_intakeArmSolenoid->Set(DoubleSolenoid::kReverse);
 }
 
 void IntakeSubsystem::setIntakeArmDown() {
-	mp_intakeArmSolenoid->Set(DoubleSolenoid::kForward);
+	if (m_rollerTalonPresent) mp_intakeArmSolenoid->Set(DoubleSolenoid::kForward);
 }
 
-DoubleSolenoid::Value IntakeSubsystem::getIntakeArmValue(){
+DoubleSolenoid::Value IntakeSubsystem::getIntakeArmValue() {
+	if (m_rollerTalonPresent) return DoubleSolenoid::kOff;
 	return mp_intakeArmSolenoid->Get();
 }
 
@@ -78,11 +80,11 @@ void IntakeSubsystem::sendValuesToSmartDashboard() {
 	SmartDashboard::PutBoolean("Intake/Arm_Clear", isIntakeArmUp());
 	SmartDashboard::PutBoolean("Intake/Ball_In", isBallInPosition());
 	SmartDashboard::PutNumber("Intake/Roller_Revolutions",
-			rollerTalonPresent ? getRollerRevolutions() : 0);
+			m_rollerTalonPresent ? getRollerRevolutions() : 0);
 
-	SmartDashboard::PutBoolean("Intake/RollerStatus", rollerTalonPresent);
+	SmartDashboard::PutBoolean("Intake/RollerStatus", m_rollerTalonPresent);
 	SmartDashboard::PutNumber("Intake/RollerWatts",
-			rollerTalonPresent ?
+			m_rollerTalonPresent ?
 					mp_rollers->GetOutputVoltage()
 							* mp_rollers->GetOutputCurrent() :
 					0);

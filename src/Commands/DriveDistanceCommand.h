@@ -14,7 +14,7 @@ protected:
 	static constexpr double RAMP_RATE = 0.1;
 	static constexpr double MAX_SPEED = 0.7;
 public:
-	DriveDistanceCommand(double distance);
+	explicit DriveDistanceCommand(double distance);
 	void Initialize();
 	void Execute();
 	bool IsFinished();

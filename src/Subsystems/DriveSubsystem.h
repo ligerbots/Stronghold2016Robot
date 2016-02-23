@@ -16,11 +16,11 @@ private:
 
 	std::unique_ptr<DoubleSolenoid> mp_shifterSolenoid;
 
-	CANTalon* talonPtrs[7];
+	CANTalon *talonPtrs[7];
 	bool talonsPresent[7];
 
-	CANTalon* mp_leftEncoder;
-	CANTalon* mp_rightEncoder;
+	CANTalon *mp_leftEncoder;
+	CANTalon *mp_rightEncoder;
 
 protected:
 	class DriveTurnPIDOutput: public PIDOutput {

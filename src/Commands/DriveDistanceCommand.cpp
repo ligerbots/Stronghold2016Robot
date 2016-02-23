@@ -14,7 +14,8 @@ void DriveDistanceCommand::Initialize() {
 void DriveDistanceCommand::Execute() {
 	double left = driveSubsystem->getLeftEncoderPosition();
 	double right = driveSubsystem->getRightEncoderPosition();
-
+	(void)left;	// avoid warnings until we finish this function
+	(void)right;
 }
 
 bool DriveDistanceCommand::IsFinished() {

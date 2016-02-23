@@ -101,6 +101,7 @@ void Robot::AutonomousInit() {
 
 	CommandBase::driveJoystickCommand->Cancel();
 	CommandBase::intakeRollerCommand->Cancel();
+	CommandBase::flapCommand->Cancel();
 }
 
 void Robot::AutonomousPeriodic() {
@@ -117,6 +118,7 @@ void Robot::TeleopInit() {
 	// this line or comment it out.
 	CommandBase::driveJoystickCommand->Start();
 	CommandBase::intakeRollerCommand->Start();
+	CommandBase::flapCommand->Start();
 }
 
 void Robot::TeleopPeriodic() {

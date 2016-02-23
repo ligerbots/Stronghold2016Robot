@@ -131,8 +131,16 @@ DriveSubsystem::DriveSubsystem() :
 		mp_rightEncoder = NULL;
 	}*/
 
+	// detect roadkill if both 3rd talons are missing
+	if(!talonsPresent[RobotMap::CT_DRIVE_LEFT3]
+			&& !talonsPresent[RobotMap::CT_DRIVE_RIGHT3]){
+		Robot::isRoadkill = true;
+		printf("Roadkill detected\n");
+	}
+
 	mp_leftEncoder = talonPtrs[RobotMap::CT_DRIVE_LEFT1];
-	mp_rightEncoder = talonPtrs[RobotMap::CT_DRIVE_RIGHT3];
+	if (!Robot::isRoadkill)	mp_rightEncoder = talonPtrs[RobotMap::CT_DRIVE_RIGHT3];
+	else mp_rightEncoder = talonPtrs[RobotMap::CT_DRIVE_RIGHT1];
 
 	// the object that actually handles setting talons from Arcade Drive input
 	mp_robotDrive.reset(
@@ -148,12 +156,6 @@ DriveSubsystem::DriveSubsystem() :
 					RobotMap::PCM_SHIFTER_HIGH_GEAR,
 					RobotMap::PCM_SHIFTER_LOW_GEAR));
 
-	// detect roadkill if both 3rd talons are missing
-	if(!talonsPresent[RobotMap::CT_DRIVE_LEFT3]
-			&& !talonsPresent[RobotMap::CT_DRIVE_RIGHT3]){
-		Robot::isRoadkill = true;
-		printf("Roadkill detected\n");
-	}
 	printf("Drive init done\n");
 }
 

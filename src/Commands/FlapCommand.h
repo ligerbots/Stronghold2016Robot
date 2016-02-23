@@ -8,8 +8,6 @@
  */
 class FlapCommand: public CommandBase {
 protected:
-	bool m_direction;
-	bool m_done;
 public:
 	Parameter<double> leftLowLimit;
 	Parameter<double> leftHighLimit;

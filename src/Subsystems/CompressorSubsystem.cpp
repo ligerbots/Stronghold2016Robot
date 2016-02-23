@@ -2,26 +2,30 @@
 
 CompressorSubsystem::CompressorSubsystem() :
 		Subsystem("Compressor") {
-	mp_compressor.reset(new Compressor(RobotMap::PCM_CAN));
+	// Since they ripped the PCM off of Road Kill, we'd better not reference it
+	// It would be better if we could test for the presence/absence of the PCM
+	// directly, but unfortunately that doesn't seem possible through WPILib
+	m_Enable = !Robot::isRoadkill;
+	if (m_Enable) mp_compressor.reset(new Compressor(RobotMap::PCM_CAN));
 }
 
 void CompressorSubsystem::InitDefaultCommand() {
 }
 
 void CompressorSubsystem::setCompressor(bool on) {
-	mp_compressor->SetClosedLoopControl(on);
+	if (m_Enable) mp_compressor->SetClosedLoopControl(on);
 }
 
 bool CompressorSubsystem::isCompressorOn() {
-	return mp_compressor->GetClosedLoopControl();
+	return m_Enable && mp_compressor->GetClosedLoopControl();
 }
 
 bool CompressorSubsystem::isPressureSwitchTriggered() {
-	return mp_compressor->GetPressureSwitchValue();
+	return m_Enable && mp_compressor->GetPressureSwitchValue();
 }
 
 void CompressorSubsystem::toggleCompressor() {
-	setCompressor(not (isCompressorOn()));
+	if (m_Enable) setCompressor(not (isCompressorOn()));
 }
 
 void CompressorSubsystem::sendValuesToSmartDashboard() {
