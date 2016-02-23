@@ -8,14 +8,15 @@ class VisionSubsystem: public Subsystem, public PIDSource {
 private:
 	Parameter<int> exposure;
 	Parameter<bool> showVision;
+	Parameter<bool> paintTarget;
 
 	std::mutex m_frameMutex;
 	Image* mp_currentFrame;
 	Image* mp_processingFrame;
 
-	double frameCenterX;
-	double frameCenterY;
-	Parameter<int> frameCenterXParam;
+	double m_frameCenterX;
+	double m_frameCenterY;
+	int m_numParticles;
 
 	int activeCamera;
 

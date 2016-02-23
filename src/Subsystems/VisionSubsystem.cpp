@@ -1,11 +1,17 @@
 #include <Stronghold2016Robot.h>
 
 VisionSubsystem::VisionSubsystem() :
-		Subsystem("VisionSubsystem"), exposure("VisionSubsystem_exposure"), showVision(
-				"VisionSubsystem_showProcessing"), mp_currentFrame(NULL), mp_processingFrame(
-		NULL), frameCenterX(0), frameCenterXParam(
-				"Vision/frameCenterX", false), m_processingThread(
-				&VisionSubsystem::visionProcessingThread, this) {
+		Subsystem("VisionSubsystem"),
+			exposure("Exposure"),
+			showVision("ShowVision"),
+			paintTarget("PaintTarget"),
+			mp_currentFrame(NULL),
+			mp_processingFrame(NULL),
+			m_frameCenterX(0),
+			m_frameCenterY(0),
+			m_numParticles(0),
+			m_processingThread(&VisionSubsystem::visionProcessingThread, this)
+{
 	activeCamera = 0;
 	ledRingSpike.reset(new Relay(RobotMap::RELAY_LED_RING_SPIKE));
 }
@@ -48,12 +54,14 @@ void VisionSubsystem::updateVision(int ticks) {
 		image = Camera::GetCamera(activeCamera)->GetStoredFrame();
 		mp_currentFrame = Camera::GetCamera(0)->GetStoredFrame();
 	}
-	if (!showVision.get() && image != NULL)
+
+	if (!paintTarget.get() && !showVision.get() && image != NULL) {
 		LCameraServer::GetInstance()->SetImage(image);
+	}
 }
 
-void VisionSubsystem::toggleCameraFeed(){
-	if (Camera::GetNumberOfCameras() > 1){
+void VisionSubsystem::toggleCameraFeed() {
+	if (Camera::GetNumberOfCameras() > 1) {
 		activeCamera = 1 - activeCamera; // 1 -> 0; 0 -> 1
 	} else {
 		activeCamera = 0;
@@ -63,7 +71,6 @@ void VisionSubsystem::toggleCameraFeed(){
 void VisionSubsystem::visionProcessingThread() {
 	printf("VisionSubsystem: Processing thread start\n");
 
-	int width, height;
 	timeval startTime;
 	timeval endTime;
 	while (true) {
@@ -82,22 +89,6 @@ void VisionSubsystem::visionProcessingThread() {
 
 		{
 			std::lock_guard<std::mutex> lock(m_frameMutex);
-//			Rect rect;
-//			rect.top = 0;
-//			rect.left = 0;
-//			int width;
-//			int height;
-//			imaqGetImageSize(mp_currentFrame, &width, &height);
-//			imaqSetImageSize(mp_processingFrame, width, height);
-//			unsigned int bitDepth;
-//			imaqGetBitDepth(mp_currentFrame, &bitDepth);
-//			imaqSetBitDepth(mp_processingFrame, bitDepth);
-//			rect.width = width;
-//			rect.height = height;
-//			Point pt;
-//			pt.x = 0;
-//			pt.y = 0;
-//			imaqCopyRect(mp_processingFrame, mp_currentFrame, rect, pt);
 			imaqDuplicate(mp_processingFrame, mp_currentFrame);
 		}
 
@@ -108,35 +99,38 @@ void VisionSubsystem::visionProcessingThread() {
 		bool needsConnection = true;
 		imaqCountParticles(mp_processingFrame, needsConnection, &numParticles);
 		if (numParticles != 0) {
-			imaqGetImageSize(mp_currentFrame, &width, &height);
 			imaqMeasureParticle(mp_processingFrame, 0, false,
-					IMAQ_MT_CENTER_OF_MASS_X, &frameCenterX);
+					IMAQ_MT_CENTER_OF_MASS_X, &m_frameCenterX);
 			imaqMeasureParticle(mp_processingFrame, 0, false,
-					IMAQ_MT_CENTER_OF_MASS_Y, &frameCenterY);
+					IMAQ_MT_CENTER_OF_MASS_Y, &m_frameCenterY);
 		} else {
 			// TODO: make sure that in pid commands you stop if it's NAN
 //			frameCenterX = NAN;
 		}
-		frameCenterXParam = frameCenterX;
 
-		if (showVision.get()) {
+		if (paintTarget.get()) {
+			// Send the image to the dashboard with a target indicator
+			if (m_numParticles != 0) {
+				int width, height;
+				imaqGetImageSize(mp_processingFrame, &width, &height);
+				int x = (int) m_frameCenterX;
+				int y = (int) m_frameCenterY;
+				int centerX = width/2;
+				bool centered = (centerX < x+5) && (centerX > y -5);
+				int top, left, rectheight, rectwidth;
+				top = y + 5;
+				left = x + 5;
+				rectheight = 10;
+				rectwidth = 10;
+
+				RGBValue rgbColor = centered ? IMAQ_RGB_GREEN : IMAQ_RGB_RED;
+				RGBValue *pColor = &rgbColor;
+
+				imaqOverlayOval(mp_currentFrame, {top, left, rectheight, rectwidth}, pColor, IMAQ_DRAW_VALUE, NULL);
+			}
+			LCameraServer::GetInstance()->SetImage(mp_currentFrame);
+		} else if (showVision.get()) {
 			LCameraServer::GetInstance()->SetImage(mp_processingFrame);
-		}
-		else if (numParticles != 0) {
-			int x = (int) frameCenterX;
-			int y = (int) frameCenterY;
-			int centerX = width/2;
-			bool centered = (centerX < x+5) && (centerX > y -5);
-			int top, left, rectheight, rectwidth;
-			top = y + 5;
-			left = x + 5;
-			rectheight = 10;
-			rectwidth = 10;
-
-			RGBValue rgbColor = centered ? IMAQ_RGB_GREEN : IMAQ_RGB_RED;
-			RGBValue *pColor = &rgbColor;
-
-			imaqOverlayOval(mp_currentFrame, {top, left, rectheight, rectwidth}, pColor, IMAQ_DRAW_VALUE, NULL);
 		}
 
 		gettimeofday(&endTime, 0);
@@ -163,21 +157,25 @@ double VisionSubsystem::getFrameCenter() {
 
 void VisionSubsystem::sendValuesToSmartDashboard() {
 	if (ledRingSpike->GetError().GetCode() != 0) {
-		SmartDashboard::PutString("Vision/LED", "Not Present");
+		SmartDashboard::PutString("LED", "Not Present");
 	} else {
 		Relay::Value val = ledRingSpike->Get();
 		if (val == Relay::kOff) {
-			SmartDashboard::PutString("Vision/LED", "Off");
+			SmartDashboard::PutString("LED", "Off");
 		} else if (val == Relay::kForward) {
-			SmartDashboard::PutString("Vision/LED", "Forward");
+			SmartDashboard::PutString("LED", "Forward");
 		} else if (val == Relay::kReverse) {
-			SmartDashboard::PutString("Vision/LED", "Reverse");
+			SmartDashboard::PutString("LED", "Reverse");
 		}
 	}
 
-	SmartDashboard::PutNumber("Vision/CamerasCount", Camera::GetNumberOfCameras());
-	SmartDashboard::PutBoolean("Vision/CamerasEnabled", Camera::IsEnabled());
-	SmartDashboard::PutBoolean("Vision/CamerasOpen", Camera::IsOpen());
+	SmartDashboard::PutNumber("CamerasCount", Camera::GetNumberOfCameras());
+	SmartDashboard::PutBoolean("CamerasEnabled", Camera::IsEnabled());
+	SmartDashboard::PutBoolean("CamerasOpen", Camera::IsOpen());
+	SmartDashboard::PutNumber("TargetsDetected", m_numParticles);
+	SmartDashboard::PutNumber("Target X Pos", m_frameCenterX);
+	SmartDashboard::PutNumber("Target Y Pos", m_frameCenterY);
+	SmartDashboard::PutNumber("TargetsDetected", m_numParticles);
 }
 
 void VisionSubsystem::SetPIDSourceType(PIDSourceType pidSource) {
@@ -189,6 +187,6 @@ PIDSourceType VisionSubsystem::GetPIDSourceType() const {
 }
 
 double VisionSubsystem::PIDGet() {
-	return frameCenterX / (getFrameCenter() * 2);
+	return m_frameCenterX / (getFrameCenter() * 2);
 }
 

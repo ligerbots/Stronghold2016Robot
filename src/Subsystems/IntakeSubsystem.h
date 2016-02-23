@@ -11,7 +11,7 @@ private:
 	std::unique_ptr<DigitalInput> mp_intakeUpSwitch;
 	std::unique_ptr<DigitalInput> mp_ballInSwitch;
 
-	bool rollerTalonPresent;
+	bool m_rollerTalonPresent;
 
 	static constexpr double ROLLER_SPEED = 1;
 public:

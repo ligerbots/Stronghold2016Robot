@@ -7,6 +7,7 @@ class CompressorSubsystem: public Subsystem
 {
 private:
 	std::unique_ptr<Compressor> mp_compressor;
+	bool m_Enable;
 public:
 	CompressorSubsystem();
 	void InitDefaultCommand();
