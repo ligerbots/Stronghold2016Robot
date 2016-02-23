@@ -3,7 +3,7 @@
 VisionSubsystem::VisionSubsystem() :
 		Subsystem("VisionSubsystem"), exposure("VisionSubsystem_exposure"), showVision(
 				"VisionSubsystem_showProcessing"), mp_currentFrame(NULL), mp_processingFrame(
-		NULL), frameCenterX(0), frameCenterXParam(
+		NULL), frameCenterX(0), frameCenterY(0), frameCenterXParam(
 				"Vision/frameCenterX", false), m_processingThread(
 				&VisionSubsystem::visionProcessingThread, this) {
 	activeCamera = 0;

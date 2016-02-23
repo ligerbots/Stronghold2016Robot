@@ -1,46 +1,45 @@
 #include <Stronghold2016Robot.h>
 
 FlapCommand::FlapCommand() :
-		CommandBase("FlapCommand_"), leftLowLimit("FlapLeftLowLimit"),
-								    leftHighLimit("FlapLeftHighLimit"),
-									rightLowLimit("FlapRightLowLimit"),
-									rightHighLimit("FlapRightHighLimit")
-{
+		CommandBase("FlapCommand_"), leftLowLimit("FlapLeftLowLimit"), leftHighLimit(
+				"FlapLeftHighLimit"), rightLowLimit("FlapRightLowLimit"), rightHighLimit(
+				"FlapRightHighLimit") {
 	Requires(flapSubsystem.get());
-	m_direction = false;
-    m_done = false;
+	SetInterruptible(true);
 }
 
 void FlapCommand::Initialize() {
-	m_direction = !m_direction;
-	printf("FlapTest initialized, direction = %s\n", m_direction ? "true" : "false");
-	m_done = false;
+	printf("FlapCommand initialized\n");
 }
 
 void FlapCommand::Execute() {
-	if (m_direction) {
-		printf("Move flaps %s to %4.2f, %4.2f\n", m_direction ? "true" : "false",
-				leftLowLimit.get(), rightHighLimit.get());
-		flapSubsystem->setLeftFlapAngle(leftLowLimit.get());
-		flapSubsystem->setRightFlapAngle(rightHighLimit.get());
+	int hat = Robot::instance->mp_operatorInterface->pXboxController->GetPOV(0);
+	if (hat != -1) {
+		double fraction = 0; // angle = 0 or 360
+		if (hat == 90)
+			fraction = 1.0 / 3.0;
+		else if (hat == 180)
+			fraction = 2.0 / 3.0;
+		else if (hat == 270)
+			fraction = 1;
+
+		double leftFlapPosition = (leftHighLimit.get() - leftLowLimit.get()) * fraction
+				+ leftLowLimit.get();
+		double rightFlapPosition = (rightHighLimit.get() - rightLowLimit.get()) * fraction
+				+ rightLowLimit.get();
+		flapSubsystem->setLeftFlapAngle(leftFlapPosition);
+		flapSubsystem->setRightFlapAngle(rightFlapPosition);
 	}
-	else {
-		printf("Move flaps to %s to %4.2f, %4.2f\n", m_direction ? "true" : "false",
-				leftHighLimit.get(), rightLowLimit.get());
-		flapSubsystem->setLeftFlapAngle(leftHighLimit.get());
-		flapSubsystem->setRightFlapAngle(rightLowLimit.get());
-	}
-	m_done = true;
 }
 
 bool FlapCommand::IsFinished() {
-	return m_done;
+	return false;
 }
 
 void FlapCommand::End() {
-	printf("Flap Test Done\n");
+	printf("FlapCommand: Done\n");
 }
 
 void FlapCommand::Interrupted() {
-	printf("FlapTest Interrupted");
+	printf("FlapCommand: Interrupted\n");
 }

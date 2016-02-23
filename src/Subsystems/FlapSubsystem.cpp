@@ -1,6 +1,7 @@
 #include <Stronghold2016Robot.h>
 
-FlapSubsystem::FlapSubsystem() : Subsystem("FlapSubsystem") {
+FlapSubsystem::FlapSubsystem() :
+		Subsystem("FlapSubsystem") {
 	mp_leftFlap.reset(new Servo(RobotMap::PWM_SERVO_SHOOTER_LEFT));
 	mp_rightFlap.reset(new Servo(RobotMap::PWM_SERVO_SHOOTER_RIGHT));
 }
