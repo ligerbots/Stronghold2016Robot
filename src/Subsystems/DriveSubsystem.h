@@ -31,9 +31,15 @@ protected:
 			mr_parent(r_parent) {
 		}
 		void PIDWrite(float pidOutput) {
+			if(fabs(pidOutput) > 0 && fabs(pidOutput) < 0.4){
+				if(pidOutput < 0)
+					pidOutput = -0.4;
+				else
+					pidOutput = 0.4;
+			}
+			pidOutput = -pidOutput;
+
 			printf("TurnPIDOutput %f\n", pidOutput);
-			if(pidOutput > 0.7) pidOutput = 0.7;
-			if(pidOutput > 0 && pidOutput < 0.33) pidOutput = 0.33;
 			mr_parent.drive(0, pidOutput); // turn
 		}
 	};
@@ -74,6 +80,7 @@ public:
 	void zeroMotors();
 	void shiftUp();
 	void shiftDown();
+	bool isShiftedUp();
 	double getLeftEncoderPosition();
 	double getRightEncoderPosition();
 

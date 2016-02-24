@@ -9,6 +9,7 @@ private:
 	Parameter<int> exposure;
 	Parameter<bool> showVision;
 	Parameter<bool> paintTarget;
+	Parameter<double> color;
 
 	std::mutex m_frameMutex;
 	Image* mp_currentFrame;

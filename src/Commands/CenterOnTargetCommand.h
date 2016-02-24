@@ -5,7 +5,7 @@
 
 class CenterOnTargetCommand: public CommandBase {
 protected:
-	PIDController m_softwarePID;
+	PIDController *m_softwarePID;
 
 public:
 	CenterOnTargetCommand();

@@ -45,7 +45,7 @@ void IntakeSubsystem::setRollSpeed(double speed){
 }
 
 double IntakeSubsystem::getRollerRevolutions() {
-	if (m_rollerTalonPresent) return 0.0;
+	if (!m_rollerTalonPresent) return 0.0;
 	return mp_rollers->GetPosition();
 }
 
@@ -58,6 +58,8 @@ void IntakeSubsystem::setIntakeArmDown() {
 }
 
 DoubleSolenoid::Value IntakeSubsystem::getIntakeArmValue() {
+	if (!m_rollerTalonPresent)
+		return DoubleSolenoid::kOff;
 	return mp_intakeArmSolenoid->Get();
 }
 

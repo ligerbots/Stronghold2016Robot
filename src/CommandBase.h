@@ -46,4 +46,5 @@ public:
 	static std::unique_ptr<Command> gearShiftDownCommand;
 	static std::unique_ptr<Command> gearShiftUpCommand;
 	static std::unique_ptr<Command> intakeRollerCommand;
+	static std::unique_ptr<Command> gearShiftCommand;
 };

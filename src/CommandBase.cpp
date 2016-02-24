@@ -22,6 +22,7 @@ std::unique_ptr<Command> CommandBase::intakeToggleCommand = NULL;
 std::unique_ptr<Command> CommandBase::gearShiftDownCommand = NULL;
 std::unique_ptr<Command> CommandBase::gearShiftUpCommand = NULL;
 std::unique_ptr<Command> CommandBase::intakeRollerCommand = NULL;
+std::unique_ptr<Command> CommandBase::gearShiftCommand = NULL;
 
 CommandBase::CommandBase(const std::string &name) :
 		Command(name) {
@@ -54,5 +55,5 @@ void CommandBase::init() {
 	gearShiftDownCommand.reset(new GearShiftDownCommand());
 	gearShiftUpCommand.reset(new GearShiftUpCommand());
 	intakeRollerCommand.reset(new IntakeRollerCommand());
-
+	gearShiftCommand.reset(new GearShiftCommand());
 }

@@ -177,6 +177,10 @@ void DriveSubsystem::shiftDown() {
 	mp_shifterSolenoid->Set(DoubleSolenoid::kReverse);
 }
 
+bool DriveSubsystem::isShiftedUp(){
+	return mp_shifterSolenoid->Get() == DoubleSolenoid::kForward;
+}
+
 void DriveSubsystem::drive(double y, double x) {
 	if (mp_robotDrive.get() == NULL)
 		return;

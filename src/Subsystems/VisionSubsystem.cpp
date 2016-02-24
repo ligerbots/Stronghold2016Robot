@@ -5,6 +5,7 @@ VisionSubsystem::VisionSubsystem() :
 			exposure("Exposure"),
 			showVision("ShowVision"),
 			paintTarget("PaintTarget"),
+			color("DrawColor"),
 			mp_currentFrame(NULL),
 			mp_processingFrame(NULL),
 			m_frameCenterX(0),
@@ -49,7 +50,7 @@ void VisionSubsystem::updateVision(int ticks) {
 
 	Image* image = NULL;
 	{
-		std::lock_guard<std::mutex> lock(m_frameMutex);
+//		std::lock_guard<std::mutex> lock(m_frameMutex);
 		Camera::Feed(ticks);
 		image = Camera::GetCamera(activeCamera)->GetStoredFrame();
 		mp_currentFrame = Camera::GetCamera(0)->GetStoredFrame();
@@ -88,17 +89,16 @@ void VisionSubsystem::visionProcessingThread() {
 		gettimeofday(&startTime, 0);
 
 		{
-			std::lock_guard<std::mutex> lock(m_frameMutex);
+//			std::lock_guard<std::mutex> lock(m_frameMutex);
 			imaqDuplicate(mp_processingFrame, mp_currentFrame);
 		}
 
 		int err = IVA_ProcessImage(mp_processingFrame); // run vision script
 		SmartDashboard::PutNumber("Vision/imaq_err", err);
 
-		int numParticles;
 		bool needsConnection = true;
-		imaqCountParticles(mp_processingFrame, needsConnection, &numParticles);
-		if (numParticles != 0) {
+		imaqCountParticles(mp_processingFrame, needsConnection, &m_numParticles);
+		if (m_numParticles != 0) {
 			imaqMeasureParticle(mp_processingFrame, 0, false,
 					IMAQ_MT_CENTER_OF_MASS_X, &m_frameCenterX);
 			imaqMeasureParticle(mp_processingFrame, 0, false,
@@ -123,13 +123,15 @@ void VisionSubsystem::visionProcessingThread() {
 				rectheight = 10;
 				rectwidth = 10;
 
-				RGBValue rgbColor = centered ? IMAQ_RGB_GREEN : IMAQ_RGB_RED;
-				RGBValue *pColor = &rgbColor;
+//				RGBValue rgbColor = centered ? IMAQ_RGB_GREEN : IMAQ_RGB_RED;
+//				RGBValue *pColor = &rgbColor;
 
-				imaqOverlayOval(mp_currentFrame, {top, left, rectheight, rectwidth}, pColor, IMAQ_DRAW_VALUE, NULL);
+
+				imaqDrawShapeOnImage(mp_currentFrame, mp_currentFrame, {top, left, rectheight, rectwidth}, IMAQ_DRAW_VALUE, IMAQ_SHAPE_OVAL, color.get());
+//				imaqOverlayOval(mp_currentFrame, {top, left, rectheight, rectwidth}, pColor, IMAQ_DRAW_VALUE, NULL);
 			}
 			imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame, DrawMode::IMAQ_DRAW_VALUE,
-										{width/2, 0}, {width/2, height}, 1.0);
+										{width/2, 0}, {width/2, height}, color.get());
 			LCameraServer::GetInstance()->SetImage(mp_currentFrame);
 		} else if (showVision.get()) {
 			LCameraServer::GetInstance()->SetImage(mp_processingFrame);

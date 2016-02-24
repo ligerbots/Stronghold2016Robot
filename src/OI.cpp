@@ -7,23 +7,25 @@ OI::OI() :
 }
 
 void OI::registerCommands() {
-	registerButton(pXboxController, 1, PRESSED,
-			CommandBase::gearShiftDownCommand.get());
+//	registerButton(pXboxController, 1, PRESSED,
+//			CommandBase::something.get());
 	// safety
 	registerButton(pXboxController, 3, PRESSED,
 				CommandBase::shootCommand.get());
 	registerButton(pXboxController, 2, PRESSED,
 					CommandBase::flapCommand.get());
 	registerButton(pXboxController, 4, PRESSED,
-				CommandBase::gearShiftUpCommand.get());
-	registerButton(pXboxController, 5, PRESSED,
-				CommandBase::intakeToggleCommand.get());
-	registerButton(pXboxController, 6, PRESSED,
 				CommandBase::wedgeToggleCommand.get());
+	registerButton(pXboxController, 5, PRESSED,
+				CommandBase::gearShiftCommand.get());
+	registerButton(pXboxController, 6, PRESSED,
+				CommandBase::intakeToggleCommand.get());
 	registerButton(pXboxController, 7, PRESSED,
 				CommandBase::toggleLedCommand.get());
 	registerButton(pXboxController, 8, PRESSED,
 				CommandBase::toggleCompressorCommand.get());
+
+	SmartDashboard::PutData(CommandBase::centerOnTargetCommand.get());
 }
 
 bool OI::joystickButtonPressed(Joystick* pJoystick, int buttonNumber) {

@@ -26,6 +26,7 @@
 #include "Commands/DriveDistanceCommand.h"
 #include "Commands/DriveJoystickCommand.h"
 #include "Commands/FlapCommand.h"
+#include "Commands/GearShiftCommand.h"
 #include "Commands/GearShiftDownCommand.h"
 #include "Commands/GearShiftUpCommand.h"
 #include "Commands/IntakeRollerCommand.h"
