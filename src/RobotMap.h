@@ -44,8 +44,8 @@ public:
 	static constexpr int PCM_HIGH_FLOW_CAN = 9;
 
 
-	static constexpr int PCM_SHIFTER_LOW_GEAR = 0;
-	static constexpr int PCM_SHIFTER_HIGH_GEAR = 1;
+	static constexpr int PCM_SHIFTER_LOW_GEAR = 1;
+	static constexpr int PCM_SHIFTER_HIGH_GEAR = 0;
 	static constexpr int PCM_INTAKE_UP = 4;
 	static constexpr int PCM_INTAKE_DOWN = 5;
 	static constexpr int PCM_WEDGES_UP = 2;
@@ -55,8 +55,8 @@ public:
 	static constexpr int PCM_SHOOTER_RETRACT = 7;
 
 	static constexpr int LIMIT_SWITCH_INTAKE_UP = 0;
-	static constexpr int LIMIT_SWITCH_INTAKE_BALL_IN = 1;
-	static constexpr int LIMIT_SWITCH_WEGDE_DOWN = 2;
+	static constexpr int LIMIT_SWITCH_INTAKE_BALL_IN = 2;
+	static constexpr int LIMIT_SWITCH_WEGDE_DOWN = 1;
 
 	static constexpr int PWM_SERVO_SHOOTER_LEFT = 0;
 	static constexpr int PWM_SERVO_SHOOTER_RIGHT = 1;

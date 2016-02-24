@@ -110,9 +110,9 @@ void VisionSubsystem::visionProcessingThread() {
 
 		if (paintTarget.get()) {
 			// Send the image to the dashboard with a target indicator
+			int width, height;
+			imaqGetImageSize(mp_processingFrame, &width, &height);
 			if (m_numParticles != 0) {
-				int width, height;
-				imaqGetImageSize(mp_processingFrame, &width, &height);
 				int x = (int) m_frameCenterX;
 				int y = (int) m_frameCenterY;
 				int centerX = width/2;
@@ -128,6 +128,8 @@ void VisionSubsystem::visionProcessingThread() {
 
 				imaqOverlayOval(mp_currentFrame, {top, left, rectheight, rectwidth}, pColor, IMAQ_DRAW_VALUE, NULL);
 			}
+			imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame, DrawMode::IMAQ_DRAW_VALUE,
+										{width/2, 0}, {width/2, height}, 1.0);
 			LCameraServer::GetInstance()->SetImage(mp_currentFrame);
 		} else if (showVision.get()) {
 			LCameraServer::GetInstance()->SetImage(mp_processingFrame);

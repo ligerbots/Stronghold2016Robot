@@ -53,7 +53,7 @@ Camera::Camera(uInt32 i) :
 	firstTime = true;
 	frame = NULL;
 	session = ULONG_MAX;
-	verticalFlip = true;
+	verticalFlip = false;
 	frameWidth = 0;
 	frameHeight = 0;
 }

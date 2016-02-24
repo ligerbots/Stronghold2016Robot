@@ -33,6 +33,7 @@ protected:
 		void PIDWrite(float pidOutput) {
 			printf("TurnPIDOutput %f\n", pidOutput);
 			if(pidOutput > 0.7) pidOutput = 0.7;
+			if(pidOutput > 0 && pidOutput < 0.33) pidOutput = 0.33;
 			mr_parent.drive(0, pidOutput); // turn
 		}
 	};

@@ -58,7 +58,6 @@ void IntakeSubsystem::setIntakeArmDown() {
 }
 
 DoubleSolenoid::Value IntakeSubsystem::getIntakeArmValue() {
-	if (m_rollerTalonPresent) return DoubleSolenoid::kOff;
 	return mp_intakeArmSolenoid->Get();
 }
 
