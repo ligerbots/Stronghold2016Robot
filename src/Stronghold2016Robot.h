@@ -24,6 +24,7 @@
 #include "Commands/CenterOnTargetCommand.h"
 #include "Commands/DelayCommand.h"
 #include "Commands/DriveDistanceCommand.h"
+#include "Commands/DriveDistanceIMUCommand.h"
 #include "Commands/DriveJoystickCommand.h"
 #include "Commands/FlapCommand.h"
 #include "Commands/GearShiftCommand.h"

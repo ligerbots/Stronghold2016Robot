@@ -5,9 +5,10 @@ CenterOnTargetCommand::CenterOnTargetCommand() :
 	Requires(visionSubsystem.get());
 	Requires(driveSubsystem.get());
 	if(m_softwarePID == NULL){
-		m_softwarePID = new PIDController(0.4, 0.0, 0.0,
+		m_softwarePID = new PIDController(5, 0.0, 0.0,
 						visionSubsystem.get(), driveSubsystem->turnPIDOutput.get());
 	}
+	m_softwarePID->SetAbsoluteTolerance(0.02);
 	SmartDashboard::PutData("CenterOnTargetPID", m_softwarePID);
 }
 

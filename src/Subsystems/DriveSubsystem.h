@@ -31,12 +31,12 @@ protected:
 			mr_parent(r_parent) {
 		}
 		void PIDWrite(float pidOutput) {
-			if(fabs(pidOutput) > 0 && fabs(pidOutput) < 0.4){
-				if(pidOutput < 0)
-					pidOutput = -0.4;
-				else
-					pidOutput = 0.4;
-			}
+//			if(fabs(pidOutput) > 0 && fabs(pidOutput) < 0.38){
+//				if(pidOutput < 0)
+//					pidOutput = -0.38;
+//				else
+//					pidOutput = 0.38;
+//			}
 			pidOutput = -pidOutput;
 
 			printf("TurnPIDOutput %f\n", pidOutput);
