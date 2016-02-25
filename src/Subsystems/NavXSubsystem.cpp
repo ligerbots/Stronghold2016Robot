@@ -19,6 +19,10 @@ double NavXSubsystem::getYaw() {
 	return mp_navX->GetYaw();
 }
 
+AHRS* NavXSubsystem::getNavX(){
+	return mp_navX.get();
+}
+
 void NavXSubsystem::sendValuesToSmartDashboard() {
 	SmartDashboard::PutBoolean("NavX/IMU_Connected", mp_navX->IsConnected());
 	SmartDashboard::PutNumber("NavX/IMU_Yaw", mp_navX->GetYaw());

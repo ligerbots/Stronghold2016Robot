@@ -12,6 +12,7 @@ public:
 	NavXSubsystem();
 	void InitDefaultCommand();
 	double getYaw();
+	AHRS* getNavX();
 	void sendValuesToSmartDashboard();
 
 	// PIDSource

@@ -9,10 +9,11 @@
  */
 class DriveDistanceIMUCommand: public CommandBase {
 protected:
-	double distanceMeters;
-	double start;
+	double distanceMeters2;
+	double startX;
+	double startY;
 public:
-	DriveDistanceIMUCommand(double distanceMeters);
+	explicit DriveDistanceIMUCommand(double distanceMeters);
 	void Initialize();
 	void Execute();bool IsFinished();
 	void End();

@@ -12,6 +12,7 @@ void DriveDistanceCommand::Initialize() {
 }
 
 void DriveDistanceCommand::Execute() {
+#pragma GCC diagnostic ignored "-Wunused-variable"
 	double left = driveSubsystem->getLeftEncoderPosition();
 	double right = driveSubsystem->getRightEncoderPosition();
 	(void)left;	// avoid warnings until we finish this function

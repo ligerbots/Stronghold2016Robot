@@ -115,8 +115,8 @@ void VisionSubsystem::visionProcessingThread() {
 			if (m_numParticles != 0) {
 				int x = (int) m_frameCenterX;
 				int y = (int) m_frameCenterY;
-				int centerX = width/2;
-				bool centered = (centerX < x+5) && (centerX > y -5);
+//				int centerX = width/2;
+//				bool centered = (centerX < x+5) && (centerX > y -5);
 				int top, left, rectheight, rectwidth;
 				top = y + 5;
 				left = x + 5;
