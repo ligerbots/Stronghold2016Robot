@@ -1,6 +1,6 @@
 #include <Stronghold2016Robot.h>
 
-CenterOnTargetCommand::CenterOnTargetCommand(double centerTo = 0.5) :
+CenterOnTargetCommand::CenterOnTargetCommand(double centerTo) :
 		CommandBase("CenterOnTargetCommand"), mp_softwarePID(
 				(PIDController*) SmartDashboard::GetData("CenterOnTargetPID")), centerTo(centerTo) {
 	Requires(visionSubsystem.get());
@@ -26,7 +26,7 @@ void CenterOnTargetCommand::Initialize() {
 	Preferences::GetInstance()->PutDouble("CenterOnTargetD", mp_softwarePID->GetD());
 
 	mp_softwarePID->Reset();
-	mp_softwarePID->SetSetpoint(.5);
+	mp_softwarePID->SetSetpoint(centerTo);
 	mp_softwarePID->Enable();
 }
 
