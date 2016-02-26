@@ -1,11 +1,11 @@
 #include <Stronghold2016Robot.h>
 
 FlapCommand::FlapCommand() :
-		CommandBase("FlapCommand_"), leftLowLimit("FlapLeftLowLimit"), leftHighLimit(
-				"FlapLeftHighLimit"), rightLowLimit("FlapRightLowLimit"), rightHighLimit(
-				"FlapRightHighLimit") {
+		CommandBase("FlapCommand_"), flapPosition("FlapCommandPosition", false) {
 	Requires(flapSubsystem.get());
 	SetInterruptible(true);
+
+	flapPosition = 0;
 }
 
 void FlapCommand::Initialize() {
@@ -23,12 +23,11 @@ void FlapCommand::Execute() {
 		else if (hat == 270)
 			fraction = 1;
 
-		double leftFlapPosition = (leftHighLimit.get() - leftLowLimit.get()) * fraction
-				+ leftLowLimit.get();
-		double rightFlapPosition = (rightHighLimit.get() - rightLowLimit.get()) * fraction
-				+ rightLowLimit.get();
-		flapSubsystem->setLeftFlapAngle(leftFlapPosition);
-		flapSubsystem->setRightFlapAngle(rightFlapPosition);
+		flapPosition = fraction;
+
+		flapSubsystem->setFlapsFraction(fraction);
+	} else {
+		flapSubsystem->setFlapsFraction(flapPosition.get());
 	}
 }
 

@@ -9,10 +9,7 @@
 class FlapCommand: public CommandBase {
 protected:
 public:
-	Parameter<double> leftLowLimit;
-	Parameter<double> leftHighLimit;
-	Parameter<double> rightLowLimit;
-	Parameter<double> rightHighLimit;
+	Parameter<double> flapPosition;
 
 	explicit FlapCommand();
 	void Initialize();
