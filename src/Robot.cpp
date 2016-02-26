@@ -99,6 +99,9 @@ void Robot::AutonomousInit() {
 	 } */
 	printf("Robot: AutononmousInit\n");
 
+	CommandBase::navXSubsystem->getNavX()->ZeroYaw(); // assume robot starts facing directly forward
+	CommandBase::navXSubsystem->getNavX()->ResetDisplacement();
+
 	CommandBase::driveJoystickCommand->Cancel();
 	CommandBase::intakeRollerCommand->Cancel();
 	CommandBase::flapCommand->Cancel();
