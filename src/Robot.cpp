@@ -46,6 +46,9 @@ void Robot::RobotInit() {
 		bytes[30 * 3 + 1] = 254;
 		i2c.WriteBulk(bytes, sizeof(bytes));
 	}
+
+	CommandBase::flapSubsystem->setFlapsFraction(0.0); // default to flaps down
+
 	printf("Done\n");
 }
 

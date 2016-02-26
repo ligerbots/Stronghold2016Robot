@@ -1,8 +1,8 @@
 #include <Stronghold2016Robot.h>
 
-CenterOnTargetCommand::CenterOnTargetCommand() :
+CenterOnTargetCommand::CenterOnTargetCommand(double centerTo = 0.5) :
 		CommandBase("CenterOnTargetCommand"), mp_softwarePID(
-				(PIDController*) SmartDashboard::GetData("CenterOnTargetPID")) {
+				(PIDController*) SmartDashboard::GetData("CenterOnTargetPID")), centerTo(centerTo) {
 	Requires(visionSubsystem.get());
 	Requires(driveSubsystem.get());
 	if (mp_softwarePID == NULL) {
