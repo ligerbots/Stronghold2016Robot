@@ -1,8 +1,10 @@
 #include <Stronghold2016Robot.h>
 
-DriveDistanceIMUCommand::DriveDistanceIMUCommand(double distanceMeters) :
+DriveDistanceIMUCommand::DriveDistanceIMUCommand(double distanceMeters,
+		double speed) :
 		CommandBase("DriveDistanceIMUCommand"), distanceMeters2(
-				distanceMeters * distanceMeters), startX(0), startY(0) {
+				distanceMeters * distanceMeters), startX(0), startY(0), speed(
+				speed) {
 	Requires(driveSubsystem.get());
 	SetInterruptible(false);
 }
@@ -14,13 +16,14 @@ void DriveDistanceIMUCommand::Initialize() {
 }
 
 void DriveDistanceIMUCommand::Execute() {
-	driveSubsystem->drive(1, 0);
+	driveSubsystem->drive(speed, 0);
 }
 
 bool DriveDistanceIMUCommand::IsFinished() {
 	double x = navXSubsystem->getNavX()->GetDisplacementX();
 	double y = navXSubsystem->getNavX()->GetDisplacementY();
-	return (x - startX) * (x - startX) + (y - startY) * (y - startY) >= distanceMeters2;
+	return (x - startX) * (x - startX) + (y - startY) * (y - startY)
+			>= distanceMeters2;
 }
 
 void DriveDistanceIMUCommand::End() {

@@ -2,23 +2,37 @@
 
 IntakeToggleCommand::IntakeToggleCommand() :
 		CommandBase("IntakeToggleCommand_") {
-	intakeDown = false;
 	Requires(intakeSubsystem.get());
+	mode = 2;
+}
+
+IntakeToggleCommand::IntakeToggleCommand(bool intakeUp) :
+		CommandBase("IntakeToggleCommand_") {
+	Requires(intakeSubsystem.get());
+	mode = intakeUp;
 }
 
 void IntakeToggleCommand::Initialize() {
-	intakeDown = !intakeSubsystem->isIntakeArmUp();
 	printf("IntakeCommand: init\n");
 }
 
 void IntakeToggleCommand::Execute() {
-	if (/*intakeDown*/ intakeSubsystem->getIntakeArmValue() != DoubleSolenoid::kReverse) {
-		intakeSubsystem -> setIntakeArmUp();
-		printf("IntakeCommand: arm up\n");
-	}
-	else {
-		intakeSubsystem -> setIntakeArmDown();
-		printf("IntakeCommand: arm down\n");
+	if (mode == 2) {
+		if (intakeSubsystem->getIntakeArmValue() != DoubleSolenoid::kReverse) {
+			intakeSubsystem->setIntakeArmUp();
+			printf("IntakeCommand: arm up\n");
+		} else {
+			intakeSubsystem->setIntakeArmDown();
+			printf("IntakeCommand: arm down\n");
+		}
+	} else {
+		if (mode) {
+			intakeSubsystem->setIntakeArmUp();
+			printf("IntakeCommand: arm up\n");
+		} else {
+			intakeSubsystem->setIntakeArmDown();
+			printf("IntakeCommand: arm down\n");
+		}
 	}
 
 }
@@ -29,7 +43,8 @@ bool IntakeToggleCommand::IsFinished() {
 }
 
 void IntakeToggleCommand::End() {
-CommandBase::intakeRollerCommand->Start();printf("IntakeCommand: end\n");
+	CommandBase::intakeRollerCommand->Start();
+	printf("IntakeCommand: end\n");
 }
 
 void IntakeToggleCommand::Interrupted() {

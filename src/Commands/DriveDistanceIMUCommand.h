@@ -12,8 +12,9 @@ protected:
 	double distanceMeters2;
 	double startX;
 	double startY;
+	double speed;
 public:
-	explicit DriveDistanceIMUCommand(double distanceMeters);
+	explicit DriveDistanceIMUCommand(double distanceMeters, double speed = 1.0);
 	void Initialize();
 	void Execute();bool IsFinished();
 	void End();

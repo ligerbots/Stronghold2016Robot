@@ -7,9 +7,10 @@
 
 class IntakeToggleCommand: public CommandBase {
 private:
-	bool intakeDown;
+	int mode;
 public:
 	explicit IntakeToggleCommand();
+	explicit IntakeToggleCommand(bool intakeUp);
 	void Initialize();
 	void Execute();
 

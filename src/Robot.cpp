@@ -22,7 +22,8 @@ void Robot::RobotInit() {
 
 	CommandBase::visionSubsystem->camerasOn();
 
-//	mp_autonomousModeChooser->AddDefault("Default Auto", new ExampleCommand());
+	mp_autonomousModeChooser->AddDefault("Low Bar / Terrain",
+			new AutonomousDriveSequence(false, false, 2));
 	SmartDashboard::PutData("Auto Modes", mp_autonomousModeChooser);
 
 	if (!isRoadkill)
