@@ -26,7 +26,8 @@ public:
 	 * is all the way in the other direction.
 	 * @param fraction 0 to 1
 	 */
-	void setFlapsFraction(double fraction);
+	void setFlapsFraction(double fractionBoth);
+	void setFlapsFraction(double fractionLeft, double fractionRight);
 
 	double getRightFlapAngle();
 	double getLeftFlapAngle();

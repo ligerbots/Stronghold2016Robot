@@ -1,11 +1,13 @@
 #include <Stronghold2016Robot.h>
 
 FlapCommand::FlapCommand() :
-		CommandBase("FlapCommand_"), flapPosition("FlapCommandPosition", false) {
+		CommandBase("FlapCommand_"), flapPositionLeft("FlapCommandPositionLeft",
+				false), flapPositionRight("FlapCommandPositionRight", false) {
 	Requires(flapSubsystem.get());
 	SetInterruptible(true);
 
-	flapPosition = 0;
+	flapPositionLeft = 0;
+	flapPositionRight = 0;
 }
 
 void FlapCommand::Initialize() {
@@ -23,11 +25,15 @@ void FlapCommand::Execute() {
 		else if (hat == 270)
 			fraction = 1;
 
-		flapPosition = fraction;
+		flapPositionLeft = fraction;
+		flapPositionRight = fraction;
 
+		// there should be a codan prefs file in the project that removes the
+		// pesky eclipse error on this line. If there isn't the error is safe
+		// to ignore
 		flapSubsystem->setFlapsFraction(fraction);
 	} else {
-		flapSubsystem->setFlapsFraction(flapPosition.get());
+		flapSubsystem->setFlapsFraction(flapPositionLeft.get(), flapPositionRight.get());
 	}
 }
 

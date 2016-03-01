@@ -9,7 +9,8 @@
 class FlapCommand: public CommandBase {
 protected:
 public:
-	Parameter<double> flapPosition;
+	Parameter<double> flapPositionLeft;
+	Parameter<double> flapPositionRight;
 
 	explicit FlapCommand();
 	void Initialize();
