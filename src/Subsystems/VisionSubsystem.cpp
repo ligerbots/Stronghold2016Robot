@@ -6,7 +6,8 @@ VisionSubsystem::VisionSubsystem() :
 			showVision("ShowVision"),
 			paintTarget("PaintTarget"),
 			color("DrawColor"),
-			distanceProportion("VisionDistanceProportion"),
+			distanceProportion("VisionDistanceProportion", false),
+			convexHullSize("VisionCHSize", false),
 			mp_currentFrame(NULL),
 			mp_processingFrame(NULL),
 			m_frameCenterX(0),
@@ -111,6 +112,7 @@ void VisionSubsystem::visionProcessingThread() {
 			imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_BOUNDING_RECT_WIDTH, &widthBoundingBox);
 
 			distanceProportion = areaConvexHull / widthBoundingBox;
+			convexHullSize = areaConvexHull;
 		} else {
 			// TODO: make sure that in pid commands you stop if it's NAN
 //			frameCenterX = NAN;

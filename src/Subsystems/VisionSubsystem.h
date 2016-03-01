@@ -11,6 +11,7 @@ private:
 	Parameter<bool> paintTarget;
 	Parameter<double> color;
 	Parameter<double> distanceProportion;
+	Parameter<double> convexHullSize;
 
 	std::mutex m_frameMutex;
 	Image* mp_currentFrame;
