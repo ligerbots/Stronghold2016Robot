@@ -10,6 +10,7 @@ private:
 	Parameter<bool> showVision;
 	Parameter<bool> paintTarget;
 	Parameter<double> color;
+	Parameter<double> distanceProportion;
 
 	std::mutex m_frameMutex;
 	Image* mp_currentFrame;
