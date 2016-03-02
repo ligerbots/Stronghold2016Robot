@@ -100,6 +100,9 @@ void VisionSubsystem::visionProcessingThread() {
 		int err = IVA_ProcessImage(mp_processingFrame); // run vision script
 		SmartDashboard::PutNumber("Vision/imaq_err", err);
 
+		// TODO: refactor into a single imaqMeasureParticles(...) call
+		// also use largest particle only, and check (convex hull area)/(particle area)
+		// to make sure it's about 2.2
 		bool needsConnection = true;
 		imaqCountParticles(mp_processingFrame, needsConnection, &m_numParticles);
 		if (m_numParticles != 0) {
@@ -175,6 +178,28 @@ double VisionSubsystem::getFrameCenter() {
 		else
 			return width / 2.0;
 	}
+}
+
+double VisionSubsystem::getCenterOfMassX(){
+	return m_frameCenterX;
+}
+
+double VisionSubsystem::getCenterOfMassY(){
+	return m_frameCenterY;
+}
+
+double VisionSubsystem::getBoundingBoxWidth(){
+	return boundingBoxWidth.get();
+}
+
+double VisionSubsystem::getBoundingBoxHeight(){
+	return boundingBoxHeight.get();
+}
+
+double VisionSubsystem::getDistanceToTarget(){
+	// an exponential regression fits our data with r2=99.9%
+	double centerOfMassY = getCenterOfMassY();
+	return 2.2395 * pow(1.0053, centerOfMassY);
 }
 
 void VisionSubsystem::sendValuesToSmartDashboard() {
