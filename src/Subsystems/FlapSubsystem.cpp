@@ -31,8 +31,8 @@ static inline double constrain(double x, double high, double low) {
 void FlapSubsystem::setFlapsFraction(double fractionLeft,
 		double fractionRight) {
 	// don't break the servos; make sure we have valid values
-	fractionLeft = constrain(fractionLeft, 0, 1);
-	fractionRight = constrain(fractionRight, 0, 1);
+	//fractionLeft = constrain(fractionLeft, 0, 1);
+	//fractionRight = constrain(fractionRight, 0, 1);
 	// transform [0, 1] to [flapLow, flapHigh]
 	double leftFlapPosition = (leftHighLimit.get() - leftLowLimit.get())
 			* fractionLeft + leftLowLimit.get();

@@ -10,8 +10,10 @@ private:
 	Parameter<bool> showVision;
 	Parameter<bool> paintTarget;
 	Parameter<double> color;
-	Parameter<double> distanceProportion;
+	Parameter<double> boundingBoxWidth;
+	Parameter<double> boundingBoxHeight;
 	Parameter<double> convexHullSize;
+	Parameter<double> convexHullPerArea;
 
 	std::mutex m_frameMutex;
 	Image* mp_currentFrame;
