@@ -26,6 +26,7 @@ void OI::registerCommands() {
 				CommandBase::toggleCompressorCommand.get());
 
 	SmartDashboard::PutData(CommandBase::centerOnTargetCommand.get());
+	SmartDashboard::PutData(new AutonomousShootCommand());
 }
 
 bool OI::joystickButtonPressed(Joystick* pJoystick, int buttonNumber) {

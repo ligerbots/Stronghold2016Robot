@@ -22,6 +22,7 @@
 #include <sys/time.h>
 #include "CommandBase.h"
 #include "Commands/AutonomousDriveSequence.h"
+#include "Commands/AutonomousShootCommand.h"
 #include "Commands/CenterOnTargetCommand.h"
 #include "Commands/DelayCommand.h"
 #include "Commands/DriveDistanceCommand.h"

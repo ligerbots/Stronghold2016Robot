@@ -14,6 +14,11 @@ private:
 	Parameter<double> boundingBoxHeight;
 	Parameter<double> convexHullSize;
 	Parameter<double> convexHullPerArea;
+	Parameter<double> feretDiameter;
+	Parameter<double> feretStartX;
+	Parameter<double> feretStartY;
+	Parameter<double> feretEndX;
+	Parameter<double> feretEndY;
 
 	std::mutex m_frameMutex;
 	Image* mp_currentFrame;
@@ -55,6 +60,10 @@ public:
 	 * @return Distance, in feet
 	 */
 	double getDistanceToTarget();
+	/**
+	 * Bad implementation that uses lookup table values from the test data
+	 */
+	double getFlapAngle(double distance);
 
 	void sendValuesToSmartDashboard();
 
