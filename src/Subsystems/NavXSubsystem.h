@@ -11,6 +11,8 @@ private:
 public:
 	NavXSubsystem();
 	void InitDefaultCommand();
+	double getRoll();
+	double getPitch();
 	double getYaw();
 	AHRS* getNavX();
 	void sendValuesToSmartDashboard();
