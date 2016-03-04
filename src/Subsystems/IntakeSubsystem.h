@@ -9,7 +9,8 @@ private:
 	std::unique_ptr<DoubleSolenoid> mp_intakeArmSolenoid;
 	std::unique_ptr<CANTalon> mp_rollers;
 	std::unique_ptr<DigitalInput> mp_intakeUpSwitch;
-	std::unique_ptr<DigitalInput> mp_ballInSwitch;
+	std::unique_ptr<DigitalInput> mp_ballInShooterSwitch;
+	std::unique_ptr<DigitalInput> mp_ballInDefensePositionSwitch;
 
 	bool m_rollerTalonPresent;
 
@@ -24,7 +25,8 @@ public:
 	double getRollerRevolutions();
 	bool isIntakeArmUp();
 	DoubleSolenoid::Value getIntakeArmValue();
-	bool isBallInPosition();
+	bool isBallInShooterPosition();
+	bool isBallInDefensesCrossingPosition();
 	bool isIntakeReadyToFire();
 	void setIntakeArmUp();
 	void setIntakeArmDown();

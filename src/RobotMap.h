@@ -55,8 +55,9 @@ public:
 	static constexpr int PCM_SHOOTER_RETRACT = 7;
 
 	static constexpr int LIMIT_SWITCH_INTAKE_UP = 0;
-	static constexpr int LIMIT_SWITCH_INTAKE_BALL_IN = 2;
 	static constexpr int LIMIT_SWITCH_WEGDE_DOWN = 1;
+	static constexpr int LIMIT_SWITCH_INTAKE_BALL_IN_SHOOTER = 2;
+	static constexpr int LIMIT_SWITCH_INTAKE_BALL_DEFENSES_POSITION = 3;
 
 	static constexpr int PWM_SERVO_SHOOTER_LEFT = 0;
 	static constexpr int PWM_SERVO_SHOOTER_RIGHT = 1;
