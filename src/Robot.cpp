@@ -30,6 +30,8 @@ Robot::Robot() {
 	mp_defense = new SendableChooser();
 	mp_target = new SendableChooser();
 
+	mp_autonomousCommand = NULL;
+
 	mp_operatorInterface = new OI();
 	ticks = 0;
 }
@@ -142,7 +144,15 @@ void Robot::AutonomousInit() {
 	int pos = *((int*) mp_position->GetSelected());
 	int def = *((int*) mp_defense->GetSelected());
 	int target = *((int*) mp_target->GetSelected());
-	printf("Autonomous: Position %d | Defense %d | Target %d\n", pos, def, target);
+	printf("Autonomous: Position %d | Defense %d | Target %d\n", pos, def,
+			target);
+
+	if (mp_autonomousCommand != NULL) {
+		delete mp_autonomousCommand;
+		mp_autonomousCommand = NULL;
+	}
+	mp_autonomousCommand = new AutonomousDriveSequence(pos, def, target);
+	mp_autonomousCommand->Start();
 
 	CommandBase::navXSubsystem->getNavX()->ZeroYaw(); // assume robot starts facing directly forward
 	CommandBase::navXSubsystem->getNavX()->ResetDisplacement();
@@ -159,11 +169,9 @@ void Robot::AutonomousPeriodic() {
 
 void Robot::TeleopInit() {
 	printf("Robot: TeleopInit\n");
-	CommandBase::compressorSubsystem->setCompressor(false);
-	// This makes sure that the autonomous stops running when
-	// teleop starts running. If you want the autonomous to
-	// continue until interrupted by another command, remove
-	// this line or comment it out.
+	if (mp_autonomousCommand != NULL) {
+		mp_autonomousCommand->Cancel();
+	}
 	CommandBase::driveJoystickCommand->Start();
 	CommandBase::intakeRollerCommand->Start();
 	CommandBase::flapCommand->Start();

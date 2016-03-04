@@ -39,6 +39,8 @@ public:
 	SendableChooser* mp_defense;
 	SendableChooser* mp_target;
 
+	Command* mp_autonomousCommand;
+
 
 	Robot();
 	virtual ~Robot();

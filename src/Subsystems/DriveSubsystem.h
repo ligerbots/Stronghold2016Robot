@@ -37,6 +37,10 @@ protected:
 //				else
 //					pidOutput = 0.38;
 //			}
+			if(fabs(pidOutput) > .9){
+				pidOutput = pidOutput < 0 ? -.9 : .9;
+			}
+
 			pidOutput = -pidOutput;
 
 			printf("TurnPIDOutput %f\n", pidOutput);
