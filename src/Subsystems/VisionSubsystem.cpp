@@ -110,10 +110,10 @@ void VisionSubsystem::visionProcessingThread() {
 		bool needsConnection = true;
 		imaqCountParticles(mp_processingFrame, needsConnection, &m_numParticles);
 		if (m_numParticles != 0) {
-			//imaqMeasureParticle(mp_processingFrame, 0, false,
-			//		IMAQ_MT_CENTER_OF_MASS_X, &m_frameCenterX);
-			//imaqMeasureParticle(mp_processingFrame, 0, false,
-			//		IMAQ_MT_CENTER_OF_MASS_Y, &m_frameCenterY);
+			imaqMeasureParticle(mp_processingFrame, 0, false,
+					IMAQ_MT_CENTER_OF_MASS_X, &m_frameCenterX);
+			imaqMeasureParticle(mp_processingFrame, 0, false,
+					IMAQ_MT_CENTER_OF_MASS_Y, &m_frameCenterY);
 
 			double areaConvexHull;
 			double areaParticle;
@@ -143,8 +143,8 @@ void VisionSubsystem::visionProcessingThread() {
 			this->feretEndX = feretEndX;
 			this->feretEndY = feretEndY;
 
-			m_frameCenterX = (feretStartX + feretEndX) / 2;
-			m_frameCenterY = (feretStartY + feretEndY) / 2;
+//			m_frameCenterX = (feretStartX + feretEndX) / 2;
+//			m_frameCenterY = (feretStartY + feretEndY) / 2;
 
 			convexHullPerArea = areaConvexHull / areaParticle;
 			convexHullSize = areaConvexHull;
@@ -257,6 +257,7 @@ void VisionSubsystem::sendValuesToSmartDashboard() {
 	SmartDashboard::PutNumber("TargetsDetected", m_numParticles);
 	SmartDashboard::PutNumber("Target X Pos", m_frameCenterX);
 	SmartDashboard::PutNumber("Target Y Pos", m_frameCenterY);
+	SmartDashboard::PutNumber("XPos", m_frameCenterX);
 	SmartDashboard::PutNumber("TargetsDetected", m_numParticles);
 }
 
