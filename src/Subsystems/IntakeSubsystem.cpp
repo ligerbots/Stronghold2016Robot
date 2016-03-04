@@ -64,8 +64,13 @@ DoubleSolenoid::Value IntakeSubsystem::getIntakeArmValue() {
 }
 
 bool IntakeSubsystem::isIntakeArmUp() {
+#ifdef ROBOT_2_TEST
+#pragma message "Warning: disabling intake arm check. Run without -DROBOT_2_TEST to enable"
+	return true;
+#else
 	// flip value so that it's false if it's not connected
 	return !mp_intakeUpSwitch->Get();
+#endif
 }
 
 bool IntakeSubsystem::isBallInPosition() {

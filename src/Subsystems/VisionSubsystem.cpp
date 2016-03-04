@@ -69,9 +69,8 @@ void VisionSubsystem::updateVision(int ticks) {
 }
 
 void VisionSubsystem::toggleCameraFeed() {
-	if (Camera::GetNumberOfCameras() > 1) {
-		activeCamera = 1 - activeCamera; // 1 -> 0; 0 -> 1
-	} else {
+	activeCamera++;
+	if(activeCamera >= Camera::GetNumberOfCameras()){
 		activeCamera = 0;
 	}
 }
