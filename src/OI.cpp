@@ -27,6 +27,9 @@ void OI::registerCommands() {
 
 	SmartDashboard::PutData(CommandBase::centerOnTargetCommand.get());
 	SmartDashboard::PutData(new AutonomousShootCommand());
+
+	SmartDashboard::PutData(new RotateIMUCommand(90));
+	SmartDashboard::PutData(new DriveDistanceIMUCommand(1, 0.7));
 }
 
 bool OI::joystickButtonPressed(Joystick* pJoystick, int buttonNumber) {

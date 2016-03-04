@@ -1,7 +1,7 @@
 #include <Stronghold2016Robot.h>
 
 RotateIMUCommand::RotateIMUCommand(double targetAngle) :
-		CommandBase("RotateIMUCommand"), targetAngle(targetAngle), currentAngle(
+		CommandBase("RotateIMUCommand_" + std::to_string(targetAngle)), targetAngle(targetAngle), currentAngle(
 				0), lastAngle(0), isClockwise(false) {
 	Requires(driveSubsystem.get());
 	SetInterruptible(false);
@@ -41,7 +41,7 @@ void RotateIMUCommand::Execute() {
 bool RotateIMUCommand::IsFinished() {
 	bool finished = false;
 	// find if we passed the target angle (in mod 360)
-	if (lastAngle < currentAngle) {
+	if ((isClockwise && lastAngle < currentAngle) || (!isClockwise && currentAngle < lastAngle)) {
 		finished = lastAngle <= targetAngle && targetAngle <= currentAngle;
 	} else {
 		finished = !(currentAngle <= targetAngle && targetAngle <= lastAngle);
