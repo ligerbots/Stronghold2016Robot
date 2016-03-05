@@ -39,6 +39,10 @@ double NavXSubsystem::getYaw() {
 	return mp_navX->GetYaw();
 }
 
+bool NavXSubsystem::isRobotAboutToTip() {
+	return (CommandBase::navXSubsystem->getPitch()>RobotMap::MAX_PITCH_ANGLE);
+}
+
 AHRS* NavXSubsystem::getNavX(){
 	return mp_navX.get();
 }
@@ -46,11 +50,15 @@ AHRS* NavXSubsystem::getNavX(){
 void NavXSubsystem::sendValuesToSmartDashboard() {
 	SmartDashboard::PutBoolean("NavX/IMU_Connected", mp_navX->IsConnected());
 	SmartDashboard::PutNumber("NavX/IMU_Yaw", mp_navX->GetYaw());
-	SmartDashboard::PutNumber("NavX/IMU_Pitch", mp_navX->GetPitch());
-	SmartDashboard::PutNumber("NavX/IMU_Roll", mp_navX->GetRoll());
+	// Since the NavX is mounted on the side of the robot, we have
+	// swapped the roll and pitch axes.
+	SmartDashboard::PutNumber("NavX/IMU_Pitch", mp_navX->GetRoll());
+	SmartDashboard::PutNumber("NavX/IMU_Roll", mp_navX->GetPitch());
 	SmartDashboard::PutNumber("NavX/IMU_CompassHeading", mp_navX->GetCompassHeading());
 	SmartDashboard::PutNumber("NavX/IMU_Update_Count", mp_navX->GetUpdateCount());
 	SmartDashboard::PutNumber("NavX/IMU_Byte_Count", mp_navX->GetByteCount());
+
+	SmartDashboard::PutBoolean("Robot is about to tip", Robot::ROBOT_IS_ABOUT_TO_TIP);
 
 	/* These functions are compatible w/the WPI Gyro Class */
 	SmartDashboard::PutNumber("NavX/IMU_TotalYaw", mp_navX->GetAngle());
