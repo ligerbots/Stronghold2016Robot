@@ -16,6 +16,7 @@ public:
 	double getYaw();
 	AHRS* getNavX();
 	void sendValuesToSmartDashboard();
+	bool isRobotAboutToTip();
 
 	// PIDSource
 	void SetPIDSourceType(PIDSourceType pidSource);

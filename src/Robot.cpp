@@ -100,6 +100,9 @@ void Robot::RobotInit() {
 void Robot::AlwaysPeriodic() {
 	ticks++;
 
+	// Check to see if the robot is about to tip
+	m_robotIsAboutToTip = CommandBase::navXSubsystem->isRobotAboutToTip();
+
 	// other stuff
 	CommandBase::visionSubsystem->updateVision(Robot::ticks);
 

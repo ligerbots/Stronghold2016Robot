@@ -94,4 +94,5 @@ public:
 	std::shared_ptr<DriveTurnPIDOutput> turnPIDOutput;
 
 	void sendValuesToSmartDashboard();
+
 };
