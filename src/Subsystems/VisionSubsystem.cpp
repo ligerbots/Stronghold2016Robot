@@ -19,6 +19,21 @@ VisionSubsystem::VisionSubsystem() :
 {
 	activeCamera = 0;
 	ledRingSpike.reset(new Relay(RobotMap::RELAY_LED_RING_SPIKE));
+
+	// initalize our measurement type array here -- once
+	mT[COMX] = IMAQ_MT_CENTER_OF_MASS_X;
+	mT[COMY] = IMAQ_MT_CENTER_OF_MASS_Y;
+	mT[CHA] = IMAQ_MT_CONVEX_HULL_AREA;
+	mT[AREA] = IMAQ_MT_AREA;
+	mT[BRW] = IMAQ_MT_BOUNDING_RECT_WIDTH;
+	mT[BRH] = IMAQ_MT_BOUNDING_RECT_HEIGHT;
+	mT[AVSL] = IMAQ_MT_AVERAGE_VERT_SEGMENT_LENGTH;
+	mT[AHSL] = IMAQ_MT_AVERAGE_HORIZ_SEGMENT_LENGTH;
+	mT[MFD] = IMAQ_MT_MAX_FERET_DIAMETER;
+	mT[ERLS] = IMAQ_MT_EQUIVALENT_RECT_LONG_SIDE;
+	mT[ERSS] = IMAQ_MT_EQUIVALENT_RECT_SHORT_SIDE;
+	mT[ERSSF] = IMAQ_MT_EQUIVALENT_RECT_SHORT_SIDE_FERET;
+	mT[MFDO] = IMAQ_MT_MAX_FERET_DIAMETER_ORIENTATION;
 }
 
 void VisionSubsystem::InitDefaultCommand() {
@@ -101,12 +116,28 @@ void VisionSubsystem::visionProcessingThread() {
 		SmartDashboard::PutNumber("Vision/imaq_err", err);
 
 		bool needsConnection = true;
+
 		imaqCountParticles(mp_processingFrame, needsConnection, &m_numParticles);
 		if (m_numParticles != 0) {
-			imaqMeasureParticle(mp_processingFrame, 0, false,
-					IMAQ_MT_CENTER_OF_MASS_X, &m_frameCenterX);
-			imaqMeasureParticle(mp_processingFrame, 0, false,
-					IMAQ_MT_CENTER_OF_MASS_Y, &m_frameCenterY);
+			MeasureParticlesReport *mprArray = imaqMeasureParticles(mp_processingFrame, IMAQ_CALIBRATION_MODE_PIXEL,
+					mT, MAXVAL);
+
+			// Find the particle with the largest area
+			double partArea = 0.0;
+			int largest = 0;
+			double *pM;
+			for (int i=0; i!=m_numParticles; i++)
+			{
+				double *pixelMeasurements = mprArray->pixelMeasurements[i];
+				if (pixelMeasurements[AREA] > partArea) {
+					partArea = pixelMeasurements[AREA];
+					largest = i;
+				}
+			}
+			pM = mprArray->pixelMeasurements[largest];
+
+			m_frameCenterX = pM[COMX];
+			m_frameCenterY = pM[COMY];
 
 			double areaConvexHull;
 			double areaParticle;
