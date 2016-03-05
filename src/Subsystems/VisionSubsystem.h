@@ -83,7 +83,7 @@ public:
 	/**
 	 * Bad implementation that uses lookup table values from the test data
 	 */
-	double getFlapAngle(double distance);
+	double getFlapsFractionForDistance(double distance);
 
 	void sendValuesToSmartDashboard();
 

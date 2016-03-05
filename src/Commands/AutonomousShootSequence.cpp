@@ -1,6 +1,6 @@
 #include <Stronghold2016Robot.h>
 
-ShootSequence::ShootSequence()
+AutonomousShootSequence::AutonomousShootSequence()
 {
 	// Add Commands here:
 	// e.g. AddSequential(new Command1());
@@ -20,7 +20,9 @@ ShootSequence::ShootSequence()
 	// arm.
 
 	AddSequential(new CenterOnTargetCommand());
+	AddSequential(new RollBallToShooterCommand());
 	AddSequential(new IntakeToggleCommand(true));
-	AddSequential(new WaitForIntakeUp());
+	AddSequential(new WaitForIntakeUpCommand());
+	AddSequential(new AutoSetFlapsCommand());
 	AddSequential(new ShootCommand());
 }

@@ -4,9 +4,9 @@
 #include "Commands/CommandGroup.h"
 #include "WPILib.h"
 
-class ShootSequence: public CommandGroup {
+class AutonomousShootSequence: public CommandGroup {
 public:
-	ShootSequence();
+	AutonomousShootSequence();
 };
 
 #endif

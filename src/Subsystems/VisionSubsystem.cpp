@@ -240,11 +240,12 @@ double VisionSubsystem::getBoundingBoxHeight(){
 
 double VisionSubsystem::getDistanceToTarget(){
 	// an exponential regression fits our data with r2=99.9%
+	// TODO: recalculate with new data
 	double centerOfMassY = getCenterOfMassY();
 	return 2.333 * pow(1.0052, centerOfMassY);
 }
 
-double VisionSubsystem::getFlapAngle(double distance){
+double VisionSubsystem::getFlapsFractionForDistance(double distance){
 	double angles[] = {-1, -1, -1, -1, .6, .5, .49, .48, .47, .455};
 	distance = fmax(fmin(distance, 9), 4);
 	double low = angles[(int) floor(distance)];
