@@ -31,8 +31,6 @@
 #include "Commands/FlapCommand.h"
 #include "Commands/FlapSetCommand.h"
 #include "Commands/GearShiftCommand.h"
-#include "Commands/GearShiftDownCommand.h"
-#include "Commands/GearShiftUpCommand.h"
 #include "Commands/IntakeRollerCommand.h"
 #include "Commands/IntakeToggleCommand.h"
 #include "Commands/PrepareForAutoCommand.h"

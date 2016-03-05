@@ -53,9 +53,9 @@ void CommandBase::init() {
 	toggleLedCommand.reset(new ToggleLedCommand());
 	wedgeToggleCommand.reset(new WedgeToggleCommand());
 	intakeToggleCommand.reset(new IntakeToggleCommand());
-	gearShiftDownCommand.reset(new GearShiftDownCommand());
-	gearShiftUpCommand.reset(new GearShiftUpCommand());
+	gearShiftDownCommand.reset(new GearShiftCommand(GearShiftCommand::SHIFT_DOWN));
+	gearShiftUpCommand.reset(new GearShiftCommand(GearShiftCommand::SHIFT_UP));
 	intakeRollerCommand.reset(new IntakeRollerCommand());
-	gearShiftCommand.reset(new GearShiftCommand());
+	gearShiftCommand.reset(new GearShiftCommand(GearShiftCommand::TOGGLE));
 	toggleCameraFeedCommand.reset(new ToggleCameraFeedCommand());
 }

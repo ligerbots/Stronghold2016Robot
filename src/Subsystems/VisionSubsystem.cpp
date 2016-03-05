@@ -108,12 +108,28 @@ void VisionSubsystem::visionProcessingThread() {
 		// also use largest particle only, and check (convex hull area)/(particle area)
 		// to make sure it's about 2.2
 		bool needsConnection = true;
+
 		imaqCountParticles(mp_processingFrame, needsConnection, &m_numParticles);
 		if (m_numParticles != 0) {
-			imaqMeasureParticle(mp_processingFrame, 0, false,
-					IMAQ_MT_CENTER_OF_MASS_X, &m_frameCenterX);
-			imaqMeasureParticle(mp_processingFrame, 0, false,
-					IMAQ_MT_CENTER_OF_MASS_Y, &m_frameCenterY);
+			MeasureParticlesReport *mprArray = imaqMeasureParticles(mp_processingFrame, IMAQ_CALIBRATION_MODE_PIXEL,
+					mT, MAXVAL);
+
+			// Find the particle with the largest area
+			double partArea = 0.0;
+			int largest = 0;
+			double *pM;
+			for (int i=0; i!=m_numParticles; i++)
+			{
+				double *pixelMeasurements = mprArray->pixelMeasurements[i];
+				if (pixelMeasurements[AREA] > partArea) {
+					partArea = pixelMeasurements[AREA];
+					largest = i;
+				}
+			}
+			pM = mprArray->pixelMeasurements[largest];
+
+			m_frameCenterX = pM[COMX];
+			m_frameCenterY = pM[COMY];
 
 			double areaConvexHull;
 			double areaParticle;

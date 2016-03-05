@@ -27,7 +27,7 @@ AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense,
 	AddSequential(new ToggleLedCommand(true));
 	AddSequential(new ToggleCompressorCommand(true));
 	AddSequential(new PrepareForAutoCommand(wedgesUp, intakeUp));
-	AddSequential(new GearShiftDownCommand());
+	AddSequential(new GearShiftCommand(GearShiftCommand::SHIFT_DOWN));
 	AddSequential(new DriveDistanceIMUCommand(2, driveSpeed));
 	// handle going to specified target
 }

@@ -1,19 +1,24 @@
 #include <Stronghold2016Robot.h>
 
-GearShiftCommand::GearShiftCommand() : CommandBase("GearShiftCommand"){
-	isShiftedUp = false;
+GearShiftCommand::GearShiftCommand(Direction direction) : CommandBase("GearShiftCommand"),
+	m_direction(direction)
+{
 }
 
 void GearShiftCommand::Initialize() {
-	isShiftedUp = driveSubsystem->isShiftedUp();
 }
 
 void GearShiftCommand::Execute() {
-	if(isShiftedUp){
-		driveSubsystem->shiftDown();
-	} else {
-		driveSubsystem->shiftUp();
+	if (m_direction == TOGGLE)
+	{
+		if (driveSubsystem->isShiftedUp()){
+			driveSubsystem->shiftDown();
+		} else {
+			driveSubsystem->shiftUp();
+		}
 	}
+	else if (m_direction == SHIFT_DOWN) driveSubsystem->shiftDown();
+	else if (m_direction == SHIFT_UP)  driveSubsystem->shiftUp();
 }
 
 bool GearShiftCommand::IsFinished() {
