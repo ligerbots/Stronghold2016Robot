@@ -41,7 +41,7 @@ public:
 
 	Command* mp_autonomousCommand;
 
-	static bool m_robotIsAboutToTip;
+	static bool ROBOT_IS_ABOUT_TO_TIP;
 
 	Robot();
 	virtual ~Robot();

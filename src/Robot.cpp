@@ -4,6 +4,7 @@
 Robot* Robot::instance = NULL;
 int Robot::ticks;
 bool Robot::isRoadkill = false;
+bool Robot::ROBOT_IS_ABOUT_TO_TIP = false;
 
 int Robot::POS_ONE = 1;
 int Robot::POS_TWO = 2;
@@ -101,7 +102,7 @@ void Robot::AlwaysPeriodic() {
 	ticks++;
 
 	// Check to see if the robot is about to tip
-	m_robotIsAboutToTip = CommandBase::navXSubsystem->isRobotAboutToTip();
+	ROBOT_IS_ABOUT_TO_TIP = CommandBase::navXSubsystem->isRobotAboutToTip();
 
 	// other stuff
 	CommandBase::visionSubsystem->updateVision(Robot::ticks);

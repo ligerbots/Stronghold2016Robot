@@ -58,7 +58,7 @@ void NavXSubsystem::sendValuesToSmartDashboard() {
 	SmartDashboard::PutNumber("NavX/IMU_Update_Count", mp_navX->GetUpdateCount());
 	SmartDashboard::PutNumber("NavX/IMU_Byte_Count", mp_navX->GetByteCount());
 
-	SmartDashboard::PutBoolean("Robot is about to tip", Robot::m_robotIsAboutToTip);
+	SmartDashboard::PutBoolean("Robot is about to tip", Robot::ROBOT_IS_ABOUT_TO_TIP);
 
 	/* These functions are compatible w/the WPI Gyro Class */
 	SmartDashboard::PutNumber("NavX/IMU_TotalYaw", mp_navX->GetAngle());
