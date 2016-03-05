@@ -2,7 +2,9 @@
 
 DriveDistanceIMUCommand::DriveDistanceIMUCommand(double distanceMeters,
 		double speed) :
-		CommandBase("DriveDistanceIMUCommand"), distanceMeters2(
+		CommandBase(
+				"DriveDistanceIMUCommand_" + std::to_string(distanceMeters)
+						+ "_" + std::to_string(speed)), distanceMeters2(
 				distanceMeters * distanceMeters), startX(0), startY(0), speed(
 				speed) {
 	Requires(driveSubsystem.get());

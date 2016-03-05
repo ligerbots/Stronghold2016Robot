@@ -18,8 +18,11 @@ IntakeSubsystem::IntakeSubsystem() :
 		m_rollerTalonPresent = true;
 	}
 
-	mp_ballInSwitch.reset(
-			new DigitalInput(RobotMap::LIMIT_SWITCH_INTAKE_BALL_IN));
+	mp_ballInShooterSwitch.reset(
+			new DigitalInput(RobotMap::LIMIT_SWITCH_INTAKE_BALL_IN_SHOOTER));
+	mp_ballInDefensePositionSwitch.reset(
+			new DigitalInput(
+					RobotMap::LIMIT_SWITCH_INTAKE_BALL_DEFENSES_POSITION));
 	mp_intakeUpSwitch.reset(new DigitalInput(RobotMap::LIMIT_SWITCH_INTAKE_UP));
 }
 
@@ -29,32 +32,39 @@ void IntakeSubsystem::InitDefaultCommand() {
 }
 
 void IntakeSubsystem::rollIn() {
-	if (m_rollerTalonPresent) mp_rollers->Set(ROLLER_SPEED);
+	if (m_rollerTalonPresent)
+		mp_rollers->Set(ROLLER_SPEED);
 }
 
 void IntakeSubsystem::rollOut() {
-	if (m_rollerTalonPresent) mp_rollers->Set(-ROLLER_SPEED);
+	if (m_rollerTalonPresent)
+		mp_rollers->Set(-ROLLER_SPEED);
 }
 
 void IntakeSubsystem::rollStop() {
-	if (m_rollerTalonPresent) mp_rollers->Set(0);
+	if (m_rollerTalonPresent)
+		mp_rollers->Set(0);
 }
 
-void IntakeSubsystem::setRollSpeed(double speed){
-	if (m_rollerTalonPresent) mp_rollers->Set(speed);
+void IntakeSubsystem::setRollSpeed(double speed) {
+	if (m_rollerTalonPresent)
+		mp_rollers->Set(speed);
 }
 
 double IntakeSubsystem::getRollerRevolutions() {
-	if (!m_rollerTalonPresent) return 0.0;
+	if (!m_rollerTalonPresent)
+		return 0.0;
 	return mp_rollers->GetPosition();
 }
 
 void IntakeSubsystem::setIntakeArmUp() {
-	if (m_rollerTalonPresent) mp_intakeArmSolenoid->Set(DoubleSolenoid::kReverse);
+	if (m_rollerTalonPresent)
+		mp_intakeArmSolenoid->Set(DoubleSolenoid::kReverse);
 }
 
 void IntakeSubsystem::setIntakeArmDown() {
-	if (m_rollerTalonPresent) mp_intakeArmSolenoid->Set(DoubleSolenoid::kForward);
+	if (m_rollerTalonPresent)
+		mp_intakeArmSolenoid->Set(DoubleSolenoid::kForward);
 }
 
 DoubleSolenoid::Value IntakeSubsystem::getIntakeArmValue() {
@@ -64,22 +74,33 @@ DoubleSolenoid::Value IntakeSubsystem::getIntakeArmValue() {
 }
 
 bool IntakeSubsystem::isIntakeArmUp() {
+#ifdef ROBOT_2_TEST
+#pragma message "Warning: disabling intake arm check. Run without -DROBOT_2_TEST to enable"
+	return true;
+#else
 	// flip value so that it's false if it's not connected
 	return !mp_intakeUpSwitch->Get();
+#endif
 }
 
-bool IntakeSubsystem::isBallInPosition() {
+bool IntakeSubsystem::isBallInShooterPosition() {
 	// flip value so that it's false if it's not connected
-	return !mp_ballInSwitch->Get();
+	return !mp_ballInShooterSwitch->Get();
+}
+
+bool IntakeSubsystem::isBallInDefensesCrossingPosition(){
+	// flip value so that it's false if it's not connected
+	return !mp_ballInDefensePositionSwitch->Get();
 }
 
 bool IntakeSubsystem::isIntakeReadyToFire() {
-	return isIntakeArmUp() && isBallInPosition();
+	return isIntakeArmUp() && isBallInShooterPosition();
 }
 
 void IntakeSubsystem::sendValuesToSmartDashboard() {
 	SmartDashboard::PutBoolean("Intake/Arm_Clear", isIntakeArmUp());
-	SmartDashboard::PutBoolean("Intake/Ball_In", isBallInPosition());
+	SmartDashboard::PutBoolean("Intake/Ball_In", isBallInShooterPosition());
+	SmartDashboard::PutBoolean("Intake/Ball_Defenses", isBallInDefensesCrossingPosition());
 	SmartDashboard::PutNumber("Intake/Roller_Revolutions",
 			m_rollerTalonPresent ? getRollerRevolutions() : 0);
 

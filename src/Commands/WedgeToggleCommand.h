@@ -7,9 +7,10 @@
 
 class WedgeToggleCommand: public CommandBase {
 private:
-	bool wedgeDown;
+	int action;
 public:
-	explicit WedgeToggleCommand();
+	WedgeToggleCommand();
+	explicit WedgeToggleCommand(bool wedgeUp);
 	void Initialize();
 	void Execute();
 

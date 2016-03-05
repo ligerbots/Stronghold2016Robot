@@ -5,5 +5,5 @@
 
 class AutonomousDriveSequence: public CommandGroup {
 public:
-	AutonomousDriveSequence(bool wedgesUp, bool intakeUp, double driveDistance);
+	AutonomousDriveSequence(int position, int defense, int target);
 };

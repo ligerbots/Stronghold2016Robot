@@ -10,6 +10,7 @@ VisionSubsystem::VisionSubsystem() :
 			boundingBoxHeight("VisionBoundingBoxHeight", false),
 			convexHullSize("VisionCHSize", false),
 			convexHullPerArea("VisionCHPerArea", false),
+			feretDiameter("VisionFeretDiameter", false),
 			mp_currentFrame(NULL),
 			mp_processingFrame(NULL),
 			m_frameCenterX(0),
@@ -20,20 +21,7 @@ VisionSubsystem::VisionSubsystem() :
 	activeCamera = 0;
 	ledRingSpike.reset(new Relay(RobotMap::RELAY_LED_RING_SPIKE));
 
-	// initalize our measurement type array here -- once
-	mT[COMX] = IMAQ_MT_CENTER_OF_MASS_X;
-	mT[COMY] = IMAQ_MT_CENTER_OF_MASS_Y;
-	mT[CHA] = IMAQ_MT_CONVEX_HULL_AREA;
-	mT[AREA] = IMAQ_MT_AREA;
-	mT[BRW] = IMAQ_MT_BOUNDING_RECT_WIDTH;
-	mT[BRH] = IMAQ_MT_BOUNDING_RECT_HEIGHT;
-	mT[AVSL] = IMAQ_MT_AVERAGE_VERT_SEGMENT_LENGTH;
-	mT[AHSL] = IMAQ_MT_AVERAGE_HORIZ_SEGMENT_LENGTH;
-	mT[MFD] = IMAQ_MT_MAX_FERET_DIAMETER;
-	mT[ERLS] = IMAQ_MT_EQUIVALENT_RECT_LONG_SIDE;
-	mT[ERSS] = IMAQ_MT_EQUIVALENT_RECT_SHORT_SIDE;
-	mT[ERSSF] = IMAQ_MT_EQUIVALENT_RECT_SHORT_SIDE_FERET;
-	mT[MFDO] = IMAQ_MT_MAX_FERET_DIAMETER_ORIENTATION;
+	color = 0;
 }
 
 void VisionSubsystem::InitDefaultCommand() {
@@ -81,15 +69,16 @@ void VisionSubsystem::updateVision(int ticks) {
 }
 
 void VisionSubsystem::toggleCameraFeed() {
-	if (Camera::GetNumberOfCameras() > 1) {
-		activeCamera = 1 - activeCamera; // 1 -> 0; 0 -> 1
-	} else {
+	activeCamera++;
+	if(activeCamera >= Camera::GetNumberOfCameras()){
 		activeCamera = 0;
 	}
 }
 
 void VisionSubsystem::visionProcessingThread() {
 	printf("VisionSubsystem: Processing thread start\n");
+
+	color.set(color.get() + 1000);
 
 	timeval startTime;
 	timeval endTime;
@@ -115,6 +104,9 @@ void VisionSubsystem::visionProcessingThread() {
 		int err = IVA_ProcessImage(mp_processingFrame); // run vision script
 		SmartDashboard::PutNumber("Vision/imaq_err", err);
 
+		// TODO: refactor into a single imaqMeasureParticles(...) call
+		// also use largest particle only, and check (convex hull area)/(particle area)
+		// to make sure it's about 2.2
 		bool needsConnection = true;
 
 		imaqCountParticles(mp_processingFrame, needsConnection, &m_numParticles);
@@ -143,10 +135,32 @@ void VisionSubsystem::visionProcessingThread() {
 			double areaParticle;
 			double widthBoundingBox;
 			double heightBoundingBox;
+			double feret;
+			double feretStartX, feretStartY, feretEndX, feretEndY;
+
 			imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_CONVEX_HULL_AREA, &areaConvexHull);
 			imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_AREA, &areaParticle);
-			imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_BOUNDING_RECT_WIDTH, &widthBoundingBox);
-			imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_BOUNDING_RECT_HEIGHT, &heightBoundingBox);
+			//imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_BOUNDING_RECT_WIDTH, &widthBoundingBox);
+			//imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_BOUNDING_RECT_HEIGHT, &heightBoundingBox);
+
+			imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_EQUIVALENT_RECT_LONG_SIDE, &widthBoundingBox);
+			imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_EQUIVALENT_RECT_SHORT_SIDE, &heightBoundingBox);
+
+			imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_MAX_FERET_DIAMETER, &feret);
+
+			imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_MAX_FERET_DIAMETER_START_X, &feretStartX);
+			imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_MAX_FERET_DIAMETER_START_Y, &feretStartY);
+			imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_MAX_FERET_DIAMETER_END_X, &feretEndX);
+			imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_MAX_FERET_DIAMETER_END_Y, &feretEndY);
+
+			feretDiameter = feret;
+			this->feretStartX = feretStartX;
+			this->feretStartY = feretStartY;
+			this->feretEndX = feretEndX;
+			this->feretEndY = feretEndY;
+
+//			m_frameCenterX = (feretStartX + feretEndX) / 2;
+//			m_frameCenterY = (feretStartY + feretEndY) / 2;
 
 			convexHullPerArea = areaConvexHull / areaParticle;
 			convexHullSize = areaConvexHull;
@@ -176,7 +190,7 @@ void VisionSubsystem::visionProcessingThread() {
 //				RGBValue *pColor = &rgbColor;
 
 
-				imaqDrawShapeOnImage(mp_currentFrame, mp_currentFrame, {top, left, rectheight, rectwidth}, IMAQ_DRAW_VALUE, IMAQ_SHAPE_OVAL, color.get());
+				imaqDrawShapeOnImage(mp_currentFrame, mp_currentFrame, {top, left, rectheight, rectwidth}, IMAQ_PAINT_VALUE, IMAQ_SHAPE_OVAL, color.get());
 //				imaqOverlayOval(mp_currentFrame, {top, left, rectheight, rectwidth}, pColor, IMAQ_DRAW_VALUE, NULL);
 			}
 			imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame, DrawMode::IMAQ_DRAW_VALUE,
@@ -208,6 +222,37 @@ double VisionSubsystem::getFrameCenter() {
 	}
 }
 
+double VisionSubsystem::getCenterOfMassX(){
+	return m_frameCenterX;
+}
+
+double VisionSubsystem::getCenterOfMassY(){
+	return m_frameCenterY;
+}
+
+double VisionSubsystem::getBoundingBoxWidth(){
+	return boundingBoxWidth.get();
+}
+
+double VisionSubsystem::getBoundingBoxHeight(){
+	return boundingBoxHeight.get();
+}
+
+double VisionSubsystem::getDistanceToTarget(){
+	// an exponential regression fits our data with r2=99.9%
+	double centerOfMassY = getCenterOfMassY();
+	return 2.333 * pow(1.0052, centerOfMassY);
+}
+
+double VisionSubsystem::getFlapAngle(double distance){
+	double angles[] = {-1, -1, -1, -1, .6, .5, .49, .48, .47, .455};
+	distance = fmax(fmin(distance, 9), 4);
+	double low = angles[(int) floor(distance)];
+	double high = angles[(int) ceil(distance)];
+	double flapAngle = low + (high - low) * (distance - floor(distance));
+	return flapAngle;
+}
+
 void VisionSubsystem::sendValuesToSmartDashboard() {
 	if (ledRingSpike->GetError().GetCode() != 0) {
 		SmartDashboard::PutString("LED", "Not Present");
@@ -228,6 +273,7 @@ void VisionSubsystem::sendValuesToSmartDashboard() {
 	SmartDashboard::PutNumber("TargetsDetected", m_numParticles);
 	SmartDashboard::PutNumber("Target X Pos", m_frameCenterX);
 	SmartDashboard::PutNumber("Target Y Pos", m_frameCenterY);
+	SmartDashboard::PutNumber("XPos", m_frameCenterX);
 	SmartDashboard::PutNumber("TargetsDetected", m_numParticles);
 }
 

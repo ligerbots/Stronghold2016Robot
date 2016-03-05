@@ -2,20 +2,31 @@
 
 WedgeToggleCommand::WedgeToggleCommand() :
 		CommandBase("WedgeToggleCommand_") {
-	wedgeDown = false;
 	Requires(wedgeSubsystem.get());
+	action = 2; // toggle
+}
+
+WedgeToggleCommand::WedgeToggleCommand(bool wedgeUp) :
+		CommandBase("WedgeToggleCommand_" + std::to_string(wedgeUp)) {
+	Requires(wedgeSubsystem.get());
+	action = wedgeUp;
 }
 
 void WedgeToggleCommand::Initialize() {
-	wedgeDown = wedgeSubsystem -> isWedgeDown();
 }
 
 void WedgeToggleCommand::Execute() {
-	if (/*wedgeDown*/ wedgeSubsystem->getWedgeValue() != DoubleSolenoid::kReverse) {
-		wedgeSubsystem -> liftWedge();
-	}
-	else {
-		wedgeSubsystem -> lowerWedge();
+	bool lift;
+	if (action == 2)
+		lift = wedgeSubsystem->getWedgeValue() != DoubleSolenoid::kReverse;
+	else
+		lift = action;
+	if (lift) {
+		printf("WedgeToggleCommand: lifting wedges\n");
+		wedgeSubsystem->liftWedge();
+	} else {
+		printf("WedgeToggleCommand: lowering wedges\n");
+		wedgeSubsystem->lowerWedge();
 	}
 }
 

@@ -16,6 +16,11 @@ private:
 	Parameter<double> boundingBoxHeight;
 	Parameter<double> convexHullSize;
 	Parameter<double> convexHullPerArea;
+	Parameter<double> feretDiameter;
+	Parameter<double> feretStartX;
+	Parameter<double> feretStartY;
+	Parameter<double> feretEndX;
+	Parameter<double> feretEndY;
 	// Define the indexes to our MeasuremeParticleReport
 	enum Measures {
 		COMX,	// IMAQ_MT_CENTER_OF_MASS_X
@@ -63,6 +68,22 @@ public:
 	void toggleCameraFeed();
 
 	double getFrameCenter();
+
+	double getCenterOfMassX();
+	double getCenterOfMassY();
+	double getBoundingBoxWidth();
+	double getBoundingBoxHeight();
+
+	/**
+	 * Gives distance to target in feet using an equation calculated from test data.
+	 * Assumes the target is visible, otherwise it probably returns the last known distance
+	 * @return Distance, in feet
+	 */
+	double getDistanceToTarget();
+	/**
+	 * Bad implementation that uses lookup table values from the test data
+	 */
+	double getFlapAngle(double distance);
 
 	void sendValuesToSmartDashboard();
 

@@ -40,6 +40,7 @@ bool CenterOnTargetCommand::IsFinished() {
 
 void CenterOnTargetCommand::End() {
 	printf("CenterOnTarget: end\n");
+	printf("\tOn target: %d\n", mp_softwarePID->OnTarget());
 	mp_softwarePID->Disable();
 	driveSubsystem->zeroMotors();
 	CommandBase::driveJoystickCommand->Start();

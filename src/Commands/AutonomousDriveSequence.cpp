@@ -1,7 +1,7 @@
 #include <Stronghold2016Robot.h>
 
-AutonomousDriveSequence::AutonomousDriveSequence(bool wedgesUp, bool intakeUp,
-		double driveDistance) {
+AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense,
+		int target) {
 	// Add Commands here:
 	// e.g. AddSequential(new Command1());
 	//      AddSequential(new Command2());
@@ -18,9 +18,16 @@ AutonomousDriveSequence::AutonomousDriveSequence(bool wedgesUp, bool intakeUp,
 	// e.g. if Command1 requires chassis, and Command2 requires arm,
 	// a CommandGroup containing them would require both the chassis and the
 	// arm.
+
+	bool intakeUp = false;
+	bool wedgesUp = false;
+
+	double driveSpeed = 0.8;
+
 	AddSequential(new ToggleLedCommand(true));
 	AddSequential(new ToggleCompressorCommand(true));
 	AddSequential(new PrepareForAutoCommand(wedgesUp, intakeUp));
-	AddSequential(new GearShiftDownCommand());
-	AddSequential(new DriveDistanceIMUCommand(driveDistance, 0.8));
+	AddSequential(new GearShiftCommand(GearShiftCommand::SHIFT_DOWN));
+	AddSequential(new DriveDistanceIMUCommand(2, driveSpeed));
+	// handle going to specified target
 }

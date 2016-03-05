@@ -13,9 +13,29 @@ NavXSubsystem::NavXSubsystem() :
 void NavXSubsystem::InitDefaultCommand() {
 }
 
+double NavXSubsystem::getRoll() {
+	if (mp_navX.get() == NULL)
+		return 0;
+	// Since the NavX is mounted on the side of the robot, the axes are swapped.
+	// The GetPitch method actually returns the roll angle with positive angle
+	// indicating that the left side is higher than the right side.
+	return mp_navX->GetPitch();
+}
+
+double NavXSubsystem::getPitch() {
+	if (mp_navX.get() == NULL)
+		return 0;
+	// Since the NavX is mounted on the side of the robot, the axes are swapped.
+	// The GetRoll method actually returns the pitch angle with positive angle
+	// indicating that the Intake side (front) is higher than the Shooter side (back).
+	return mp_navX->GetRoll();
+}
+
 double NavXSubsystem::getYaw() {
 	if (mp_navX.get() == NULL)
 		return 0;
+	// The NavX calibration routine sets the Z axis to be pointing down, so  clockwise turn
+	// corresponds to a positive change in the yaw angle.
 	return mp_navX->GetYaw();
 }
 

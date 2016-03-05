@@ -7,25 +7,28 @@ OI::OI() :
 }
 
 void OI::registerCommands() {
-//	registerButton(pXboxController, 1, PRESSED,
-//			CommandBase::something.get());
-	// safety
-	registerButton(pXboxController, 3, PRESSED,
-				CommandBase::shootCommand.get());
+	registerButton(pXboxController, 1, PRESSED,
+			CommandBase::toggleCameraFeedCommand.get());
 	registerButton(pXboxController, 2, PRESSED,
-					CommandBase::flapCommand.get());
+			CommandBase::flapCommand.get());
+	registerButton(pXboxController, 3, PRESSED,
+			CommandBase::shootCommand.get());
 	registerButton(pXboxController, 4, PRESSED,
-				CommandBase::wedgeToggleCommand.get());
+			CommandBase::wedgeToggleCommand.get());
 	registerButton(pXboxController, 5, PRESSED,
-				CommandBase::gearShiftCommand.get());
+			CommandBase::gearShiftCommand.get());
 	registerButton(pXboxController, 6, PRESSED,
-				CommandBase::intakeToggleCommand.get());
+			CommandBase::intakeToggleCommand.get());
 	registerButton(pXboxController, 7, PRESSED,
-				CommandBase::toggleLedCommand.get());
+			CommandBase::toggleLedCommand.get());
 	registerButton(pXboxController, 8, PRESSED,
-				CommandBase::toggleCompressorCommand.get());
+			CommandBase::toggleCompressorCommand.get());
 
 	SmartDashboard::PutData(CommandBase::centerOnTargetCommand.get());
+	SmartDashboard::PutData(new AutonomousShootCommand());
+
+	SmartDashboard::PutData(new RotateIMUCommand(90));
+	SmartDashboard::PutData(new DriveDistanceIMUCommand(1, 0.7));
 }
 
 bool OI::joystickButtonPressed(Joystick* pJoystick, int buttonNumber) {
