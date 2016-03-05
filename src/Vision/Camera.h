@@ -41,7 +41,7 @@ public:
 	static Camera* GetCamera(int number);
 	static int GetNumberOfCameras();
 	static int EnumerateCameras();
-	static uInt32 SwitchCamera();
+	static uInt32 SwitchCamera(uInt32 which);
 	static void StartCameras();
 	static void StopCameras();
 	static void Feed(int ticks);

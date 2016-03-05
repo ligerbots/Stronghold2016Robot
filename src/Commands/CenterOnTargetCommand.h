@@ -7,6 +7,7 @@ class CenterOnTargetCommand: public CommandBase {
 protected:
 	PIDController *mp_softwarePID;
 	double centerTo;
+	Parameter<double> izone;
 public:
 	explicit CenterOnTargetCommand(double centerTo = 0.5);
 	void Initialize();

@@ -1,23 +1,15 @@
 #include <Stronghold2016Robot.h>
 
 VisionSubsystem::VisionSubsystem() :
-		Subsystem("VisionSubsystem"),
-			exposure("Exposure"),
-			showVision("ShowVision"),
-			paintTarget("PaintTarget"),
-			color("DrawColor"),
-			boundingBoxWidth("VisionBoundingBoxWidth", false),
-			boundingBoxHeight("VisionBoundingBoxHeight", false),
-			convexHullSize("VisionCHSize", false),
-			convexHullPerArea("VisionCHPerArea", false),
-			feretDiameter("VisionFeretDiameter", false),
-			mp_currentFrame(NULL),
-			mp_processingFrame(NULL),
-			m_frameCenterX(0),
-			m_frameCenterY(0),
-			m_numParticles(0),
-			m_processingThread(&VisionSubsystem::visionProcessingThread, this)
-{
+		Subsystem("VisionSubsystem"), exposure("Exposure"), showVision(
+				"ShowVision"), paintTarget("PaintTarget"), color("DrawColor"), boundingBoxWidth(
+				"VisionBoundingBoxWidth", false), boundingBoxHeight(
+				"VisionBoundingBoxHeight", false), convexHullSize(
+				"VisionCHSize", false), convexHullPerArea("VisionCHPerArea",
+		false), feretDiameter("VisionFeretDiameter", false), mp_currentFrame(
+		NULL), mp_processingFrame(NULL), m_frameCenterX(0), m_frameCenterY(0), m_numParticles(
+				0), m_processingThread(&VisionSubsystem::visionProcessingThread,
+				this) {
 	activeCamera = 0;
 	ledRingSpike.reset(new Relay(RobotMap::RELAY_LED_RING_SPIKE));
 
@@ -70,9 +62,11 @@ void VisionSubsystem::updateVision(int ticks) {
 
 void VisionSubsystem::toggleCameraFeed() {
 	activeCamera++;
-	if(activeCamera >= Camera::GetNumberOfCameras()){
+	if (activeCamera >= Camera::GetNumberOfCameras()) {
 		activeCamera = 0;
 	}
+	Camera::SwitchCamera(activeCamera);
+	printf("Active camera: %d\n", activeCamera);
 }
 
 void VisionSubsystem::visionProcessingThread() {
@@ -109,17 +103,18 @@ void VisionSubsystem::visionProcessingThread() {
 		// to make sure it's about 2.2
 		bool needsConnection = true;
 
-		imaqCountParticles(mp_processingFrame, needsConnection, &m_numParticles);
+		imaqCountParticles(mp_processingFrame, needsConnection,
+				&m_numParticles);
 		if (m_numParticles != 0) {
-			MeasureParticlesReport *mprArray = imaqMeasureParticles(mp_processingFrame, IMAQ_CALIBRATION_MODE_PIXEL,
-					mT, MAXVAL);
+			MeasureParticlesReport *mprArray = imaqMeasureParticles(
+					mp_processingFrame, IMAQ_CALIBRATION_MODE_PIXEL, mT,
+					MAXVAL);
 
 			// Find the particle with the largest area
 			double partArea = 0.0;
 			int largest = 0;
 			double *pM;
-			for (int i=0; i!=m_numParticles; i++)
-			{
+			for (int i = 0; i != m_numParticles; i++) {
 				double *pixelMeasurements = mprArray->pixelMeasurements[i];
 				if (pixelMeasurements[AREA] > partArea) {
 					partArea = pixelMeasurements[AREA];
@@ -138,20 +133,29 @@ void VisionSubsystem::visionProcessingThread() {
 			double feret;
 			double feretStartX, feretStartY, feretEndX, feretEndY;
 
-			imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_CONVEX_HULL_AREA, &areaConvexHull);
-			imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_AREA, &areaParticle);
+			imaqMeasureParticle(mp_processingFrame, 0, false,
+					IMAQ_MT_CONVEX_HULL_AREA, &areaConvexHull);
+			imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_AREA,
+					&areaParticle);
 			//imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_BOUNDING_RECT_WIDTH, &widthBoundingBox);
 			//imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_BOUNDING_RECT_HEIGHT, &heightBoundingBox);
 
-			imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_EQUIVALENT_RECT_LONG_SIDE, &widthBoundingBox);
-			imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_EQUIVALENT_RECT_SHORT_SIDE, &heightBoundingBox);
+			imaqMeasureParticle(mp_processingFrame, 0, false,
+					IMAQ_MT_EQUIVALENT_RECT_LONG_SIDE, &widthBoundingBox);
+			imaqMeasureParticle(mp_processingFrame, 0, false,
+					IMAQ_MT_EQUIVALENT_RECT_SHORT_SIDE, &heightBoundingBox);
 
-			imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_MAX_FERET_DIAMETER, &feret);
+			imaqMeasureParticle(mp_processingFrame, 0, false,
+					IMAQ_MT_MAX_FERET_DIAMETER, &feret);
 
-			imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_MAX_FERET_DIAMETER_START_X, &feretStartX);
-			imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_MAX_FERET_DIAMETER_START_Y, &feretStartY);
-			imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_MAX_FERET_DIAMETER_END_X, &feretEndX);
-			imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_MAX_FERET_DIAMETER_END_Y, &feretEndY);
+			imaqMeasureParticle(mp_processingFrame, 0, false,
+					IMAQ_MT_MAX_FERET_DIAMETER_START_X, &feretStartX);
+			imaqMeasureParticle(mp_processingFrame, 0, false,
+					IMAQ_MT_MAX_FERET_DIAMETER_START_Y, &feretStartY);
+			imaqMeasureParticle(mp_processingFrame, 0, false,
+					IMAQ_MT_MAX_FERET_DIAMETER_END_X, &feretEndX);
+			imaqMeasureParticle(mp_processingFrame, 0, false,
+					IMAQ_MT_MAX_FERET_DIAMETER_END_Y, &feretEndY);
 
 			feretDiameter = feret;
 			this->feretStartX = feretStartX;
@@ -159,8 +163,8 @@ void VisionSubsystem::visionProcessingThread() {
 			this->feretEndX = feretEndX;
 			this->feretEndY = feretEndY;
 
-//			m_frameCenterX = (feretStartX + feretEndX) / 2;
-//			m_frameCenterY = (feretStartY + feretEndY) / 2;
+			m_frameCenterX = (feretStartX + feretEndX) / 2;
+			m_frameCenterY = (feretStartY + feretEndY) / 2;
 
 			convexHullPerArea = areaConvexHull / areaParticle;
 			convexHullSize = areaConvexHull;
@@ -180,21 +184,38 @@ void VisionSubsystem::visionProcessingThread() {
 				int y = (int) m_frameCenterY;
 //				int centerX = width/2;
 //				bool centered = (centerX < x+5) && (centerX > y -5);
-				int top, left, rectheight, rectwidth;
-				top = y + 5;
-				left = x + 5;
-				rectheight = 10;
-				rectwidth = 10;
+//				int top, left, rectheight, rectwidth;
+//				top = y + 5;
+//				left = x + 5;
+//				rectheight = 10;
+//				rectwidth = 10;
 
 //				RGBValue rgbColor = centered ? IMAQ_RGB_GREEN : IMAQ_RGB_RED;
 //				RGBValue *pColor = &rgbColor;
 
-
-				imaqDrawShapeOnImage(mp_currentFrame, mp_currentFrame, {top, left, rectheight, rectwidth}, IMAQ_PAINT_VALUE, IMAQ_SHAPE_OVAL, color.get());
+//				imaqDrawShapeOnImage(mp_currentFrame, mp_currentFrame, { top,
+//						left, rectheight, rectwidth }, IMAQ_PAINT_VALUE,
+//						IMAQ_SHAPE_OVAL, color.get());
+				imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
+						DrawMode::IMAQ_DRAW_VALUE, { (int) m_frameCenterX - 5,
+								(int) m_frameCenterY },
+						{ (int) m_frameCenterX + 5, (int) m_frameCenterY },
+						color.get());
+				imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
+						DrawMode::IMAQ_DRAW_VALUE,
+						{ (int) m_frameCenterX, (int) m_frameCenterY - 5 },
+						{ (int) m_frameCenterX, (int) m_frameCenterY + 5 },
+						color.get());
 //				imaqOverlayOval(mp_currentFrame, {top, left, rectheight, rectwidth}, pColor, IMAQ_DRAW_VALUE, NULL);
+				imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
+						DrawMode::IMAQ_DRAW_VALUE, { (int) feretStartX.get(),
+								(int) feretStartY.get() }, {
+								(int) feretEndX.get(), (int) feretEndY.get() },
+						color.get());
 			}
-			imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame, DrawMode::IMAQ_DRAW_VALUE,
-										{width/2, 0}, {width/2, height}, color.get());
+			imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
+					DrawMode::IMAQ_DRAW_VALUE, { width / 2, 0 }, { width / 2,
+							height }, color.get());
 			LCameraServer::GetInstance()->SetImage(mp_currentFrame);
 		} else if (showVision.get()) {
 			LCameraServer::GetInstance()->SetImage(mp_processingFrame);
@@ -222,31 +243,31 @@ double VisionSubsystem::getFrameCenter() {
 	}
 }
 
-double VisionSubsystem::getCenterOfMassX(){
+double VisionSubsystem::getCenterOfMassX() {
 	return m_frameCenterX;
 }
 
-double VisionSubsystem::getCenterOfMassY(){
+double VisionSubsystem::getCenterOfMassY() {
 	return m_frameCenterY;
 }
 
-double VisionSubsystem::getBoundingBoxWidth(){
+double VisionSubsystem::getBoundingBoxWidth() {
 	return boundingBoxWidth.get();
 }
 
-double VisionSubsystem::getBoundingBoxHeight(){
+double VisionSubsystem::getBoundingBoxHeight() {
 	return boundingBoxHeight.get();
 }
 
-double VisionSubsystem::getDistanceToTarget(){
+double VisionSubsystem::getDistanceToTarget() {
 	// an exponential regression fits our data with r2=99.9%
 	// TODO: recalculate with new data
 	double centerOfMassY = getCenterOfMassY();
 	return 2.333 * pow(1.0052, centerOfMassY);
 }
 
-double VisionSubsystem::getFlapsFractionForDistance(double distance){
-	double angles[] = {-1, -1, -1, -1, .6, .5, .49, .48, .47, .455};
+double VisionSubsystem::getFlapsFractionForDistance(double distance) {
+	double angles[] = { -1, -1, -1, -1, .6, .5, .49, .48, .47, .455, .454, .453, .452 };
 	distance = fmax(fmin(distance, 9), 4);
 	double low = angles[(int) floor(distance)];
 	double high = angles[(int) ceil(distance)];

@@ -131,11 +131,23 @@ int Camera::EnumerateCameras() {
 	// last parameter is "connectedOnly". Why would we want to enumerate non-connected cameras?
 	IMAQdxEnumerateCameras(camInfo, &count, true);
 	cameraCount = count;
+	Camera *tempCameras[6];
+	uInt32 visionCameraIndex = 0;
 	printf("Cameras (%u):\n", (unsigned int) cameraCount);
 	for (uInt32 i = 0; i != cameraCount; i++) {
-		cameras[i] = new Camera(i);
+		tempCameras[i] = new Camera(i);
 		printf("  %s / %s / %s\n", camInfo[i].VendorName, camInfo[i].ModelName,
 				camInfo[i].InterfaceName);
+		if (strstr(camInfo[i].ModelName, "C930e") != nullptr) {
+			visionCameraIndex = i;
+			cameras[0] = tempCameras[i];
+		}
+	}
+	for (uInt32 i = 0, j = 1; i < 6; i++) {
+		if (i != visionCameraIndex) {
+			cameras[j] = tempCameras[i];
+			j++;
+		}
 	}
 	return cameraCount;
 }
@@ -148,9 +160,9 @@ Camera* Camera::GetCamera(int number) {
 	return cameras[number];
 }
 
-uInt32 Camera::SwitchCamera() {
-	if (++currentCamera >= cameraCount)
-		currentCamera = 0;
+uInt32 Camera::SwitchCamera(uInt32 which) {
+	if (which < cameraCount)
+		currentCamera = which;
 	return currentCamera;
 }
 
@@ -192,27 +204,32 @@ IMAQdxError Camera::Start() {
 		session = ULONG_MAX;
 		return imaqError;
 	}
+	printf("Opened session %d\n", session);
 	// imaqError = Camera::SetMode();
-	if (strstr(camInfo[camera].ModelName, "LifeCam") != nullptr)
+	if (strstr(camInfo[camera].ModelName, "LifeCam") != nullptr) {
 		SetVideoMode(416, 240, 15, false);
-	else if (strstr(camInfo[camera].ModelName, "Logitech Webcam") != nullptr)
+		printf("Detected LifeCam\n");
+	} else if (strstr(camInfo[camera].ModelName, "Logitech Webcam") != nullptr
+			|| strstr(camInfo[camera].ModelName, "HD Webcam") != nullptr) {
 		SetVideoMode(640, 360, 24, false);
-	else {
+		printf("Detected Logitech\n");
+	} else {
 		if (!SetVideoMode(800, 600, 10, false)) // Genuis wide angle camera, low frame rate
 			SetVideoMode(320, 240, 15, false); // default to a widely supported mode
+		printf("Using generic settings\n");
 	}
 	if (imaqError != IMAQdxErrorSuccess) {
 		return imaqError;
 	}
 	imaqError = IMAQdxConfigureGrab(session);
 	if (imaqError != IMAQdxErrorSuccess) {
-		printf("IMAQdxOpenCamera error: %x\n", imaqError);
+		printf("IMAQdxConfigureGrab error: %x\n", imaqError);
 		return imaqError;
 	}
 	// start to acquire images
 	IMAQdxStartAcquisition(session);
 	if (imaqError != IMAQdxErrorSuccess) {
-		printf("IMAQdxOpenCamera error: %x\n", imaqError);
+		printf("IMAQdxStartAcquisition error: %x\n", imaqError);
 		return imaqError;
 	}
 
@@ -257,6 +274,9 @@ IMAQdxError Camera::Stop() {
 void Camera::Feed(int ticks) {
 	if (enabled && cameraCount > 0) {
 		IMAQdxError imaqError = cameras[currentCamera]->GetFrame();
+		if (currentCamera != 0) { // vision camera
+			cameras[0]->GetFrame();
+		}
 		if (cameras[currentCamera]->frame != NULL) {
 			if (IMAQdxErrorSuccess == imaqError) {
 				// TODO: take overlay code out into visionsubsystem

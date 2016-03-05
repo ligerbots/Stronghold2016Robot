@@ -38,6 +38,8 @@ void OI::registerCommands() {
 			CommandBase::toggleLedCommand.get());
 	registerButton(pLogitechJoystick, 8, PRESSED,
 			CommandBase::toggleCompressorCommand.get());
+	registerButton(pLogitechJoystick, 13, PRESSED,
+				new AutoSetFlapsCommand());
 
 	SmartDashboard::PutData(CommandBase::centerOnTargetCommand.get());
 	SmartDashboard::PutData(new AutonomousShootSequence());
@@ -54,7 +56,7 @@ bool OI::joystickButtonPressed(Joystick* pJoystick, int buttonNumber) {
 			(uintptr_t) pJoystick);
 	if (buttonsPressedIterator == buttonsPressed.end()) {
 		std::vector<bool> apButtonsPressed;
-		for (int i = 0; i < 12; i++) {
+		for (int i = 0; i < 30; i++) {
 			apButtonsPressed.push_back(false);
 		}
 		buttonsPressed.insert(
@@ -85,7 +87,7 @@ void OI::registerButton(Joystick* pJoystick, int buttonNumber, ButtonEvent when,
 	// find the vector to use
 	JoystickMap_t::iterator cIt = controllerButtons.find((uintptr_t) pJoystick);
 	if (cIt == controllerButtons.end()) {
-		std::vector<JoystickButton*> apButtons(13);
+		std::vector<JoystickButton*> apButtons(31);
 		controllerButtons.insert(
 				std::pair<uintptr_t, std::vector<JoystickButton*>>(
 						(uintptr_t) pJoystick, apButtons));
