@@ -1,18 +1,28 @@
 #include <Stronghold2016Robot.h>
 
 VisionSubsystem::VisionSubsystem() :
-		Subsystem("VisionSubsystem"), exposure("Exposure"), showVision(
-				"ShowVision"), paintTarget("PaintTarget"), color("DrawColor"), boundingBoxWidth(
-				"VisionBoundingBoxWidth", false), boundingBoxHeight(
-				"VisionBoundingBoxHeight", false), convexHullSize(
-				"VisionCHSize", false), convexHullPerArea("VisionCHPerArea",
-		false), feretDiameter("VisionFeretDiameter", false), mp_currentFrame(
-		NULL), mp_processingFrame(NULL), m_frameCenterX(0), m_frameCenterY(0), m_numParticles(
-				0), m_processingThread(&VisionSubsystem::visionProcessingThread,
-				this) {
+		Subsystem("VisionSubsystem"),
+		exposure("Exposure"),
+		showVision("ShowVision"),
+		paintTarget("PaintTarget"),
+		color("DrawColor"),
+		enableVision("EnableVision"),
+		boundingBoxWidth("VisionBoundingBoxWidth", false),
+		boundingBoxHeight("VisionBoundingBoxHeight", false),
+		convexHullSize("VisionCHSize", false),
+		convexHullPerArea("VisionCHPerArea",false),
+		feretDiameter("VisionFeretDiameter", false),
+		mp_currentFrame(NULL),
+		mp_processingFrame(NULL),
+		m_frameCenterX(0),
+		m_frameCenterY(0),
+		m_numParticles(0),
+		m_processingThread(&VisionSubsystem::visionProcessingThread,this),
+		m_inVision(false)
+{
 	activeCamera = 0;
 	ledRingSpike.reset(new Relay(RobotMap::RELAY_LED_RING_SPIKE));
-
+	enableVision = true;	// default on
 	color = 0;
 }
 
@@ -50,12 +60,26 @@ void VisionSubsystem::updateVision(int ticks) {
 	Image* image = NULL;
 	{
 //		std::lock_guard<std::mutex> lock(m_frameMutex);
-		Camera::Feed(ticks);
-		image = Camera::GetCamera(activeCamera)->GetStoredFrame();
-		mp_currentFrame = Camera::GetCamera(0)->GetStoredFrame();
+		if (!enableVision) {
+			Camera::Feed(ticks);
+			image = Camera::GetCamera(activeCamera)->GetStoredFrame();
+			mp_currentFrame = Camera::GetCamera(0)->GetStoredFrame();
+		}
+		else {
+			bool inVision;
+			{
+				//std::lock_guard<std::mutex> lock(m_frameMutex);
+				inVision = m_inVision;
+			}
+			if (!inVision) {
+				Camera::Feed(ticks);
+				image = Camera::GetCamera(activeCamera)->GetStoredFrame();
+				mp_currentFrame = Camera::GetCamera(0)->GetStoredFrame();
+			}
+		}
 	}
 
-	if (!paintTarget.get() && !showVision.get() && image != NULL) {
+	if (image != NULL && (!enableVision.get() || (!paintTarget.get() && !showVision.get())) ) {
 		LCameraServer::GetInstance()->SetImage(image);
 	}
 }
@@ -72,162 +96,177 @@ void VisionSubsystem::toggleCameraFeed() {
 void VisionSubsystem::visionProcessingThread() {
 	printf("VisionSubsystem: Processing thread start\n");
 
-	color.set(color.get() + 1000);
-
 	timeval startTime;
 	timeval endTime;
+
+	gettimeofday(&startTime, 0);
+	color.set(color.get() + 1000);
+
 	while (true) {
-		if (mp_currentFrame == NULL) {
-			// wait for first frame
-			usleep(34000); // 34 ms
-			continue;
-		}
-		if (mp_processingFrame == NULL) {
-			// create our processing frame
-			printf("VisionSubsystem: Creating second Image*\n");
-			mp_processingFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
-		}
-
-		gettimeofday(&startTime, 0);
-
-		{
-//			std::lock_guard<std::mutex> lock(m_frameMutex);
-			imaqDuplicate(mp_processingFrame, mp_currentFrame);
-		}
-
-		int err = IVA_ProcessImage(mp_processingFrame); // run vision script
-		SmartDashboard::PutNumber("Vision/imaq_err", err);
-
-		// TODO: refactor into a single imaqMeasureParticles(...) call
-		// also use largest particle only, and check (convex hull area)/(particle area)
-		// to make sure it's about 2.2
-		bool needsConnection = true;
-
-		imaqCountParticles(mp_processingFrame, needsConnection,
-				&m_numParticles);
-		if (m_numParticles != 0) {
-			MeasureParticlesReport *mprArray = imaqMeasureParticles(
-					mp_processingFrame, IMAQ_CALIBRATION_MODE_PIXEL, mT,
-					MAXVAL);
-
-			// Find the particle with the largest area
-			double partArea = 0.0;
-			int largest = 0;
-			double *pM;
-			for (int i = 0; i != m_numParticles; i++) {
-				double *pixelMeasurements = mprArray->pixelMeasurements[i];
-				if (pixelMeasurements[AREA] > partArea) {
-					partArea = pixelMeasurements[AREA];
-					largest = i;
-				}
+		if (enableVision.get()) {
+			{
+				//std::lock_guard<std::mutex> lock(m_frameMutex);
+				m_inVision = true;;
 			}
-			pM = mprArray->pixelMeasurements[largest];
+			if (mp_currentFrame == NULL) {
+				// wait for first frame
+				usleep(34000); // 34 ms
+				continue;
+			}
+			if (mp_processingFrame == NULL) {
+				// create our processing frame
+				printf("VisionSubsystem: Creating second Image*\n");
+				mp_processingFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
+			}
 
-			m_frameCenterX = pM[COMX];
-			m_frameCenterY = pM[COMY];
 
-			double areaConvexHull;
-			double areaParticle;
-			double widthBoundingBox;
-			double heightBoundingBox;
-			double feret;
-			double feretStartX, feretStartY, feretEndX, feretEndY;
 
-			imaqMeasureParticle(mp_processingFrame, 0, false,
-					IMAQ_MT_CONVEX_HULL_AREA, &areaConvexHull);
-			imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_AREA,
-					&areaParticle);
-			//imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_BOUNDING_RECT_WIDTH, &widthBoundingBox);
-			//imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_BOUNDING_RECT_HEIGHT, &heightBoundingBox);
+			{
+	//			std::lock_guard<std::mutex> lock(m_frameMutex);
+				mp_processingFrame = mp_currentFrame;
+				//imaqDuplicate(mp_processingFrame, mp_currentFrame);
+			}
 
-			imaqMeasureParticle(mp_processingFrame, 0, false,
-					IMAQ_MT_EQUIVALENT_RECT_LONG_SIDE, &widthBoundingBox);
-			imaqMeasureParticle(mp_processingFrame, 0, false,
-					IMAQ_MT_EQUIVALENT_RECT_SHORT_SIDE, &heightBoundingBox);
+			int err = IVA_ProcessImage(mp_processingFrame); // run vision script
 
-			imaqMeasureParticle(mp_processingFrame, 0, false,
-					IMAQ_MT_MAX_FERET_DIAMETER, &feret);
+			SmartDashboard::PutNumber("Vision/imaq_err", err);
 
-			imaqMeasureParticle(mp_processingFrame, 0, false,
-					IMAQ_MT_MAX_FERET_DIAMETER_START_X, &feretStartX);
-			imaqMeasureParticle(mp_processingFrame, 0, false,
-					IMAQ_MT_MAX_FERET_DIAMETER_START_Y, &feretStartY);
-			imaqMeasureParticle(mp_processingFrame, 0, false,
-					IMAQ_MT_MAX_FERET_DIAMETER_END_X, &feretEndX);
-			imaqMeasureParticle(mp_processingFrame, 0, false,
-					IMAQ_MT_MAX_FERET_DIAMETER_END_Y, &feretEndY);
+			// TODO: refactor into a single imaqMeasureParticles(...) call
+			// also use largest particle only, and check (convex hull area)/(particle area)
+			// to make sure it's about 2.2
+			bool needsConnection = true;
 
-			feretDiameter = feret;
-			this->feretStartX = feretStartX;
-			this->feretStartY = feretStartY;
-			this->feretEndX = feretEndX;
-			this->feretEndY = feretEndY;
-
-			m_frameCenterX = (feretStartX + feretEndX) / 2;
-			m_frameCenterY = (feretStartY + feretEndY) / 2;
-
-			convexHullPerArea = areaConvexHull / areaParticle;
-			convexHullSize = areaConvexHull;
-			boundingBoxWidth = widthBoundingBox;
-			boundingBoxHeight = heightBoundingBox;
-		} else {
-			// TODO: make sure that in pid commands you stop if it's NAN
-//			frameCenterX = NAN;
-		}
-
-		if (paintTarget.get()) {
-			// Send the image to the dashboard with a target indicator
-			int width, height;
-			imaqGetImageSize(mp_processingFrame, &width, &height);
+			imaqCountParticles(mp_processingFrame, needsConnection,
+					&m_numParticles);
 			if (m_numParticles != 0) {
-				int x = (int) m_frameCenterX;
-				int y = (int) m_frameCenterY;
-//				int centerX = width/2;
-//				bool centered = (centerX < x+5) && (centerX > y -5);
-//				int top, left, rectheight, rectwidth;
-//				top = y + 5;
-//				left = x + 5;
-//				rectheight = 10;
-//				rectwidth = 10;
+				MeasureParticlesReport *mprArray = imaqMeasureParticles(
+						mp_processingFrame, IMAQ_CALIBRATION_MODE_PIXEL, mT,
+						MAXVAL);
 
-//				RGBValue rgbColor = centered ? IMAQ_RGB_GREEN : IMAQ_RGB_RED;
-//				RGBValue *pColor = &rgbColor;
+				// Find the particle with the largest area
+				double partArea = 0.0;
+				int largest = 0;
+				double *pM;
+				for (int i = 0; i != m_numParticles; i++) {
+					double *pixelMeasurements = mprArray->pixelMeasurements[i];
+					if (pixelMeasurements[AREA] > partArea) {
+						partArea = pixelMeasurements[AREA];
+						largest = i;
+					}
+				}
+				pM = mprArray->pixelMeasurements[largest];
 
-//				imaqDrawShapeOnImage(mp_currentFrame, mp_currentFrame, { top,
-//						left, rectheight, rectwidth }, IMAQ_PAINT_VALUE,
-//						IMAQ_SHAPE_OVAL, color.get());
-				imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
-						DrawMode::IMAQ_DRAW_VALUE, { (int) m_frameCenterX - 5,
-								(int) m_frameCenterY },
-						{ (int) m_frameCenterX + 5, (int) m_frameCenterY },
-						color.get());
-				imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
-						DrawMode::IMAQ_DRAW_VALUE,
-						{ (int) m_frameCenterX, (int) m_frameCenterY - 5 },
-						{ (int) m_frameCenterX, (int) m_frameCenterY + 5 },
-						color.get());
-//				imaqOverlayOval(mp_currentFrame, {top, left, rectheight, rectwidth}, pColor, IMAQ_DRAW_VALUE, NULL);
-				imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
-						DrawMode::IMAQ_DRAW_VALUE, { (int) feretStartX.get(),
-								(int) feretStartY.get() }, {
-								(int) feretEndX.get(), (int) feretEndY.get() },
-						color.get());
+				m_frameCenterX = pM[COMX];
+				m_frameCenterY = pM[COMY];
+
+				double areaConvexHull;
+				double areaParticle;
+				double widthBoundingBox;
+				double heightBoundingBox;
+				double feret;
+				double feretStartX, feretStartY, feretEndX, feretEndY;
+
+				imaqMeasureParticle(mp_processingFrame, 0, false,
+						IMAQ_MT_CONVEX_HULL_AREA, &areaConvexHull);
+				imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_AREA,
+						&areaParticle);
+				//imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_BOUNDING_RECT_WIDTH, &widthBoundingBox);
+				//imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_BOUNDING_RECT_HEIGHT, &heightBoundingBox);
+
+				imaqMeasureParticle(mp_processingFrame, 0, false,
+						IMAQ_MT_EQUIVALENT_RECT_LONG_SIDE, &widthBoundingBox);
+				imaqMeasureParticle(mp_processingFrame, 0, false,
+						IMAQ_MT_EQUIVALENT_RECT_SHORT_SIDE, &heightBoundingBox);
+
+				imaqMeasureParticle(mp_processingFrame, 0, false,
+						IMAQ_MT_MAX_FERET_DIAMETER, &feret);
+
+				imaqMeasureParticle(mp_processingFrame, 0, false,
+						IMAQ_MT_MAX_FERET_DIAMETER_START_X, &feretStartX);
+				imaqMeasureParticle(mp_processingFrame, 0, false,
+						IMAQ_MT_MAX_FERET_DIAMETER_START_Y, &feretStartY);
+				imaqMeasureParticle(mp_processingFrame, 0, false,
+						IMAQ_MT_MAX_FERET_DIAMETER_END_X, &feretEndX);
+				imaqMeasureParticle(mp_processingFrame, 0, false,
+						IMAQ_MT_MAX_FERET_DIAMETER_END_Y, &feretEndY);
+
+				feretDiameter = feret;
+				this->feretStartX = feretStartX;
+				this->feretStartY = feretStartY;
+				this->feretEndX = feretEndX;
+				this->feretEndY = feretEndY;
+
+				m_frameCenterX = (feretStartX + feretEndX) / 2;
+				m_frameCenterY = (feretStartY + feretEndY) / 2;
+
+				convexHullPerArea = areaConvexHull / areaParticle;
+				convexHullSize = areaConvexHull;
+				boundingBoxWidth = widthBoundingBox;
+				boundingBoxHeight = heightBoundingBox;
+			} else {
+				// TODO: make sure that in pid commands you stop if it's NAN
+	//			frameCenterX = NAN;
 			}
-			imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
-					DrawMode::IMAQ_DRAW_VALUE, { width / 2, 0 }, { width / 2,
-							height }, color.get());
-			LCameraServer::GetInstance()->SetImage(mp_currentFrame);
-		} else if (showVision.get()) {
-			LCameraServer::GetInstance()->SetImage(mp_processingFrame);
+
+			if (paintTarget.get()) {
+				// Send the image to the dashboard with a target indicator
+				int width, height;
+				imaqGetImageSize(mp_processingFrame, &width, &height);
+				if (m_numParticles != 0) {
+					int x = (int) m_frameCenterX;
+					int y = (int) m_frameCenterY;
+	//				int centerX = width/2;
+	//				bool centered = (centerX < x+5) && (centerX > y -5);
+	//				int top, left, rectheight, rectwidth;
+	//				top = y + 5;
+	//				left = x + 5;
+	//				rectheight = 10;
+	//				rectwidth = 10;
+
+	//				RGBValue rgbColor = centered ? IMAQ_RGB_GREEN : IMAQ_RGB_RED;
+	//				RGBValue *pColor = &rgbColor;
+
+	//				imaqDrawShapeOnImage(mp_currentFrame, mp_currentFrame, { top,
+	//						left, rectheight, rectwidth }, IMAQ_PAINT_VALUE,
+	//						IMAQ_SHAPE_OVAL, color.get());
+					imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
+							DrawMode::IMAQ_DRAW_VALUE, { (int) m_frameCenterX - 5,
+									(int) m_frameCenterY },
+							{ (int) m_frameCenterX + 5, (int) m_frameCenterY },
+							color.get());
+					imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
+							DrawMode::IMAQ_DRAW_VALUE,
+							{ (int) m_frameCenterX, (int) m_frameCenterY - 5 },
+							{ (int) m_frameCenterX, (int) m_frameCenterY + 5 },
+							color.get());
+	//				imaqOverlayOval(mp_currentFrame, {top, left, rectheight, rectwidth}, pColor, IMAQ_DRAW_VALUE, NULL);
+					imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
+							DrawMode::IMAQ_DRAW_VALUE, { (int) feretStartX.get(),
+									(int) feretStartY.get() }, {
+									(int) feretEndX.get(), (int) feretEndY.get() },
+							color.get());
+				}
+				imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
+						DrawMode::IMAQ_DRAW_VALUE, { width / 2, 0 }, { width / 2,
+								height }, color.get());
+				LCameraServer::GetInstance()->SetImage(mp_currentFrame);
+			} else if (showVision.get()) {
+				LCameraServer::GetInstance()->SetImage(mp_processingFrame);
+			}
+
+
+			gettimeofday(&endTime, 0);
+			__suseconds_t diff = endTime.tv_usec - startTime.tv_usec;
+			if (diff > -50000) {
+				printf("Vision %ld\n", diff/1000);
+				SmartDashboard::PutNumber("Vision/processingTime", diff);
+			}
 		}
-
-		gettimeofday(&endTime, 0);
-
-		__suseconds_t diff = endTime.tv_usec - startTime.tv_usec;
-		if (diff > -50000)
-			SmartDashboard::PutNumber("Vision/processingTime", diff);
-
-		usleep(33000);
+		{
+			//std::lock_guard<std::mutex> lock(m_frameMutex);
+			m_inVision = false;
+		}
+		usleep(2000);
 	}
 }
 

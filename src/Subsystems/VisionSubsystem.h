@@ -11,6 +11,7 @@ private:
 	Parameter<int> exposure;
 	Parameter<bool> showVision;
 	Parameter<bool> paintTarget;
+	Parameter<bool> enableVision;
 	Parameter<double> color;
 	Parameter<double> boundingBoxWidth;
 	Parameter<double> boundingBoxHeight;
@@ -42,6 +43,8 @@ private:
 	std::mutex m_frameMutex;
 	Image* mp_currentFrame;
 	Image* mp_processingFrame;
+
+	bool m_inVision;
 
 	double m_frameCenterX;
 	double m_frameCenterY;
