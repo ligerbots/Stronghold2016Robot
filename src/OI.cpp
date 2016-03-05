@@ -9,8 +9,8 @@ OI::OI() :
 void OI::registerCommands() {
 	registerButton(pXboxController, 1, PRESSED,
 			CommandBase::toggleCameraFeedCommand.get());
-	registerButton(pXboxController, 2, PRESSED,
-			CommandBase::flapCommand.get());
+//	registerButton(pXboxController, 2, PRESSED,
+//			CommandBase::flapCommand.get());
 	registerButton(pXboxController, 3, PRESSED,
 			CommandBase::shootCommand.get());
 	registerButton(pXboxController, 4, PRESSED,
@@ -22,6 +22,21 @@ void OI::registerCommands() {
 	registerButton(pXboxController, 7, PRESSED,
 			CommandBase::toggleLedCommand.get());
 	registerButton(pXboxController, 8, PRESSED,
+			CommandBase::toggleCompressorCommand.get());
+
+	// change these buttons to what's convenient on the joystick
+	registerButton(pLogitechJoystick, 1, PRESSED,
+			CommandBase::toggleCameraFeedCommand.get());
+	registerButton(pLogitechJoystick, 2, PRESSED,
+			CommandBase::wedgeToggleCommand.get()); // if we have enough buttons,
+	registerButton(pLogitechJoystick, 3, PRESSED,
+			CommandBase::intakeToggleCommand.get());// make separate up/down buttons
+	// 4, 5 roll in/out (full speed) in IntakeRollerCommand
+	registerButton(pLogitechJoystick, 3, PRESSED,
+				CommandBase::centerOnTargetCommand.get());
+	registerButton(pLogitechJoystick, 7, PRESSED,
+			CommandBase::toggleLedCommand.get());
+	registerButton(pLogitechJoystick, 8, PRESSED,
 			CommandBase::toggleCompressorCommand.get());
 
 	SmartDashboard::PutData(CommandBase::centerOnTargetCommand.get());

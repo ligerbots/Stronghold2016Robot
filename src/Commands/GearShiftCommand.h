@@ -11,7 +11,7 @@ public:
 		TOGGLE = 0,
 		SHIFT_UP = 1
 	};
-	GearShiftCommand(Direction direction);
+	explicit GearShiftCommand(Direction direction);
 	void Initialize();
 	void Execute();bool IsFinished();
 	void End();

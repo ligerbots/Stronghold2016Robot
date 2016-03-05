@@ -14,6 +14,13 @@ void IntakeRollerCommand::Execute() {
 	double speed =
 			Robot::instance->mp_operatorInterface->pXboxController->GetRawAxis(3) -
 			Robot::instance->mp_operatorInterface->pXboxController->GetRawAxis(2);
+
+	if(Robot::instance->mp_operatorInterface->pLogitechJoystick->GetRawButton(4)){
+		speed = 1;
+	} else if(Robot::instance->mp_operatorInterface->pLogitechJoystick->GetRawButton(5)){
+		speed = -1;
+	}
+
 	if(fabs(speed) > 0.1)
 		intakeSubsystem->setRollSpeed(speed);
 	else
