@@ -249,6 +249,7 @@ void VisionSubsystem::sendValuesToSmartDashboard() {
 		} else if (val == Relay::kReverse) {
 			SmartDashboard::PutString("LED", "Reverse");
 		}
+		SmartDashboard::PutBoolean("Vision/LedOn", val != Relay::kOff);
 	}
 
 	SmartDashboard::PutNumber("CamerasCount", Camera::GetNumberOfCameras());
