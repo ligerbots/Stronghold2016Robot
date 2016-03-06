@@ -13,22 +13,12 @@ VisionSubsystem::VisionSubsystem() :
 		m_frameCenterY(0),
 		m_numParticles(0),
 		m_processingThread(&VisionSubsystem::visionProcessingThread,this),
-		m_inVision(false),
 		m_activeCamera(0)
 {
 	ledRingSpike.reset(new Relay(RobotMap::RELAY_LED_RING_SPIKE));
 	enableVision = true;	// default on
 	color = 0;
 
-	// Fill our array of Measurement Types
-	for (int i=0; i!=sizeof(mT)/sizeof(MeasurementType); i++) {
-		mT[i] = (MeasurementType)i;
-	}
-	/*
-	// initalize our measurement type array here -- once
-	 * Deprecated -- use the NI MeasureTypes enum instead
-	 * That gets us more results than we need, but saves lots of typing :-)
-	 * The question is whether the extra results cost us much time
 	mT[COMX] = IMAQ_MT_CENTER_OF_MASS_X;
 	mT[COMY] = IMAQ_MT_CENTER_OF_MASS_Y;
 	mT[CHA] = IMAQ_MT_CONVEX_HULL_AREA;
@@ -43,9 +33,9 @@ VisionSubsystem::VisionSubsystem() :
 	mT[ERSSF] = IMAQ_MT_EQUIVALENT_RECT_SHORT_SIDE_FERET;
 	mT[MFDO] = IMAQ_MT_MAX_FERET_DIAMETER_ORIENTATION;
 	mT[MFDSX] = IMAQ_MT_MAX_FERET_DIAMETER_START_X;
-	*/
-
-
+	mT[MFDSY] = IMAQ_MT_MAX_FERET_DIAMETER_START_Y;
+	mT[MFDEX] = IMAQ_MT_MAX_FERET_DIAMETER_END_X;
+	mT[MFDEY] = IMAQ_MT_MAX_FERET_DIAMETER_END_Y;
 }
 
 void VisionSubsystem::InitDefaultCommand() {
@@ -115,10 +105,6 @@ void VisionSubsystem::visionProcessingThread() {
 
 	while (true) {
 		if (enableVision.get()) {
-			{
-				//std::lock_guard<std::mutex> lock(m_frameMutex);
-				m_inVision = true;;
-			}
 			if (mp_currentFrame == NULL) {
 				// wait for first frame
 				usleep(34000); // 34 ms
@@ -149,7 +135,7 @@ void VisionSubsystem::visionProcessingThread() {
 			if (m_numParticles != 0) {
 				MeasureParticlesReport *mprArray = imaqMeasureParticles(
 						mp_processingFrame, IMAQ_CALIBRATION_MODE_PIXEL, mT,
-						sizeof(mT)/sizeof(MeasurementType));
+						MAXVAL);
 				if (NULL == mprArray) {
 					int imaqError = imaqGetLastError();
 					char *msg = imaqGetErrorText(imaqError);
@@ -168,24 +154,21 @@ void VisionSubsystem::visionProcessingThread() {
 					}
 					m_pM = mprArray->pixelMeasurements[largest];
 
-					m_frameCenterX = m_pM[IMAQ_MT_CENTER_OF_MASS_X];
-					m_frameCenterY = m_pM[IMAQ_MT_CENTER_OF_MASS_Y];
+					m_frameCenterX = m_pM[COMX];
+					m_frameCenterY = m_pM[COMY];
 
-					//double areaConvexHull = m_pM[IMAQ_MT_CONVEX_HULL_AREA];
-					//double areaParticle = m_pM[IMAQ_MT_AREA];
-					//double widthBoundingBox = pM[IMAQ_MT_BOUNDING_RECT_WIDTH];
-					//double heightBoundingBox = pM[IMAQ_MT_BOUNDING_RECT_HEIGHT];
-					//double feret = pM[IMAQ_MT_MAX_FERET_DIAMETER_ORIENTATION];
-					double feretStartX = m_pM[IMAQ_MT_MAX_FERET_DIAMETER_START_X];
-					double feretStartY = m_pM[IMAQ_MT_MAX_FERET_DIAMETER_START_Y];
-					double feretEndX = m_pM[IMAQ_MT_MAX_FERET_DIAMETER_END_X];
-					double feretEndY = m_pM[IMAQ_MT_MAX_FERET_DIAMETER_END_Y];
+					//double areaConvexHull = m_pM[CHA];
+					//double areaParticle = m_pM[AREA];
+					//double widthBoundingBox = pM[BRW];
+					//double heightBoundingBox = pM[BRH];
+					//double feret = pM[MFDO];
+					double feretStartX = m_pM[MFDSX];
+					double feretStartY = m_pM[MFDSX];
+					double feretEndX = m_pM[MFDEX];
+					double feretEndY = m_pM[MFDEY];
 
 					m_frameCenterX = (feretStartX + feretEndX) / 2;
 					m_frameCenterY = (feretStartY + feretEndY) / 2;
-
-					//double convexHullPerArea = areaConvexHull / areaParticle;
-					//double convexHullSize = areaConvexHull;
 
 					if (paintTarget.get()) {
 						// Send the image to the dashboard with a target indicator
@@ -223,10 +206,6 @@ void VisionSubsystem::visionProcessingThread() {
 				SmartDashboard::PutNumber("Vision/processingTime", diff);
 			}
 		}	// close if (nableVision.get())
-		{
-			//std::lock_guard<std::mutex> lock(m_frameMutex);
-			//m_inVision = false;
-		}
 		int endTicks = Robot::ticks;
 		double framesPerSec = 50.0/(endTicks - startTicks);
 		SmartDashboard::PutNumber("Vision/FPS", framesPerSec);

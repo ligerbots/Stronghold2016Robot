@@ -54,8 +54,7 @@ private:
 	std::thread m_processingThread;
 	// Take about 55 measures on each particle in one call
 	// Q: Does taking extra measurements slow things down?
-	MeasurementType mT[IMAQ_MT_COMPACTNESS_FACTOR];
-	bool m_inVision;
+	MeasurementType mT[MAXVAL];
 
 	int m_activeCamera;
 
