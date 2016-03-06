@@ -6,6 +6,8 @@
 
 class IntakeRollerCommand: public CommandBase
 {
+private:
+	Robot *robot;		// cache Robot::instance
 public:
 	IntakeRollerCommand();
 	void Initialize();

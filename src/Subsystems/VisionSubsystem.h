@@ -13,15 +13,15 @@ private:
 	Parameter<bool> paintTarget;
 	Parameter<bool> enableVision;
 	Parameter<double> color;
-	Parameter<double> boundingBoxWidth;
-	Parameter<double> boundingBoxHeight;
-	Parameter<double> convexHullSize;
-	Parameter<double> convexHullPerArea;
-	Parameter<double> feretDiameter;
-	Parameter<double> feretStartX;
-	Parameter<double> feretStartY;
-	Parameter<double> feretEndX;
-	Parameter<double> feretEndY;
+//	Parameter<double> boundingBoxWidth;
+//	Parameter<double> boundingBoxHeight;
+//	Parameter<double> convexHullSize;
+//	Parameter<double> convexHullPerArea;
+//	Parameter<double> feretDiameter;
+//	Parameter<double> feretStartX;
+//	Parameter<double> feretStartY;
+//	Parameter<double> feretEndX;
+//	Parameter<double> feretEndY;
 	// Define the indexes to our MeasuremeParticleReport
 	enum Measures {
 		COMX,	// IMAQ_MT_CENTER_OF_MASS_X
@@ -37,6 +37,10 @@ private:
 		ERSS,	// IMAQ_MT_EQUIVALENT_RECT_SHORT_SIDE
 		ERSSF, 	// IMAQ_MT_EQUIVALENT_RECT_SHORT_SIDE_FERET
 		MFDO, 	// IMAQ_MT_MAX_FERET_DIAMETER_ORIENTATION
+		MFDSX,	// IMAQ_MT_MAX_FERET_DIAMETER_START_X
+		MFDSY,	// IMAQ_MT_MAX_FERET_DIAMETER_START_Y
+		MFDEX,	// IMAQ_MT_MAX_FERET_DIAMETER_END_X
+		MFDEY,	// IMAQ_MT_MAX_FERET_DIAMETER_END_Y
 		MAXVAL
 	};
 
@@ -44,19 +48,21 @@ private:
 	Image* mp_currentFrame;
 	Image* mp_processingFrame;
 
-	bool m_inVision;
-
 	double m_frameCenterX;
 	double m_frameCenterY;
 	int m_numParticles;
-	MeasurementType mT[MAXVAL];
+	std::thread m_processingThread;
+	// Take about 55 measures on each particle in one call
+	// Q: Does taking extra measurements slow things down?
+	MeasurementType mT[IMAQ_MT_COMPACTNESS_FACTOR];
+	bool m_inVision;
 
-	int activeCamera;
+	int m_activeCamera;
 
 	// managed hardware object
 	std::unique_ptr<Relay> ledRingSpike;
+	double *m_pM;	// pixel measurement
 
-	std::thread m_processingThread;
 
 	void visionProcessingThread();
 

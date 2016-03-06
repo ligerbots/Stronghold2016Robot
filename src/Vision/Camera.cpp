@@ -204,7 +204,7 @@ IMAQdxError Camera::Start() {
 		session = ULONG_MAX;
 		return imaqError;
 	}
-	printf("Opened session %d\n", session);
+	printf("Opened session %d\n", (int)session);
 	// imaqError = Camera::SetMode();
 	if (strstr(camInfo[camera].ModelName, "LifeCam") != nullptr) {
 		SetVideoMode(416, 240, 15, false);

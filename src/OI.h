@@ -15,7 +15,8 @@ private:
 
 public:
 	Joystick* pXboxController;
-	Joystick* pLogitechJoystick;
+	Joystick* pFarmController;
+	bool m_secondControllerPresent;
 	OI();
 	OI(OI& otherOI);
 

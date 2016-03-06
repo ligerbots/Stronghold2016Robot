@@ -51,7 +51,7 @@ void CenterOnTargetCommand::Execute() {
 
 	double error = centerTo - visionSubsystem->PIDGet();
 	double sign = error < 0 ? -1 : 1;
-	if(fabs(error) > izone.get()){
+	if (fabs(error) > izone.get()) {
 		driveSubsystem->turnPIDOutput->PIDWrite(0.7 * sign);
 	} else {
 		driveSubsystem->turnPIDOutput->PIDWrite(0.40 * sign);

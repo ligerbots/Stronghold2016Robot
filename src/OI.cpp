@@ -3,7 +3,7 @@
 OI::OI() :
 		controllerButtons(), buttonsPressed() {
 	pXboxController = new Joystick(0);
-	pLogitechJoystick = new Joystick(1);
+	pFarmController = new Joystick(1);
 }
 
 void OI::registerCommands() {
@@ -24,21 +24,26 @@ void OI::registerCommands() {
 	registerButton(pXboxController, 8, PRESSED,
 			CommandBase::toggleCompressorCommand.get());
 
+	// avoid excessive errors if this joystick isn't connected
+	m_secondControllerPresent = pFarmController->GetButtonCount() > 0;
+
+	// we register the buttons even if the controller wasn't present on startup
+	// because it might be connected later
 	// change these buttons to what's convenient on the joystick
-	registerButton(pLogitechJoystick, 1, PRESSED,
+	registerButton(pFarmController, 1, PRESSED,
 			CommandBase::toggleCameraFeedCommand.get());
-	registerButton(pLogitechJoystick, 2, PRESSED,
+	registerButton(pFarmController, 2, PRESSED,
 			CommandBase::wedgeToggleCommand.get()); // if we have enough buttons,
-	registerButton(pLogitechJoystick, 3, PRESSED,
+	registerButton(pFarmController, 3, PRESSED,
 			CommandBase::intakeToggleCommand.get());// make separate up/down buttons
 	// 4, 5 roll in/out (full speed) in IntakeRollerCommand
-	registerButton(pLogitechJoystick, 3, PRESSED,
+	registerButton(pFarmController, 3, PRESSED,
 				CommandBase::centerOnTargetCommand.get());
-	registerButton(pLogitechJoystick, 7, PRESSED,
+	registerButton(pFarmController, 7, PRESSED,
 			CommandBase::toggleLedCommand.get());
-	registerButton(pLogitechJoystick, 8, PRESSED,
+	registerButton(pFarmController, 8, PRESSED,
 			CommandBase::toggleCompressorCommand.get());
-	registerButton(pLogitechJoystick, 13, PRESSED,
+	registerButton(pFarmController, 13, PRESSED,
 				new AutoSetFlapsCommand());
 
 	SmartDashboard::PutData(CommandBase::centerOnTargetCommand.get());

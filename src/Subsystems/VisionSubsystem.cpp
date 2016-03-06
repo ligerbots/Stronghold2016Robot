@@ -5,25 +5,47 @@ VisionSubsystem::VisionSubsystem() :
 		exposure("Exposure"),
 		showVision("ShowVision"),
 		paintTarget("PaintTarget"),
-		color("DrawColor"),
 		enableVision("EnableVision"),
-		boundingBoxWidth("VisionBoundingBoxWidth", false),
-		boundingBoxHeight("VisionBoundingBoxHeight", false),
-		convexHullSize("VisionCHSize", false),
-		convexHullPerArea("VisionCHPerArea",false),
-		feretDiameter("VisionFeretDiameter", false),
+		color("DrawColor"),
 		mp_currentFrame(NULL),
 		mp_processingFrame(NULL),
 		m_frameCenterX(0),
 		m_frameCenterY(0),
 		m_numParticles(0),
 		m_processingThread(&VisionSubsystem::visionProcessingThread,this),
-		m_inVision(false)
+		m_inVision(false),
+		m_activeCamera(0)
 {
-	activeCamera = 0;
 	ledRingSpike.reset(new Relay(RobotMap::RELAY_LED_RING_SPIKE));
 	enableVision = true;	// default on
 	color = 0;
+
+	// Fill our array of Measurement Types
+	for (int i=0; i!=sizeof(mT)/sizeof(MeasurementType); i++) {
+		mT[i] = (MeasurementType)i;
+	}
+	/*
+	// initalize our measurement type array here -- once
+	 * Deprecated -- use the NI MeasureTypes enum instead
+	 * That gets us more results than we need, but saves lots of typing :-)
+	 * The question is whether the extra results cost us much time
+	mT[COMX] = IMAQ_MT_CENTER_OF_MASS_X;
+	mT[COMY] = IMAQ_MT_CENTER_OF_MASS_Y;
+	mT[CHA] = IMAQ_MT_CONVEX_HULL_AREA;
+	mT[AREA] = IMAQ_MT_AREA;
+	mT[BRW] = IMAQ_MT_BOUNDING_RECT_WIDTH;
+	mT[BRH] = IMAQ_MT_BOUNDING_RECT_HEIGHT;
+	mT[AVSL] = IMAQ_MT_AVERAGE_VERT_SEGMENT_LENGTH;
+	mT[AHSL] = IMAQ_MT_AVERAGE_HORIZ_SEGMENT_LENGTH;
+	mT[MFD] = IMAQ_MT_MAX_FERET_DIAMETER;
+	mT[ERLS] = IMAQ_MT_EQUIVALENT_RECT_LONG_SIDE;
+	mT[ERSS] = IMAQ_MT_EQUIVALENT_RECT_SHORT_SIDE;
+	mT[ERSSF] = IMAQ_MT_EQUIVALENT_RECT_SHORT_SIDE_FERET;
+	mT[MFDO] = IMAQ_MT_MAX_FERET_DIAMETER_ORIENTATION;
+	mT[MFDSX] = IMAQ_MT_MAX_FERET_DIAMETER_START_X;
+	*/
+
+
 }
 
 void VisionSubsystem::InitDefaultCommand() {
@@ -62,7 +84,7 @@ void VisionSubsystem::updateVision(int ticks) {
 //		std::lock_guard<std::mutex> lock(m_frameMutex);
 		if (!enableVision) {
 			Camera::Feed(ticks);
-			image = Camera::GetCamera(activeCamera)->GetStoredFrame();
+			image = Camera::GetCamera(m_activeCamera)->GetStoredFrame();
 			mp_currentFrame = Camera::GetCamera(0)->GetStoredFrame();
 		}
 		else {
@@ -73,8 +95,9 @@ void VisionSubsystem::updateVision(int ticks) {
 			}
 			if (!inVision) {
 				Camera::Feed(ticks);
-				image = Camera::GetCamera(activeCamera)->GetStoredFrame();
+				image = Camera::GetCamera(m_activeCamera)->GetStoredFrame();
 				mp_currentFrame = Camera::GetCamera(0)->GetStoredFrame();
+				if (image!=NULL) LCameraServer::GetInstance()->SetImage(image);
 			}
 		}
 	}
@@ -85,12 +108,12 @@ void VisionSubsystem::updateVision(int ticks) {
 }
 
 void VisionSubsystem::toggleCameraFeed() {
-	activeCamera++;
-	if (activeCamera >= Camera::GetNumberOfCameras()) {
-		activeCamera = 0;
+	m_activeCamera++;
+	if (m_activeCamera >= Camera::GetNumberOfCameras()) {
+		m_activeCamera = 0;
 	}
-	Camera::SwitchCamera(activeCamera);
-	printf("Active camera: %d\n", activeCamera);
+	Camera::SwitchCamera(m_activeCamera);
+	printf("Active camera: %d\n", m_activeCamera);
 }
 
 void VisionSubsystem::visionProcessingThread() {
@@ -98,6 +121,7 @@ void VisionSubsystem::visionProcessingThread() {
 
 	timeval startTime;
 	timeval endTime;
+	int startTicks = Robot::ticks;
 
 	gettimeofday(&startTime, 0);
 	color.set(color.get() + 1000);
@@ -146,7 +170,6 @@ void VisionSubsystem::visionProcessingThread() {
 				// Find the particle with the largest area
 				double partArea = 0.0;
 				int largest = 0;
-				double *pM;
 				for (int i = 0; i != m_numParticles; i++) {
 					double *pixelMeasurements = mprArray->pixelMeasurements[i];
 					if (pixelMeasurements[AREA] > partArea) {
@@ -154,102 +177,52 @@ void VisionSubsystem::visionProcessingThread() {
 						largest = i;
 					}
 				}
-				pM = mprArray->pixelMeasurements[largest];
+				m_pM = mprArray->pixelMeasurements[largest];
 
-				m_frameCenterX = pM[COMX];
-				m_frameCenterY = pM[COMY];
+				m_frameCenterX = m_pM[IMAQ_MT_CENTER_OF_MASS_X];
+				m_frameCenterY = m_pM[IMAQ_MT_CENTER_OF_MASS_Y];
 
-				double areaConvexHull;
-				double areaParticle;
-				double widthBoundingBox;
-				double heightBoundingBox;
-				double feret;
-				double feretStartX, feretStartY, feretEndX, feretEndY;
-
-				imaqMeasureParticle(mp_processingFrame, 0, false,
-						IMAQ_MT_CONVEX_HULL_AREA, &areaConvexHull);
-				imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_AREA,
-						&areaParticle);
-				//imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_BOUNDING_RECT_WIDTH, &widthBoundingBox);
-				//imaqMeasureParticle(mp_processingFrame, 0, false, IMAQ_MT_BOUNDING_RECT_HEIGHT, &heightBoundingBox);
-
-				imaqMeasureParticle(mp_processingFrame, 0, false,
-						IMAQ_MT_EQUIVALENT_RECT_LONG_SIDE, &widthBoundingBox);
-				imaqMeasureParticle(mp_processingFrame, 0, false,
-						IMAQ_MT_EQUIVALENT_RECT_SHORT_SIDE, &heightBoundingBox);
-
-				imaqMeasureParticle(mp_processingFrame, 0, false,
-						IMAQ_MT_MAX_FERET_DIAMETER, &feret);
-
-				imaqMeasureParticle(mp_processingFrame, 0, false,
-						IMAQ_MT_MAX_FERET_DIAMETER_START_X, &feretStartX);
-				imaqMeasureParticle(mp_processingFrame, 0, false,
-						IMAQ_MT_MAX_FERET_DIAMETER_START_Y, &feretStartY);
-				imaqMeasureParticle(mp_processingFrame, 0, false,
-						IMAQ_MT_MAX_FERET_DIAMETER_END_X, &feretEndX);
-				imaqMeasureParticle(mp_processingFrame, 0, false,
-						IMAQ_MT_MAX_FERET_DIAMETER_END_Y, &feretEndY);
-
-				feretDiameter = feret;
-				this->feretStartX = feretStartX;
-				this->feretStartY = feretStartY;
-				this->feretEndX = feretEndX;
-				this->feretEndY = feretEndY;
+				//double areaConvexHull = m_pM[IMAQ_MT_CONVEX_HULL_AREA];
+				//double areaParticle = m_pM[IMAQ_MT_AREA];
+				//double widthBoundingBox = pM[IMAQ_MT_BOUNDING_RECT_WIDTH];
+				//double heightBoundingBox = pM[IMAQ_MT_BOUNDING_RECT_HEIGHT];
+				//double feret = pM[IMAQ_MT_MAX_FERET_DIAMETER_ORIENTATION];
+				double feretStartX = m_pM[IMAQ_MT_MAX_FERET_DIAMETER_START_X];
+				double feretStartY = m_pM[IMAQ_MT_MAX_FERET_DIAMETER_START_Y];
+				double feretEndX = m_pM[IMAQ_MT_MAX_FERET_DIAMETER_END_X];
+				double feretEndY = m_pM[IMAQ_MT_MAX_FERET_DIAMETER_END_Y];
 
 				m_frameCenterX = (feretStartX + feretEndX) / 2;
 				m_frameCenterY = (feretStartY + feretEndY) / 2;
 
-				convexHullPerArea = areaConvexHull / areaParticle;
-				convexHullSize = areaConvexHull;
-				boundingBoxWidth = widthBoundingBox;
-				boundingBoxHeight = heightBoundingBox;
-			} else {
-				// TODO: make sure that in pid commands you stop if it's NAN
-	//			frameCenterX = NAN;
-			}
+				//double convexHullPerArea = areaConvexHull / areaParticle;
+				//double convexHullSize = areaConvexHull;
 
-			if (paintTarget.get()) {
-				// Send the image to the dashboard with a target indicator
-				int width, height;
-				imaqGetImageSize(mp_processingFrame, &width, &height);
-				if (m_numParticles != 0) {
-					int x = (int) m_frameCenterX;
-					int y = (int) m_frameCenterY;
-	//				int centerX = width/2;
-	//				bool centered = (centerX < x+5) && (centerX > y -5);
-	//				int top, left, rectheight, rectwidth;
-	//				top = y + 5;
-	//				left = x + 5;
-	//				rectheight = 10;
-	//				rectwidth = 10;
-
-	//				RGBValue rgbColor = centered ? IMAQ_RGB_GREEN : IMAQ_RGB_RED;
-	//				RGBValue *pColor = &rgbColor;
-
-	//				imaqDrawShapeOnImage(mp_currentFrame, mp_currentFrame, { top,
-	//						left, rectheight, rectwidth }, IMAQ_PAINT_VALUE,
-	//						IMAQ_SHAPE_OVAL, color.get());
+				if (paintTarget.get()) {
+					// Send the image to the dashboard with a target indicator
+					int width, height;
+					imaqGetImageSize(mp_processingFrame, &width, &height);
+					if (m_numParticles != 0) {
+						imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
+								DrawMode::IMAQ_DRAW_VALUE, { (int) m_frameCenterX - 5,
+										(int) m_frameCenterY },
+								{ (int) m_frameCenterX + 5, (int) m_frameCenterY },
+								color.get());
+						imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
+								DrawMode::IMAQ_DRAW_VALUE,
+								{ (int) m_frameCenterX, (int) m_frameCenterY - 5 },
+								{ (int) m_frameCenterX, (int) m_frameCenterY + 5 },
+								color.get());
+		//				imaqOverlayOval(mp_currentFrame, {top, left, rectheight, rectwidth}, pColor, IMAQ_DRAW_VALUE, NULL);
+						imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
+								DrawMode::IMAQ_DRAW_VALUE, {(int) feretStartX, (int) feretStartY},
+														   {(int) feretEndX, (int) feretEndY }, color.get());
+					}
 					imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
-							DrawMode::IMAQ_DRAW_VALUE, { (int) m_frameCenterX - 5,
-									(int) m_frameCenterY },
-							{ (int) m_frameCenterX + 5, (int) m_frameCenterY },
-							color.get());
-					imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
-							DrawMode::IMAQ_DRAW_VALUE,
-							{ (int) m_frameCenterX, (int) m_frameCenterY - 5 },
-							{ (int) m_frameCenterX, (int) m_frameCenterY + 5 },
-							color.get());
-	//				imaqOverlayOval(mp_currentFrame, {top, left, rectheight, rectwidth}, pColor, IMAQ_DRAW_VALUE, NULL);
-					imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
-							DrawMode::IMAQ_DRAW_VALUE, { (int) feretStartX.get(),
-									(int) feretStartY.get() }, {
-									(int) feretEndX.get(), (int) feretEndY.get() },
-							color.get());
+							DrawMode::IMAQ_DRAW_VALUE, { width / 2, 0 }, { width / 2,
+									height }, color.get());
+					LCameraServer::GetInstance()->SetImage(mp_currentFrame);
 				}
-				imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
-						DrawMode::IMAQ_DRAW_VALUE, { width / 2, 0 }, { width / 2,
-								height }, color.get());
-				LCameraServer::GetInstance()->SetImage(mp_currentFrame);
 			} else if (showVision.get()) {
 				LCameraServer::GetInstance()->SetImage(mp_processingFrame);
 			}
@@ -258,7 +231,6 @@ void VisionSubsystem::visionProcessingThread() {
 			gettimeofday(&endTime, 0);
 			__suseconds_t diff = endTime.tv_usec - startTime.tv_usec;
 			if (diff > -50000) {
-				printf("Vision %ld\n", diff/1000);
 				SmartDashboard::PutNumber("Vision/processingTime", diff);
 			}
 		}
@@ -266,6 +238,9 @@ void VisionSubsystem::visionProcessingThread() {
 			//std::lock_guard<std::mutex> lock(m_frameMutex);
 			m_inVision = false;
 		}
+		int endTicks = Robot::ticks;
+		double framesPerSec = 50.0/(endTicks - startTicks);
+		SmartDashboard::PutNumber("Vision/FPS", framesPerSec);
 		usleep(2000);
 	}
 }
@@ -291,11 +266,11 @@ double VisionSubsystem::getCenterOfMassY() {
 }
 
 double VisionSubsystem::getBoundingBoxWidth() {
-	return boundingBoxWidth.get();
+	return m_pM[IMAQ_MT_BOUNDING_RECT_WIDTH];
 }
 
 double VisionSubsystem::getBoundingBoxHeight() {
-	return boundingBoxHeight.get();
+	return m_pM[IMAQ_MT_BOUNDING_RECT_HEIGHT];
 }
 
 double VisionSubsystem::getDistanceToTarget() {
