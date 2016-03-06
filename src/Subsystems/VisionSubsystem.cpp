@@ -163,7 +163,7 @@ void VisionSubsystem::visionProcessingThread() {
 					//double heightBoundingBox = pM[BRH];
 					//double feret = pM[MFDO];
 					double feretStartX = m_pM[MFDSX];
-					double feretStartY = m_pM[MFDSX];
+					double feretStartY = m_pM[MFDSY];
 					double feretEndX = m_pM[MFDEX];
 					double feretEndY = m_pM[MFDEY];
 
