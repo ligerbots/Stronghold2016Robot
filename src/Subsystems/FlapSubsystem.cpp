@@ -3,7 +3,7 @@
 FlapSubsystem::FlapSubsystem() :
 		Subsystem("FlapSubsystem"), leftLowLimit("FlapLeftLowLimit"), leftHighLimit(
 				"FlapLeftHighLimit"), rightLowLimit("FlapRightLowLimit"), rightHighLimit(
-				"FlapRightHighLimit") {
+				"FlapRightHighLimit"), currentLeftPosition(0), currentRightPosition(0) {
 	mp_leftFlap.reset(new Servo(RobotMap::PWM_SERVO_SHOOTER_LEFT));
 	mp_rightFlap.reset(new Servo(RobotMap::PWM_SERVO_SHOOTER_RIGHT));
 }
@@ -21,6 +21,10 @@ void FlapSubsystem::setFlapsFraction(double fractionLeft,
 	// don't break the servos; make sure we have valid values
 	fractionLeft = fmax(fmin(fractionLeft, 1), 0);
 	fractionRight = fmax(fmin(fractionRight, 1), 0);
+
+	currentLeftPosition = fractionLeft;
+	currentRightPosition = fractionRight;
+
 	// transform [0, 1] to [flapLow, flapHigh]
 	double leftFlapPosition = (leftHighLimit.get() - leftLowLimit.get())
 			* fractionLeft + leftLowLimit.get();
@@ -42,6 +46,14 @@ void FlapSubsystem::setLeftFlapAngle(double angle) {
 
 void FlapSubsystem::setRightFlapAngle(double angle) {
 	mp_rightFlap->SetAngle(angle);
+}
+
+double FlapSubsystem::getLeftFlapFraction(){
+	return currentLeftPosition;
+}
+
+double FlapSubsystem::getRightFlapFraction(){
+	return currentRightPosition;
 }
 
 double FlapSubsystem::getLeftFlapAngle() {

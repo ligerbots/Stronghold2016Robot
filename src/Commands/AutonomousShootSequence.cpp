@@ -20,7 +20,7 @@ AutonomousShootSequence::AutonomousShootSequence()
 	// arm.
 
 	AddSequential(new CenterOnTargetCommand());
-	AddSequential(new RollBallToShooterCommand());
+	AddSequential(new RollBallToIntakePositionCommand(RollBallToIntakePositionCommand::SHOOTING_POSITION));
 	AddSequential(new IntakeToggleCommand(true));
 	AddSequential(new WaitForIntakeUpCommand());
 	AddSequential(new AutoSetFlapsCommand());

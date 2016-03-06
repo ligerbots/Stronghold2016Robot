@@ -2,7 +2,7 @@
 
 CenterOnTargetCommand::CenterOnTargetCommand(double centerTo) :
 		CommandBase("CenterOnTargetCommand"), mp_softwarePID(
-				(PIDController*) SmartDashboard::GetData("CenterOnTargetPID")), centerTo(
+				NULL), centerTo(
 				centerTo), izone("PIDCenterIZone") {
 	Requires(visionSubsystem.get());
 	Requires(driveSubsystem.get());
@@ -20,6 +20,7 @@ CenterOnTargetCommand::CenterOnTargetCommand(double centerTo) :
 void CenterOnTargetCommand::Initialize() {
 	printf("CenterOnTarget: initialize\n");
 	driveSubsystem->zeroMotors();
+	driveSubsystem->shiftDown(); // untested in high gear
 	SetTimeout(20);
 
 //	Preferences::GetInstance()->PutDouble("CenterOnTargetP",

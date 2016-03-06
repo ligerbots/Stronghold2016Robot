@@ -94,6 +94,15 @@ void VisionSubsystem::toggleCameraFeed() {
 	printf("Active camera: %d\n", m_activeCamera);
 }
 
+void VisionSubsystem::setCameraFeed(int whichCamera){
+	m_activeCamera = whichCamera;
+	while(m_activeCamera >= Camera::GetNumberOfCameras()){
+		m_activeCamera--;
+	}
+	Camera::SwitchCamera(m_activeCamera);
+	printf("Active camera: %d\n", m_activeCamera);
+}
+
 void VisionSubsystem::visionProcessingThread() {
 	printf("VisionSubsystem: Processing thread start\n");
 

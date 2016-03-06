@@ -1,5 +1,6 @@
 #include <WPILib.h>
 #include <AHRS.h>
+#include <Commands/RollBallToIntakePositionCommand.h>
 #include <math.h>
 #include <exception>
 #include <algorithm>
@@ -35,7 +36,7 @@
 #include "Commands/IntakeRollerCommand.h"
 #include "Commands/IntakeToggleCommand.h"
 #include "Commands/PrepareForAutoCommand.h"
-#include "Commands/RollBallToShooterCommand.h"
+#include "Commands/PrepareForCrossingSequence.h"
 #include "Commands/RotateIMUCommand.h"
 #include "Commands/ShootCommand.h"
 #include "Commands/TabulaRasaCommand.h"

@@ -74,6 +74,7 @@ void NavXSubsystem::sendValuesToSmartDashboard() {
 	SmartDashboard::PutNumber("NavX/Velocity_Y", mp_navX->GetVelocityY());
 	SmartDashboard::PutNumber("NavX/Displacement_X", mp_navX->GetDisplacementX());
 	SmartDashboard::PutNumber("NavX/Displacement_Y", mp_navX->GetDisplacementY());
+	SmartDashboard::PutNumber("NavX/Displacement_Z", mp_navX->GetDisplacementZ());
 
 	/* Display Raw Gyro/Accelerometer/Magnetometer Values                       */
 	/* NOTE:  These values are not normally necessary, but are made available   */

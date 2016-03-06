@@ -139,14 +139,13 @@ DriveSubsystem::DriveSubsystem() :
 	}
 
 	mp_leftEncoder = talonPtrs[RobotMap::CT_DRIVE_LEFT1];
-	if (!Robot::isRoadkill)	mp_rightEncoder = talonPtrs[RobotMap::CT_DRIVE_RIGHT3];
-	else mp_rightEncoder = talonPtrs[RobotMap::CT_DRIVE_RIGHT1];
+	mp_rightEncoder = talonPtrs[RobotMap::CT_DRIVE_RIGHT1];
 
 	// the object that actually handles setting talons from Arcade Drive input
 	mp_robotDrive.reset(
 			new RobotDrive(talonPtrs[masterLeft], talonPtrs[masterRight]));
 	mp_robotDrive->SetSafetyEnabled(false);
-	mp_robotDrive->SetExpiration(0.1);
+	mp_robotDrive->SetExpiration(0.2); // 2nd robot is jumping if this is .1
 	mp_robotDrive->SetSensitivity(0.5);
 	mp_robotDrive->SetMaxOutput(1);
 

@@ -28,11 +28,8 @@ void OI::registerCommands() {
 
 	registerSecondControllerButtons();
 
-	SmartDashboard::PutData(CommandBase::centerOnTargetCommand.get());
 	SmartDashboard::PutData(new AutonomousShootSequence());
 
-	SmartDashboard::PutData(new RotateIMUCommand(90));
-	SmartDashboard::PutData(new DriveDistanceIMUCommand(1, 0.7));
 }
 
 void OI::registerSecondControllerButtons() {
@@ -42,15 +39,40 @@ void OI::registerSecondControllerButtons() {
 	if (m_secondControllerPresent) {
 		// we register the buttons even if the controller wasn't present on startup
 		// because it might be connected later
-		// change these buttons to what's convenient on the joystick
-		registerButton(pFarmController, 1, PRESSED,	CommandBase::toggleCameraFeedCommand.get());
-		registerButton(pFarmController, 2, PRESSED,	CommandBase::wedgeToggleCommand.get()); // if we have enough buttons,
-		registerButton(pFarmController, 3, PRESSED,	CommandBase::intakeToggleCommand.get());// make separate up/down buttons
-		// 4, 5 roll in/out (full speed) in IntakeRollerCommand
-		registerButton(pFarmController, 3, PRESSED,	CommandBase::centerOnTargetCommand.get());
-		registerButton(pFarmController, 7, PRESSED,	CommandBase::toggleLedCommand.get());
-		registerButton(pFarmController, 8, PRESSED,	CommandBase::toggleCompressorCommand.get());
-		registerButton(pFarmController, 13, PRESSED, CommandBase::autoSetFlapsCommand.get());
+
+		// section 1 - flaps
+		registerButton(pFarmController, 1, PRESSED,	CommandBase::autoSetFlapsCommand.get());
+		// 2-6 handled by FlapCommand
+
+		// section 2 - intake
+		registerButton(pFarmController, 4, PRESSED,
+				new RollBallToIntakePositionCommand(RollBallToIntakePositionCommand::CROSSING_POSITION));
+		registerButton(pFarmController, 5, PRESSED,
+				new RollBallToIntakePositionCommand(RollBallToIntakePositionCommand::SHOOTING_POSITION));
+		registerButton(pFarmController, 9, PRESSED,
+				new RollBallToIntakePositionCommand(RollBallToIntakePositionCommand::LOW_GOAL));
+		registerButton(pFarmController, 10, PRESSED,
+				new RollBallToIntakePositionCommand(RollBallToIntakePositionCommand::BACK_TO_SHOOTING_POSITION));
+
+		// section 3 - auto commands
+		registerButton(pFarmController, 11, PRESSED, new PrepareForCrossingSequence());
+		registerButton(pFarmController, 13, PRESSED, new CenterOnTargetCommand());
+		registerButton(pFarmController, 12, PRESSED, new DelayCommand(0.5));
+		// 14 not assigned
+		// test commands
+		registerButton(pFarmController, 15, PRESSED, new DriveDistanceCommand(9));
+		registerButton(pFarmController, 16, PRESSED, new RotateIMUCommand(0));
+
+		// section 4 - intake & wedge up/down
+		registerButton(pFarmController, 17, PRESSED, new IntakeToggleCommand(true));
+		registerButton(pFarmController, 18, PRESSED, new IntakeToggleCommand(false));
+		registerButton(pFarmController, 19, PRESSED, new WedgeToggleCommand(true));
+		registerButton(pFarmController, 20, PRESSED, new WedgeToggleCommand(false));
+
+		// section 5 - cameras
+		registerButton(pFarmController, 22, PRESSED, new ToggleCameraFeedCommand(0));
+		registerButton(pFarmController, 23, PRESSED, new ToggleCameraFeedCommand(1));
+		registerButton(pFarmController, 24, PRESSED, new ToggleCameraFeedCommand(2));
 	}
 }
 

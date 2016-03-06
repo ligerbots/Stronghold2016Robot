@@ -12,6 +12,9 @@ private:
 	Parameter<double> leftHighLimit;
 	Parameter<double> rightLowLimit;
 	Parameter<double> rightHighLimit;
+
+	double currentLeftPosition;
+	double currentRightPosition;
 public:
 	FlapSubsystem();
 	void InitDefaultCommand();
@@ -28,6 +31,9 @@ public:
 	 */
 	void setFlapsFraction(double fractionBoth);
 	void setFlapsFraction(double fractionLeft, double fractionRight);
+
+	double getLeftFlapFraction();
+	double getRightFlapFraction();
 
 	double getRightFlapAngle();
 	double getLeftFlapAngle();

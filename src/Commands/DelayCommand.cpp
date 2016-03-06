@@ -3,13 +3,12 @@
 DelayCommand::DelayCommand(double delaySeconds) :
 		CommandBase("DelayCommand_" + std::to_string(delaySeconds)), m_ticks(0), m_delaySeconds(
 				delaySeconds) {
-//	Requires (delaySubsystem);
-	// why is delaysubsystem necessary?
+	Requires(dummySubsystem.get());
 }
 
 void DelayCommand::Initialize() {
 	printf("Delay init'd for %1.2f seconds\n", m_delaySeconds);
-	SetInterruptible(false);
+//	SetInterruptible(false);
 	//SetTimeout(_delayPeriod);
 	m_ticks = 0;
 }

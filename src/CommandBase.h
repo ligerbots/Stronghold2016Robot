@@ -9,6 +9,7 @@
 #include <Subsystems/CompressorSubsystem.h>
 #include <Subsystems/WedgeSubsystem.h>
 #include <Subsystems/IntakeSubsystem.h>
+#include <Subsystems/DummySubsystem.h>
 
 /**
  * The base for all commands. All atomic commands should subclass CommandBase.
@@ -32,6 +33,7 @@ public:
 	static std::unique_ptr<CompressorSubsystem> compressorSubsystem;
 	static std::unique_ptr<WedgeSubsystem> wedgeSubsystem;
 	static std::unique_ptr<IntakeSubsystem> intakeSubsystem;
+	static std::unique_ptr<DummySubsystem> dummySubsystem;
 
 	// all commands
 	static std::unique_ptr<Command> driveJoystickCommand;

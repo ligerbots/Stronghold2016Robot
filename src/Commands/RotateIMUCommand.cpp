@@ -1,8 +1,8 @@
 #include <Stronghold2016Robot.h>
 
-RotateIMUCommand::RotateIMUCommand(double targetAngle) :
-		CommandBase("RotateIMUCommand_" + std::to_string(targetAngle)), targetAngle(targetAngle), currentAngle(
-				0), lastAngle(0), isClockwise(false) {
+RotateIMUCommand::RotateIMUCommand(double targetAngle, bool absolute) :
+		CommandBase("RotateIMUCommand_" + std::to_string(targetAngle)), angle(targetAngle), targetAngle(0), currentAngle(
+				0), lastAngle(0), isClockwise(false), isAbsolute(absolute) {
 	Requires(driveSubsystem.get());
 	SetInterruptible(false);
 }
@@ -11,20 +11,26 @@ void RotateIMUCommand::Initialize() {
 	printf("RotateIMUCommand: init\n");
 
 	updateCurrentAngle();
+	if(isAbsolute)
+		targetAngle = angle;
+	else
+		targetAngle = currentAngle + angle;
 	targetAngle = fmod(targetAngle + 360.0, 360.0);
 
 	// find the shortest direction to turn
 	if (targetAngle > currentAngle) {
 		isClockwise = (targetAngle - currentAngle
-				> currentAngle + 360 - targetAngle);
+				< currentAngle + 360 - targetAngle);
 	} else {
 		isClockwise = (currentAngle - targetAngle
-				< targetAngle + 360 - currentAngle);
+				> targetAngle + 360 - currentAngle);
 	}
+
+	printf("Turn clockwise: %d\n", isClockwise);
 
 	lastAngle = currentAngle;
 
-	SetTimeout(5);
+	SetTimeout(15);
 }
 
 void RotateIMUCommand::updateCurrentAngle() {
@@ -33,7 +39,15 @@ void RotateIMUCommand::updateCurrentAngle() {
 }
 
 void RotateIMUCommand::Execute() {
-	driveSubsystem->drive(0, isClockwise ? 1 : -1);
+	double speed = 1;
+
+	double error = fabs(currentAngle - targetAngle);
+	if(error > 180) error = 360 - error; // we always try to go the minimum number of degrees
+	if(error < 30){
+		speed = error * (1 - .45) / 30 + .45;
+	}
+
+	driveSubsystem->drive(0, isClockwise ? speed : -speed);
 	lastAngle = currentAngle;
 	updateCurrentAngle();
 }
@@ -41,10 +55,14 @@ void RotateIMUCommand::Execute() {
 bool RotateIMUCommand::IsFinished() {
 	bool finished = false;
 	// find if we passed the target angle (in mod 360)
+	printf("Rotate: %f %f %f\n", lastAngle, targetAngle, currentAngle);
+	if(lastAngle == currentAngle) return IsTimedOut(); // first iteration
 	if ((isClockwise && lastAngle < currentAngle) || (!isClockwise && currentAngle < lastAngle)) {
-		finished = lastAngle <= targetAngle && targetAngle <= currentAngle;
+		finished = isClockwise ? lastAngle <= targetAngle && targetAngle <= currentAngle
+				: lastAngle >= targetAngle && targetAngle >= currentAngle;
 	} else {
-		finished = !(currentAngle <= targetAngle && targetAngle <= lastAngle);
+		finished = !(isClockwise ? currentAngle <= targetAngle && targetAngle <= lastAngle
+				: currentAngle >= targetAngle && targetAngle >= lastAngle);
 	}
 	return IsTimedOut() || finished;
 }
@@ -52,9 +70,15 @@ bool RotateIMUCommand::IsFinished() {
 void RotateIMUCommand::End() {
 	printf("RotateIMUCommand: end\n");
 	driveSubsystem->zeroMotors();
+	if(DriverStation::GetInstance().IsOperatorControl()){
+		CommandBase::driveJoystickCommand->Start();
+	}
 }
 
 void RotateIMUCommand::Interrupted() {
 	printf("RotateIMUCommand: interrupted\n");
 	driveSubsystem->zeroMotors();
+	if(DriverStation::GetInstance().IsOperatorControl()){
+		CommandBase::driveJoystickCommand->Start();
+	}
 }

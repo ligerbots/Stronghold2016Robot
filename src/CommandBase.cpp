@@ -9,6 +9,7 @@ std::unique_ptr<PDPSubsystem> CommandBase::pdpSubsystem = NULL;
 std::unique_ptr<CompressorSubsystem> CommandBase::compressorSubsystem = NULL;
 std::unique_ptr<WedgeSubsystem> CommandBase::wedgeSubsystem = NULL;
 std::unique_ptr<IntakeSubsystem> CommandBase::intakeSubsystem = NULL;
+std::unique_ptr<DummySubsystem> CommandBase::dummySubsystem = NULL;
 
 std::unique_ptr<Command> CommandBase::driveJoystickCommand = NULL;
 std::unique_ptr<Command> CommandBase::centerOnTargetCommand = NULL;
@@ -44,6 +45,7 @@ void CommandBase::init() {
 	wedgeSubsystem.reset(new WedgeSubsystem());
 	intakeSubsystem.reset(new IntakeSubsystem());
 	compressorSubsystem.reset(new CompressorSubsystem());
+	dummySubsystem.reset(new DummySubsystem());
 
 	driveJoystickCommand.reset(new DriveJoystickCommand());
 	centerOnTargetCommand.reset(new CenterOnTargetCommand());

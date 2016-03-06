@@ -43,10 +43,13 @@ bool IntakeToggleCommand::IsFinished() {
 }
 
 void IntakeToggleCommand::End() {
-	CommandBase::intakeRollerCommand->Start();
+	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL)
+		CommandBase::intakeRollerCommand->Start();
 	printf("IntakeCommand: end\n");
 }
 
 void IntakeToggleCommand::Interrupted() {
+	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL)
+		CommandBase::intakeRollerCommand->Start();
 	printf("IntakeCommand: interrupted\n");
 }

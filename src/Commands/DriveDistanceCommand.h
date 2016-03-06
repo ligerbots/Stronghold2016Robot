@@ -13,6 +13,7 @@ protected:
 
 	static constexpr double RAMP_RATE = 0.1;
 	static constexpr double MAX_SPEED = 0.7;
+	static constexpr double TICKS_PER_FOOT = 7673; // empirically measured by driving 5 feet
 public:
 	explicit DriveDistanceCommand(double distance);
 	void Initialize();

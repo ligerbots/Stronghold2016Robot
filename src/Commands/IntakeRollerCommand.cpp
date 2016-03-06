@@ -17,11 +17,11 @@ void IntakeRollerCommand::Execute() {
 
 	double speed = oi->pXboxController->GetRawAxis(3) - oi->pXboxController->GetRawAxis(2);
 
-	if (0 == Robot::ticks % 50) {
-		// every second check to see if the 2nd joystick appeared or disappeared
-		// This is to avoid endless messages if it's not plugged in, or plugged-in late
-		oi->registerSecondControllerButtons();
-	}
+//	if (0 == Robot::ticks % 50) {
+//		// every second check to see if the 2nd joystick appeared or disappeared
+//		// This is to avoid endless messages if it's not plugged in, or plugged-in late
+//		oi->registerSecondControllerButtons();
+//	}
 	if (oi->m_secondControllerPresent) {
 		if (oi->pFarmController->GetRawButton(4)) {
 			speed = 1;

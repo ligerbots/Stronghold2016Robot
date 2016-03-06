@@ -12,18 +12,23 @@ FlapCommand::FlapCommand() :
 
 void FlapCommand::Initialize() {
 	printf("FlapCommand initialized\n");
+	// don't bash potential previous values
+	flapPositionLeft = flapSubsystem->getLeftFlapFraction();
+	flapPositionRight = flapSubsystem->getRightFlapFraction();
 }
 
 void FlapCommand::Execute() {
-	int hat = Robot::instance->mp_operatorInterface->pXboxController->GetPOV(0);
-	if (hat != -1) {
-		double fraction = 0; // angle = 0 or 360
-		if (hat == 90)
-			fraction = 1.0 / 3.0;
-		else if (hat == 180)
-			fraction = 2.0 / 3.0;
-		else if (hat == 270)
-			fraction = 1;
+//	int hat = Robot::instance->mp_operatorInterface->pXboxController->GetPOV(0);
+
+	int flapButtons =
+			Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(6) ? 0 :
+			Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(7) ? 1 :
+			Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(8) ? 2 :
+			Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(3) ? 3 :
+			Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(2) ? 4 : -1;
+
+	if (flapButtons != -1) {
+		double fraction = 1 - (flapButtons / 4.0d); // button 4 is down -> 1.0
 
 		flapPositionLeft = fraction;
 		flapPositionRight = fraction;
@@ -33,6 +38,19 @@ void FlapCommand::Execute() {
 		// to ignore
 		flapSubsystem->setFlapsFraction(fraction);
 	} else {
+
+		if(Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(25)){
+			if(Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(26)){
+				flapPositionLeft -= .01;
+				flapPositionRight -= .01;
+			}
+
+			if(Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(27)){
+				flapPositionLeft += .01;
+				flapPositionRight += .01;
+			}
+		}
+
 		flapSubsystem->setFlapsFraction(flapPositionLeft.get(), flapPositionRight.get());
 	}
 }

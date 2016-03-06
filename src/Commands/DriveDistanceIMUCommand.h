@@ -10,8 +10,9 @@
 class DriveDistanceIMUCommand: public CommandBase {
 protected:
 	double distanceMeters2;
-	double startX;
-	double startY;
+	float startX;
+	float startY;
+	float startZ;
 	double speed;
 public:
 	explicit DriveDistanceIMUCommand(double distanceMeters, double speed = 1.0);

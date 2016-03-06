@@ -6,14 +6,16 @@
 
 class RotateIMUCommand: public CommandBase {
 protected:
+	double angle;
 	double targetAngle;
 	double currentAngle;
 	double lastAngle;
 	bool isClockwise;
+	bool isAbsolute;
 
 	void updateCurrentAngle();
 public:
-	explicit RotateIMUCommand(double targetAngle);
+	explicit RotateIMUCommand(double targetAngle, bool absolute = true);
 	void Initialize();
 	void Execute();
 	bool IsFinished();

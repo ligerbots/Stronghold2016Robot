@@ -12,20 +12,29 @@ void DriveDistanceCommand::Initialize() {
 }
 
 void DriveDistanceCommand::Execute() {
-#pragma GCC diagnostic ignored "-Wunused-variable"
 	double left = driveSubsystem->getLeftEncoderPosition();
 	double right = driveSubsystem->getRightEncoderPosition();
-	(void)left;	// avoid warnings until we finish this function
-	(void)right;
+	double err = left - right;
+	double turn = err * 0.001;
+	driveSubsystem->drive(-0.7, 0);
 }
 
 bool DriveDistanceCommand::IsFinished() {
-	return false;
+	double left = driveSubsystem->getLeftEncoderPosition();
+	double right = driveSubsystem->getRightEncoderPosition();
+	return right >= startPositionRight + distance * TICKS_PER_FOOT;
 }
 
 void DriveDistanceCommand::End() {
-
+	driveSubsystem->zeroMotors();
+	if(DriverStation::GetInstance().IsOperatorControl()){
+		CommandBase::driveJoystickCommand->Start();
+	}
 }
 
 void DriveDistanceCommand::Interrupted() {
+	driveSubsystem->zeroMotors();
+	if(DriverStation::GetInstance().IsOperatorControl()){
+		CommandBase::driveJoystickCommand->Start();
+	}
 }

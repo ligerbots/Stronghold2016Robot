@@ -74,6 +74,7 @@ public:
 	bool isLedRingOn();
 	void setLedRingOn(bool on);
 	void toggleCameraFeed();
+	void setCameraFeed(int whichCamera);
 
 	double getFrameCenter();
 

@@ -1,6 +1,9 @@
 #include <Stronghold2016Robot.h>
 
-ToggleCameraFeedCommand::ToggleCameraFeedCommand() : CommandBase("ToggleCameraFeedCommand"){
+ToggleCameraFeedCommand::ToggleCameraFeedCommand() : CommandBase("ToggleCameraFeedCommand"), whichCamera(-1) {
+}
+
+ToggleCameraFeedCommand::ToggleCameraFeedCommand(int whichCamera): CommandBase("ToggleCameraFeedCommand"), whichCamera(whichCamera) {
 }
 
 void ToggleCameraFeedCommand::Initialize() {
@@ -8,7 +11,10 @@ void ToggleCameraFeedCommand::Initialize() {
 
 void ToggleCameraFeedCommand::Execute() {
 	printf("ToggleCameraFeedCommand: toggling\n");
-	visionSubsystem->toggleCameraFeed();
+	if(whichCamera == -1)
+		visionSubsystem->toggleCameraFeed();
+	else
+		visionSubsystem->setCameraFeed(whichCamera);
 }
 
 bool ToggleCameraFeedCommand::IsFinished() {
