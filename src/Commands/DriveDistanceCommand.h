@@ -6,6 +6,9 @@
 
 class DriveDistanceCommand: public CommandBase
 {
+private:
+	Parameter<double> driveStraightGain;
+
 protected:
 	double distance;
 	double startPositionLeft;
