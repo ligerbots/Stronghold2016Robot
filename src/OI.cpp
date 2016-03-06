@@ -7,50 +7,51 @@ OI::OI() :
 }
 
 void OI::registerCommands() {
-	registerButton(pXboxController, 1, PRESSED,
-			CommandBase::toggleCameraFeedCommand.get());
-//	registerButton(pXboxController, 2, PRESSED,
-//			CommandBase::flapCommand.get());
-	registerButton(pXboxController, 3, PRESSED,
-			CommandBase::shootCommand.get());
-	registerButton(pXboxController, 4, PRESSED,
-			CommandBase::wedgeToggleCommand.get());
-	registerButton(pXboxController, 5, PRESSED,
-			CommandBase::gearShiftCommand.get());
-	registerButton(pXboxController, 6, PRESSED,
-			CommandBase::intakeToggleCommand.get());
-	registerButton(pXboxController, 7, PRESSED,
-			CommandBase::toggleLedCommand.get());
-	registerButton(pXboxController, 8, PRESSED,
-			CommandBase::toggleCompressorCommand.get());
+	// XBox A command
+	registerButton(pXboxController, 1, PRESSED,CommandBase::toggleCameraFeedCommand.get());
+	// XBox B command
+//	registerButton(pXboxController, 2, PRESSED, CommandBase::flapCommand.get());
+	// XBox X command
+	registerButton(pXboxController, 3, PRESSED, CommandBase::shootCommand.get());
+	// XBox Y command
+	registerButton(pXboxController, 4, PRESSED, CommandBase::wedgeToggleCommand.get());
 
-	// avoid excessive errors if this joystick isn't connected
-	m_secondControllerPresent = pFarmController->GetButtonCount() > 0;
+	// Left bumper
+	registerButton(pXboxController, 5, PRESSED, CommandBase::gearShiftCommand.get());
+	// Right bumper
+	registerButton(pXboxController, 6, PRESSED, CommandBase::intakeToggleCommand.get());
 
-	// we register the buttons even if the controller wasn't present on startup
-	// because it might be connected later
-	// change these buttons to what's convenient on the joystick
-	registerButton(pFarmController, 1, PRESSED,
-			CommandBase::toggleCameraFeedCommand.get());
-	registerButton(pFarmController, 2, PRESSED,
-			CommandBase::wedgeToggleCommand.get()); // if we have enough buttons,
-	registerButton(pFarmController, 3, PRESSED,
-			CommandBase::intakeToggleCommand.get());// make separate up/down buttons
-	// 4, 5 roll in/out (full speed) in IntakeRollerCommand
-	registerButton(pFarmController, 3, PRESSED,
-				CommandBase::centerOnTargetCommand.get());
-	registerButton(pFarmController, 7, PRESSED,
-			CommandBase::toggleLedCommand.get());
-	registerButton(pFarmController, 8, PRESSED,
-			CommandBase::toggleCompressorCommand.get());
-	registerButton(pFarmController, 13, PRESSED,
-				new AutoSetFlapsCommand());
+	// Back command (XBox 360)
+	registerButton(pXboxController, 7, PRESSED, CommandBase::toggleLedCommand.get());
+	// Start command (XBox 360)
+	registerButton(pXboxController, 8, PRESSED, CommandBase::toggleCompressorCommand.get());
+
+	registerSecondControllerButtons();
 
 	SmartDashboard::PutData(CommandBase::centerOnTargetCommand.get());
 	SmartDashboard::PutData(new AutonomousShootSequence());
 
 	SmartDashboard::PutData(new RotateIMUCommand(90));
 	SmartDashboard::PutData(new DriveDistanceIMUCommand(1, 0.7));
+}
+
+void OI::registerSecondControllerButtons() {
+	// avoid excessive errors if this joystick isn't connected
+		m_secondControllerPresent = pFarmController->GetButtonCount() > 0;
+
+	if (m_secondControllerPresent) {
+		// we register the buttons even if the controller wasn't present on startup
+		// because it might be connected later
+		// change these buttons to what's convenient on the joystick
+		registerButton(pFarmController, 1, PRESSED,	CommandBase::toggleCameraFeedCommand.get());
+		registerButton(pFarmController, 2, PRESSED,	CommandBase::wedgeToggleCommand.get()); // if we have enough buttons,
+		registerButton(pFarmController, 3, PRESSED,	CommandBase::intakeToggleCommand.get());// make separate up/down buttons
+		// 4, 5 roll in/out (full speed) in IntakeRollerCommand
+		registerButton(pFarmController, 3, PRESSED,	CommandBase::centerOnTargetCommand.get());
+		registerButton(pFarmController, 7, PRESSED,	CommandBase::toggleLedCommand.get());
+		registerButton(pFarmController, 8, PRESSED,	CommandBase::toggleCompressorCommand.get());
+		registerButton(pFarmController, 13, PRESSED, CommandBase::autoSetFlapsCommand.get());
+	}
 }
 
 bool OI::joystickButtonPressed(Joystick* pJoystick, int buttonNumber) {
@@ -124,3 +125,7 @@ void OI::registerButton(Joystick* pJoystick, int buttonNumber, ButtonEvent when,
 		break;
 	}
 }
+
+void OI::unregisterButton(Joystick* pJoystick, int buttonNumber) {
+}
+

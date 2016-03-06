@@ -19,6 +19,7 @@ LCameraServer::LCameraServer() :
 		m_camera(), m_serverThread(&LCameraServer::Serve, this), m_captureThread(), m_imageMutex(), m_newImageVariable(), m_dataPool(
 				3), m_quality(50), m_autoCaptureStarted(false), m_hwClient(
 		true), m_imageData(nullptr, 0, 0, false) {
+	printf("LCamerserver constructed.\n");
 	for (int i = 0; i < 3; i++)
 		m_dataPool.push_back(new uint8_t[kMaxImageSize]);
 }

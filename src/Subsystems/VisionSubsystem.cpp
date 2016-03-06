@@ -82,28 +82,15 @@ void VisionSubsystem::updateVision(int ticks) {
 	Image* image = NULL;
 	{
 //		std::lock_guard<std::mutex> lock(m_frameMutex);
-		if (!enableVision) {
-			Camera::Feed(ticks);
-			image = Camera::GetCamera(m_activeCamera)->GetStoredFrame();
-			mp_currentFrame = Camera::GetCamera(0)->GetStoredFrame();
-		}
-		else {
-			bool inVision;
-			{
-				//std::lock_guard<std::mutex> lock(m_frameMutex);
-				inVision = m_inVision;
-			}
-			if (!inVision) {
-				Camera::Feed(ticks);
-				image = Camera::GetCamera(m_activeCamera)->GetStoredFrame();
-				mp_currentFrame = Camera::GetCamera(0)->GetStoredFrame();
-				if (image!=NULL) LCameraServer::GetInstance()->SetImage(image);
-			}
-		}
-	}
+		Camera::Feed(ticks);
+		image = Camera::GetCamera(m_activeCamera)->GetStoredFrame();
+		mp_currentFrame = Camera::GetCamera(0)->GetStoredFrame();
 
-	if (image != NULL && (!enableVision.get() || (!paintTarget.get() && !showVision.get())) ) {
-		LCameraServer::GetInstance()->SetImage(image);
+		if (image != NULL) {
+			// this gets a little complicated. If Vision is disabled, then we need to always send the image from here
+			if (!enableVision.get()) LCameraServer::GetInstance()->SetImage(image);
+			else if (!paintTarget.get() && !showVision.get()) LCameraServer::GetInstance()->SetImage(image);
+		}
 	}
 }
 
@@ -142,13 +129,10 @@ void VisionSubsystem::visionProcessingThread() {
 				printf("VisionSubsystem: Creating second Image*\n");
 				mp_processingFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
 			}
-
-
-
 			{
 	//			std::lock_guard<std::mutex> lock(m_frameMutex);
-				mp_processingFrame = mp_currentFrame;
-				//imaqDuplicate(mp_processingFrame, mp_currentFrame);
+				//mp_processingFrame = mp_currentFrame;
+				imaqDuplicate(mp_processingFrame, mp_currentFrame);
 			}
 
 			int err = IVA_ProcessImage(mp_processingFrame); // run vision script
@@ -165,83 +149,88 @@ void VisionSubsystem::visionProcessingThread() {
 			if (m_numParticles != 0) {
 				MeasureParticlesReport *mprArray = imaqMeasureParticles(
 						mp_processingFrame, IMAQ_CALIBRATION_MODE_PIXEL, mT,
-						MAXVAL);
-
-				// Find the particle with the largest area
-				double partArea = 0.0;
-				int largest = 0;
-				for (int i = 0; i != m_numParticles; i++) {
-					double *pixelMeasurements = mprArray->pixelMeasurements[i];
-					if (pixelMeasurements[AREA] > partArea) {
-						partArea = pixelMeasurements[AREA];
-						largest = i;
-					}
+						sizeof(mT)/sizeof(MeasurementType));
+				if (NULL == mprArray) {
+					int imaqError = imaqGetLastError();
+					char *msg = imaqGetErrorText(imaqError);
+					printf("imaqMeasureParticles failed code=%d, msg=%s\n", imaqError, msg);
 				}
-				m_pM = mprArray->pixelMeasurements[largest];
-
-				m_frameCenterX = m_pM[IMAQ_MT_CENTER_OF_MASS_X];
-				m_frameCenterY = m_pM[IMAQ_MT_CENTER_OF_MASS_Y];
-
-				//double areaConvexHull = m_pM[IMAQ_MT_CONVEX_HULL_AREA];
-				//double areaParticle = m_pM[IMAQ_MT_AREA];
-				//double widthBoundingBox = pM[IMAQ_MT_BOUNDING_RECT_WIDTH];
-				//double heightBoundingBox = pM[IMAQ_MT_BOUNDING_RECT_HEIGHT];
-				//double feret = pM[IMAQ_MT_MAX_FERET_DIAMETER_ORIENTATION];
-				double feretStartX = m_pM[IMAQ_MT_MAX_FERET_DIAMETER_START_X];
-				double feretStartY = m_pM[IMAQ_MT_MAX_FERET_DIAMETER_START_Y];
-				double feretEndX = m_pM[IMAQ_MT_MAX_FERET_DIAMETER_END_X];
-				double feretEndY = m_pM[IMAQ_MT_MAX_FERET_DIAMETER_END_Y];
-
-				m_frameCenterX = (feretStartX + feretEndX) / 2;
-				m_frameCenterY = (feretStartY + feretEndY) / 2;
-
-				//double convexHullPerArea = areaConvexHull / areaParticle;
-				//double convexHullSize = areaConvexHull;
-
-				if (paintTarget.get()) {
-					// Send the image to the dashboard with a target indicator
-					int width, height;
-					imaqGetImageSize(mp_processingFrame, &width, &height);
-					if (m_numParticles != 0) {
-						imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
-								DrawMode::IMAQ_DRAW_VALUE, { (int) m_frameCenterX - 5,
-										(int) m_frameCenterY },
-								{ (int) m_frameCenterX + 5, (int) m_frameCenterY },
-								color.get());
-						imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
-								DrawMode::IMAQ_DRAW_VALUE,
-								{ (int) m_frameCenterX, (int) m_frameCenterY - 5 },
-								{ (int) m_frameCenterX, (int) m_frameCenterY + 5 },
-								color.get());
-		//				imaqOverlayOval(mp_currentFrame, {top, left, rectheight, rectwidth}, pColor, IMAQ_DRAW_VALUE, NULL);
-						imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
-								DrawMode::IMAQ_DRAW_VALUE, {(int) feretStartX, (int) feretStartY},
-														   {(int) feretEndX, (int) feretEndY }, color.get());
+				else {
+					// Find the particle with the largest area
+					double partArea = 0.0;
+					int largest = 0;
+					for (int i = 0; i != m_numParticles; i++) {
+						double *pixelMeasurements = mprArray->pixelMeasurements[i];
+						if (pixelMeasurements[AREA] > partArea) {
+							partArea = pixelMeasurements[AREA];
+							largest = i;
+						}
 					}
-					imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
-							DrawMode::IMAQ_DRAW_VALUE, { width / 2, 0 }, { width / 2,
-									height }, color.get());
-					LCameraServer::GetInstance()->SetImage(mp_currentFrame);
+					m_pM = mprArray->pixelMeasurements[largest];
+
+					m_frameCenterX = m_pM[IMAQ_MT_CENTER_OF_MASS_X];
+					m_frameCenterY = m_pM[IMAQ_MT_CENTER_OF_MASS_Y];
+
+					//double areaConvexHull = m_pM[IMAQ_MT_CONVEX_HULL_AREA];
+					//double areaParticle = m_pM[IMAQ_MT_AREA];
+					//double widthBoundingBox = pM[IMAQ_MT_BOUNDING_RECT_WIDTH];
+					//double heightBoundingBox = pM[IMAQ_MT_BOUNDING_RECT_HEIGHT];
+					//double feret = pM[IMAQ_MT_MAX_FERET_DIAMETER_ORIENTATION];
+					double feretStartX = m_pM[IMAQ_MT_MAX_FERET_DIAMETER_START_X];
+					double feretStartY = m_pM[IMAQ_MT_MAX_FERET_DIAMETER_START_Y];
+					double feretEndX = m_pM[IMAQ_MT_MAX_FERET_DIAMETER_END_X];
+					double feretEndY = m_pM[IMAQ_MT_MAX_FERET_DIAMETER_END_Y];
+
+					m_frameCenterX = (feretStartX + feretEndX) / 2;
+					m_frameCenterY = (feretStartY + feretEndY) / 2;
+
+					//double convexHullPerArea = areaConvexHull / areaParticle;
+					//double convexHullSize = areaConvexHull;
+
+					if (paintTarget.get()) {
+						// Send the image to the dashboard with a target indicator
+						int width, height;
+						imaqGetImageSize(mp_processingFrame, &width, &height);
+						if (m_numParticles != 0) {
+							imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
+									DrawMode::IMAQ_DRAW_VALUE, { (int) m_frameCenterX - 5,
+											(int) m_frameCenterY },
+									{ (int) m_frameCenterX + 5, (int) m_frameCenterY },
+									color.get());
+							imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
+									DrawMode::IMAQ_DRAW_VALUE,
+									{ (int) m_frameCenterX, (int) m_frameCenterY - 5 },
+									{ (int) m_frameCenterX, (int) m_frameCenterY + 5 },
+									color.get());
+			//				imaqOverlayOval(mp_currentFrame, {top, left, rectheight, rectwidth}, pColor, IMAQ_DRAW_VALUE, NULL);
+							imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
+									DrawMode::IMAQ_DRAW_VALUE, {(int) feretStartX, (int) feretStartY},
+															   {(int) feretEndX, (int) feretEndY }, color.get());
+						}
+						imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
+								DrawMode::IMAQ_DRAW_VALUE, { width / 2, 0 }, { width / 2,
+										height }, color.get());
+						LCameraServer::GetInstance()->SetImage(mp_currentFrame);
+					}
 				}
 			} else if (showVision.get()) {
 				LCameraServer::GetInstance()->SetImage(mp_processingFrame);
 			}
-
 
 			gettimeofday(&endTime, 0);
 			__suseconds_t diff = endTime.tv_usec - startTime.tv_usec;
 			if (diff > -50000) {
 				SmartDashboard::PutNumber("Vision/processingTime", diff);
 			}
-		}
+		}	// close if (nableVision.get())
 		{
 			//std::lock_guard<std::mutex> lock(m_frameMutex);
-			m_inVision = false;
+			//m_inVision = false;
 		}
 		int endTicks = Robot::ticks;
 		double framesPerSec = 50.0/(endTicks - startTicks);
 		SmartDashboard::PutNumber("Vision/FPS", framesPerSec);
-		usleep(2000);
+		usleep(33000);
 	}
 }
 

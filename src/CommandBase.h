@@ -48,4 +48,5 @@ public:
 	static std::unique_ptr<Command> intakeRollerCommand;
 	static std::unique_ptr<Command> gearShiftCommand;
 	static std::unique_ptr<Command> toggleCameraFeedCommand;
+	static std::unique_ptr<Command> autoSetFlapsCommand;
 };

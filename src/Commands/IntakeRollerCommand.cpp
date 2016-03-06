@@ -20,7 +20,7 @@ void IntakeRollerCommand::Execute() {
 	if (0 == Robot::ticks % 50) {
 		// every second check to see if the 2nd joystick appeared or disappeared
 		// This is to avoid endless messages if it's not plugged in, or plugged-in late
-		oi->m_secondControllerPresent = oi->pFarmController->GetButtonCount() > 0;
+		oi->registerSecondControllerButtons();
 	}
 	if (oi->m_secondControllerPresent) {
 		if (oi->pFarmController->GetRawButton(4)) {
