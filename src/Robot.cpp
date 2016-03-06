@@ -54,14 +54,14 @@ void Robot::RobotInit() {
 	mp_position->AddObject("5", &POS_FIVE);
 
 	mp_defense->AddDefault("Low Bar", &DEF_LOW_BAR);
-	mp_defense->AddObject("Portcullis", &DEF_PORTCULLIS);
-	mp_defense->AddObject("Cheval de Frise", &DEF_CHEVAL);
-	mp_defense->AddObject("Moat", &DEF_MOAT);
-	mp_defense->AddObject("Ramparts", &DEF_RAMPARTS);
-	mp_defense->AddObject("Drawbridge", &DEF_DRAWBRIDGE);
-	mp_defense->AddObject("Sally Port", &DEF_SALLY_PORT);
-	mp_defense->AddObject("Rock Wall", &DEF_ROCK_WALL);
-	mp_defense->AddObject("Rough Terrain", &DEF_ROUGH_TERRAIN);
+	mp_defense->AddObject("A Portcullis", &DEF_PORTCULLIS);
+	mp_defense->AddObject("A Cheval de Frise", &DEF_CHEVAL);
+	mp_defense->AddObject("B Moat", &DEF_MOAT);
+	mp_defense->AddObject("B Ramparts", &DEF_RAMPARTS);
+	mp_defense->AddObject("C Drawbridge", &DEF_DRAWBRIDGE);
+	mp_defense->AddObject("C Sally Port", &DEF_SALLY_PORT);
+	mp_defense->AddObject("D Rock Wall", &DEF_ROCK_WALL);
+	mp_defense->AddObject("D Rough Terrain", &DEF_ROUGH_TERRAIN);
 
 	mp_target->AddDefault("Left", &TARGET_LEFT);
 	mp_target->AddObject("Center", &TARGET_CENTER);
