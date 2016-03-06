@@ -1,7 +1,7 @@
 #include <Stronghold2016Robot.h>
 
 OI::OI() :
-		controllerButtons(), buttonsPressed() {
+		controllerButtons(), buttonsPressed(), m_secondControllerPresent(false) {
 	pXboxController = new Joystick(0);
 	pFarmController = new Joystick(1);
 }

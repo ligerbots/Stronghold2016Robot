@@ -13,7 +13,8 @@ VisionSubsystem::VisionSubsystem() :
 		m_frameCenterY(0),
 		m_numParticles(0),
 		m_processingThread(&VisionSubsystem::visionProcessingThread,this),
-		m_activeCamera(0)
+		m_activeCamera(0),
+		m_pM(NULL)
 {
 	ledRingSpike.reset(new Relay(RobotMap::RELAY_LED_RING_SPIKE));
 	enableVision = true;	// default on
