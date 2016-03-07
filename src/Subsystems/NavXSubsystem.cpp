@@ -48,6 +48,7 @@ AHRS* NavXSubsystem::getNavX(){
 }
 
 void NavXSubsystem::sendValuesToSmartDashboard() {
+	SmartDashboard::PutBoolean("SafeToDrive", !isRobotAboutToTip());
 	SmartDashboard::PutBoolean("NavX/IMU_Connected", mp_navX->IsConnected());
 	SmartDashboard::PutNumber("NavX/IMU_Yaw", mp_navX->GetYaw());
 	// Since the NavX is mounted on the side of the robot, we have

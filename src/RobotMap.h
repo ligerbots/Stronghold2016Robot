@@ -64,5 +64,5 @@ public:
 
 	// Maximum pitch angle. If the robot gets to this angle, we need to go
 	// backwards to keep the robot from tipping over.
-	static constexpr float MAX_PITCH_ANGLE = 75.0;
+	static constexpr float MAX_PITCH_ANGLE = 60.0;
 };

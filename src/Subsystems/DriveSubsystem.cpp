@@ -184,7 +184,7 @@ void DriveSubsystem::drive(double y, double x) {
 	if (mp_robotDrive.get() == NULL)
 		return;
 	// Before we do anything, check to see if we're about to tip over
-	if (Robot::ROBOT_IS_ABOUT_TO_TIP && y >  0.0) {
+	if (Robot::ROBOT_IS_ABOUT_TO_TIP && y < 0.0) {
 		// Don't let the robot go forward anymore
 		y = 0.0;
 	}
