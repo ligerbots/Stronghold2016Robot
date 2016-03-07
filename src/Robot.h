@@ -15,25 +15,7 @@ public:
 
 	OI* mp_operatorInterface;
 
-	static int POS_ONE;
-	static int POS_TWO;
-	static int POS_THREE;
-	static int POS_FOUR;
-	static int POS_FIVE;
-
-	static int DEF_LOW_BAR;
-	static int DEF_PORTCULLIS;
-	static int DEF_CHEVAL;
-	static int DEF_MOAT;
-	static int DEF_RAMPARTS;
-	static int DEF_DRAWBRIDGE;
-	static int DEF_SALLY_PORT;
-	static int DEF_ROCK_WALL;
-	static int DEF_ROUGH_TERRAIN;
-
-	static int TARGET_LEFT;
-	static int TARGET_CENTER;
-	static int TARGET_RIGHT;
+#include "FieldInfo.h"
 
 	SendableChooser* mp_position;
 	SendableChooser* mp_defense;

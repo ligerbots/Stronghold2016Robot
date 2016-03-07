@@ -76,7 +76,15 @@ public:
 	void toggleCameraFeed();
 	void setCameraFeed(int whichCamera);
 
+	// empirical values for flap angle vs distance and curve fit for distance vs target y
+	static double angles[13];
+	static constexpr double distance_a = 2.333;
+	static constexpr double distance_b = 1.0052;
+	static constexpr double camera_offset = 3.25; // in
+
+
 	double getFrameCenter();
+	double getSetpoint();
 
 	double getCenterOfMassX();
 	double getCenterOfMassY();

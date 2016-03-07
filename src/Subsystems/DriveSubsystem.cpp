@@ -1,7 +1,7 @@
 #include <Stronghold2016Robot.h>
 
 DriveSubsystem::DriveSubsystem() :
-		Subsystem("DriveSubsystem") {
+		Subsystem("DriveSubsystem"){
 	printf("DriveSubsystem: initialize\n");
 	turnPIDOutput.reset(new DriveTurnPIDOutput(*this));
 	// create all the CANTalon objects we need

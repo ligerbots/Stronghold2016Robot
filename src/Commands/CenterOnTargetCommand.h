@@ -9,7 +9,7 @@ protected:
 	double centerTo;
 	Parameter<double> izone;
 public:
-	explicit CenterOnTargetCommand(double centerTo = 0.5);
+	explicit CenterOnTargetCommand();
 	void Initialize();
 	void Execute();bool IsFinished();
 	void End();

@@ -22,7 +22,7 @@ AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense,
 	bool intakeUp = false;
 	bool wedgesUp = false;
 
-	double driveSpeed = 0.8;
+//	double driveSpeed = 0.8;
 
 	AddSequential(new ToggleLedCommand(true));
 	AddSequential(new ToggleCompressorCommand(true));

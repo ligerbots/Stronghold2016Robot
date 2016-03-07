@@ -1,9 +1,9 @@
 #include <Stronghold2016Robot.h>
 
-CenterOnTargetCommand::CenterOnTargetCommand(double centerTo) :
+CenterOnTargetCommand::CenterOnTargetCommand() :
 		CommandBase("CenterOnTargetCommand"), mp_softwarePID(
 				NULL), centerTo(
-				centerTo), izone("PIDCenterIZone") {
+				0), izone("PIDCenterIZone") {
 	Requires(visionSubsystem.get());
 	Requires(driveSubsystem.get());
 //	if (mp_softwarePID == NULL) {
@@ -49,6 +49,8 @@ void CenterOnTargetCommand::Execute() {
 //		mp_softwarePID->SetPID(mp_softwarePID->GetP(), 0,
 //				mp_softwarePID->GetD());
 //	}
+
+	centerTo = visionSubsystem->getSetpoint();
 
 	double error = centerTo - visionSubsystem->PIDGet();
 	double sign = error < 0 ? -1 : 1;

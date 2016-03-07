@@ -22,13 +22,16 @@ void FlapCommand::Execute() {
 
 	int flapButtons =
 			Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(6) ? 0 :
-			Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(7) ? 1 :
-			Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(8) ? 2 :
-			Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(3) ? 3 :
-			Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(2) ? 4 : -1;
+			Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(7) ? 4 :
+			Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(8) ? 5 :
+			Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(3) ? 6 :
+			Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(2) ? 8 : -1;
 
 	if (flapButtons != -1) {
-		double fraction = 1 - (flapButtons / 4.0d); // button 4 is down -> 1.0
+		double fraction = 1;
+		if(flapButtons > 0){
+			fraction = VisionSubsystem::angles[flapButtons];
+		}
 
 		flapPositionLeft = fraction;
 		flapPositionRight = fraction;

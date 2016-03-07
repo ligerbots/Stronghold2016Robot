@@ -1,5 +1,7 @@
 #include <Stronghold2016Robot.h>
 
+double VisionSubsystem::angles[] = { -1, -1, -1, -1, .6, .5, .49, .48, .47, .455, .454, .453, .452 };
+
 VisionSubsystem::VisionSubsystem() :
 		Subsystem("VisionSubsystem"),
 		exposure("Exposure"),
@@ -18,7 +20,6 @@ VisionSubsystem::VisionSubsystem() :
 {
 	ledRingSpike.reset(new Relay(RobotMap::RELAY_LED_RING_SPIKE));
 	enableVision = true;	// default on
-	color = 0;
 
 	mT[COMX] = IMAQ_MT_CENTER_OF_MASS_X;
 	mT[COMY] = IMAQ_MT_CENTER_OF_MASS_Y;
@@ -79,7 +80,7 @@ void VisionSubsystem::updateVision(int ticks) {
 
 		if (image != NULL) {
 			// this gets a little complicated. If Vision is disabled, then we need to always send the image from here
-			if (!enableVision.get()) LCameraServer::GetInstance()->SetImage(image);
+			if (!enableVision.get() || m_activeCamera != 0) LCameraServer::GetInstance()->SetImage(image);
 			else if (!paintTarget.get() && !showVision.get()) LCameraServer::GetInstance()->SetImage(image);
 		}
 	}
@@ -111,7 +112,6 @@ void VisionSubsystem::visionProcessingThread() {
 	int startTicks = Robot::ticks;
 
 	gettimeofday(&startTime, 0);
-	color.set(color.get() + 1000);
 
 	while (true) {
 		if (enableVision.get()) {
@@ -200,14 +200,21 @@ void VisionSubsystem::visionProcessingThread() {
 									DrawMode::IMAQ_DRAW_VALUE, {(int) feretStartX, (int) feretStartY},
 															   {(int) feretEndX, (int) feretEndY }, color.get());
 						}
+//						imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
+//								DrawMode::IMAQ_DRAW_VALUE, { width / 2, 0 }, { width / 2,
+//										height }, color.get());
+						double setpoint = getSetpoint();
+
 						imaqDrawLineOnImage(mp_currentFrame, mp_currentFrame,
-								DrawMode::IMAQ_DRAW_VALUE, { width / 2, 0 }, { width / 2,
+								DrawMode::IMAQ_DRAW_VALUE, { (int) (setpoint * width), 0 }, { (int) (setpoint * width),
 										height }, color.get());
 						LCameraServer::GetInstance()->SetImage(mp_currentFrame);
 					}
 				}
 			} else if (showVision.get()) {
 				LCameraServer::GetInstance()->SetImage(mp_processingFrame);
+			} else {
+				LCameraServer::GetInstance()->SetImage(mp_currentFrame);
 			}
 
 			gettimeofday(&endTime, 0);
@@ -215,7 +222,7 @@ void VisionSubsystem::visionProcessingThread() {
 			if (diff > -50000) {
 				SmartDashboard::PutNumber("Vision/processingTime", diff);
 			}
-		}	// close if (nableVision.get())
+		}
 		int endTicks = Robot::ticks;
 		double framesPerSec = 50.0/(endTicks - startTicks);
 		SmartDashboard::PutNumber("Vision/FPS", framesPerSec);
@@ -230,9 +237,23 @@ double VisionSubsystem::getFrameCenter() {
 		int width = Camera::GetCamera(0)->GetWidth();
 		if (width == 0)
 			return 0; // no frame captured yet
-		else
+		else {
 			return width / 2.0;
+		}
 	}
+}
+
+double VisionSubsystem::getSetpoint(){
+	if (Camera::GetNumberOfCameras() < 1)
+			return 0;
+	else {
+		if (Camera::GetCamera(0)->GetWidth() == 0)
+			return 0; // no frame captured yet
+	}
+	double distInches = getDistanceToTarget() * 12;
+	double f = (getFrameCenter()) / 1.54857776;
+	double dxPixels = camera_offset * f / distInches;
+	return (getFrameCenter() - dxPixels) / Camera::GetCamera(0)->GetWidth();
 }
 
 double VisionSubsystem::getCenterOfMassX() {
@@ -259,7 +280,6 @@ double VisionSubsystem::getDistanceToTarget() {
 }
 
 double VisionSubsystem::getFlapsFractionForDistance(double distance) {
-	double angles[] = { -1, -1, -1, -1, .6, .5, .49, .48, .47, .455, .454, .453, .452 };
 	distance = fmax(fmin(distance, 9), 4);
 	double low = angles[(int) floor(distance)];
 	double high = angles[(int) ceil(distance)];
