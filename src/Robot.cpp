@@ -7,6 +7,11 @@ bool Robot::isRoadkill = false;
 bool Robot::ROBOT_IS_ABOUT_TO_TIP = false;
 int Robot::I[];	// our identity array
 
+// see FieldInfo.h
+constexpr Robot::StartingLocations Robot::startingLocations[];
+constexpr Robot::TargetLocations Robot::targetLocations[];
+constexpr double Robot::targetLineUpAngles[];
+
 Robot::Robot() {
 	instance = this;
 
@@ -111,7 +116,7 @@ void Robot::DisabledInit() {
 		I2C i2c(I2C::kOnboard, i);
 
 		int numLeds = 23;
-		int numStrips = 2;
+//		int numStrips = 2;
 
 		printf("%d\n", i);
 
@@ -125,7 +130,7 @@ void Robot::DisabledInit() {
 			bytes[j + 1] = g;
 			bytes[j + 2] = b;
 		}
-		i2c.WriteBulk(bytes, sizeof(bytes));
+		i2c.WriteBulk(bytes, numLeds * 3 + 1);
 	}
 
 }
@@ -142,6 +147,9 @@ void Robot::AutonomousInit() {
 	int target = *((int*) mp_target->GetSelected());
 	printf("Autonomous: Position %d | Defense %d | Target %d\n", pos, def,
 			target);
+
+	// make sure we don't inadvertently leave the LED ring off
+	CommandBase::visionSubsystem->setLedRingOn(true);
 
 	if (mp_autonomousCommand != NULL) {
 		delete mp_autonomousCommand;

@@ -64,6 +64,7 @@ private:
 
 
 	void visionProcessingThread();
+	void measureAndMark(Image *mark, Image *image);
 
 public:
 	// Subsystem

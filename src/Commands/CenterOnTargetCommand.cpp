@@ -1,9 +1,14 @@
 #include <Stronghold2016Robot.h>
 
 CenterOnTargetCommand::CenterOnTargetCommand() :
-		CommandBase("CenterOnTargetCommand"), mp_softwarePID(
-				NULL), centerTo(
-				0), izone("PIDCenterIZone") {
+		CommandBase("CenterOnTargetCommand"),
+		mp_softwarePID(NULL),
+		centerTo(0),
+		centerMediumZone("CenterMediumZone"),
+		centerSlowZone("CenterSlowZone"),
+		fastSpeed("CenterFastSpeed"),
+		mediumSpeed("CenterMediumSpeed"),
+		slowSpeed("CenterSlowSpeed") {
 	Requires(visionSubsystem.get());
 	Requires(driveSubsystem.get());
 //	if (mp_softwarePID == NULL) {
@@ -19,6 +24,7 @@ CenterOnTargetCommand::CenterOnTargetCommand() :
 
 void CenterOnTargetCommand::Initialize() {
 	printf("CenterOnTarget: initialize\n");
+	visionSubsystem->setLedRingOn(true);
 	driveSubsystem->zeroMotors();
 	driveSubsystem->shiftDown(); // untested in high gear
 	SetTimeout(20);
@@ -54,10 +60,12 @@ void CenterOnTargetCommand::Execute() {
 
 	double error = centerTo - visionSubsystem->PIDGet();
 	double sign = error < 0 ? -1 : 1;
-	if (fabs(error) > izone.get()) {
-		driveSubsystem->turnPIDOutput->PIDWrite(0.7 * sign);
+	if (fabs(error) > centerMediumZone.get()) {
+		driveSubsystem->turnPIDOutput->PIDWrite(fastSpeed.get() * sign); // .7
+	} else if (fabs(error) > centerSlowZone.get()){
+		driveSubsystem->turnPIDOutput->PIDWrite(mediumSpeed.get() * sign); // .4
 	} else {
-		driveSubsystem->turnPIDOutput->PIDWrite(0.40 * sign);
+		driveSubsystem->turnPIDOutput->PIDWrite(slowSpeed.get() * sign); // .32
 	}
 }
 
