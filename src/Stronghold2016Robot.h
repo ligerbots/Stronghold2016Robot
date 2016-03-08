@@ -23,6 +23,7 @@
 #include "CommandBase.h"
 #include "Commands/AutonomousDriveSequence.h"
 #include "Commands/AutonomousShootSequence.h"
+#include "Commands/AutonomousDriveAndShoot.h"
 #include "Commands/AutoSetFlapsCommand.h"
 #include "Commands/CenterOnTargetCommand.h"
 #include "Commands/DelayCommand.h"

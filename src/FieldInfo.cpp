@@ -5,6 +5,7 @@ int FieldInfo::I[];		// our identity array
 constexpr FieldInfo::StartingLocations FieldInfo::startingLocations[];
 constexpr FieldInfo::TargetLocations FieldInfo::targetLocations[];
 constexpr double FieldInfo::targetLineUpAngles[];
+constexpr FieldInfo::Speeds FieldInfo::crossingSpeeds[];
 
 FieldInfo::FieldInfo() {
 	// initialize our identity array
@@ -50,3 +51,8 @@ int FieldInfo::GetDefense() {
 int FieldInfo::GetTarget() {
 	return *((int*) mp_target->GetSelected());
 }
+
+bool FieldInfo::CrossSlowly() {
+	return crossingSpeeds[mp_defense->GetSelected()] == SLOW;
+}
+

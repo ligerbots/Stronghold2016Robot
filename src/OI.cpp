@@ -34,7 +34,8 @@ void OI::registerCommands() {
 
 void OI::registerSecondControllerButtons() {
 	// avoid excessive errors if this joystick isn't connected
-		m_secondControllerPresent = pFarmController->GetButtonCount() > 0;
+	// Commented out -- the second controller is now essential. We don't want to just silently fail if it's not there.
+	m_secondControllerPresent = true;	// pFarmController->GetButtonCount() > 0;
 
 	if (m_secondControllerPresent) {
 		// we register the buttons even if the controller wasn't present on startup
@@ -57,11 +58,16 @@ void OI::registerSecondControllerButtons() {
 		// section 3 - auto commands
 		registerButton(pFarmController, 11, PRESSED, new PrepareForCrossingSequence());
 		registerButton(pFarmController, 13, PRESSED, new CenterOnTargetCommand());
-		registerButton(pFarmController, 12, PRESSED, new DelayCommand(0.5));
-		// 14 not assigned
+
 		// test commands
 		registerButton(pFarmController, 15, PRESSED, new DriveDistanceCommand(9));
 		registerButton(pFarmController, 16, PRESSED, new RotateIMUCommand(0));
+
+		registerButton(pFarmController, 12, PRESSED, new AutonomousDriveSequence(
+				FieldInfo::DefenseDepth,
+				FieldInfo::DEF_MOAT,
+				FieldInfo::TARGET_CENTER));
+		registerButton(pFarmController, 14, PRESSED, new AutonomousShootSequence());
 
 		// section 4 - intake & wedge up/down
 		registerButton(pFarmController, 17, PRESSED, new IntakeToggleCommand(true));

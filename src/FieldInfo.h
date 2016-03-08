@@ -26,6 +26,7 @@ public:
 	int GetPosition();
 	int GetDefense();
 	int GetTarget();
+	bool CrossSlowly();
 
 	SendableChooser* mp_position;
 	SendableChooser* mp_defense;
@@ -83,7 +84,7 @@ public:
 		double x, y;
 	};
 
-	static constexpr TargetLocations targetLocations[3] = {
+	static constexpr TargetLocations targetLocations[] = {
 			{ -75.0, 275.00 },
 			{ 10.0, 225.0 },
 			{ 50.0, 110.0 }
@@ -108,5 +109,23 @@ public:
 		DEF_ROCK_WALL,
 		DEF_ROUGH_TERRAIN,
 		DEF_MAX
+	};
+
+	enum Speeds {
+		SLOW,
+		NORMAL
+	};
+
+	static constexpr Speeds crossingSpeeds[] = {
+		SLOW,		//			DEF_LOW_BAR,
+		SLOW,		//			DEF_PORTCULLIS,
+		SLOW,		//			DEF_CHEVAL,
+		NORMAL,		//			DEF_MOAT,
+		NORMAL,		//			DEF_RAMPARTS,
+		SLOW,		//			DEF_DRAWBRIDGE,
+		SLOW,		//			DEF_SALLY_PORT,
+		NORMAL,		//			DEF_ROCK_WALL,
+		NORMAL,		//			DEF_ROUGH_TERRAIN,
+		NORMAL		//			DEF_MAX
 	};
 };

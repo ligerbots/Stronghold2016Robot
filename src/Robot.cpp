@@ -107,8 +107,9 @@ void Robot::AutonomousInit() {
 	int pos = fieldInfo.GetPosition();
 	int def = fieldInfo.GetDefense();
 	int target = fieldInfo.GetTarget();
-	printf("Autonomous: Position %d | Defense %d | Target %d\n", pos, def,
-			target);
+	bool slow = fieldInfo.CrossSlowly();
+	printf("Autonomous: Position %d | Defense %d | Target %d, Speed %s\n",
+			pos, def, target, slow ? "SLOW" : "NORMAL");
 
 	// make sure we don't inadvertently leave the LED ring off
 	CommandBase::visionSubsystem->setLedRingOn(true);
@@ -117,7 +118,7 @@ void Robot::AutonomousInit() {
 		delete mp_autonomousCommand;
 		mp_autonomousCommand = NULL;
 	}
-	mp_autonomousCommand = new AutonomousDriveSequence(pos, def, target);
+	mp_autonomousCommand = new AutonomousDriveAndShoot(pos, def, target, slow);
 	mp_autonomousCommand->Start();
 
 	CommandBase::navXSubsystem->getNavX()->ZeroYaw(); // assume robot starts facing directly forward

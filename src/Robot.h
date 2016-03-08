@@ -15,7 +15,7 @@ public:
 	static bool isRoadkill;
 
 	OI* mp_operatorInterface;
-	// This "automatic" instance of fieldInfo is here just to ensure the constructor is run
+
 	FieldInfo fieldInfo;
 
 	Command* mp_autonomousCommand;

@@ -69,22 +69,21 @@ void VisionSubsystem::updateVision(int ticks) {
 	if (Camera::GetNumberOfCameras() < 1)
 		return;
 
+	if (enableVision.get()) setLedRingOn(true);		// just in case
+
 	Camera::GetCamera(0)->SetExposure(exposure.get());
+	// Get a frame from the current camera
+	Camera::GetCamera(m_activeCamera)->GetFrame();
+	Image *image = Camera::GetCamera(m_activeCamera)->GetStoredFrame();
+	// if we're not running Vision, just display the frame from the current camera, or
+	// if the alternate camera is current, display its frame, even if we're doing vision on camera 0
+	if (!enableVision.get() || m_activeCamera != 0) LCameraServer::GetInstance()->SetImage(image);
 
-	{
-		// Get a frame from the current camera
-		Camera::GetCamera(m_activeCamera)->GetFrame();
-		Image *image = Camera::GetCamera(m_activeCamera)->GetStoredFrame();
-		// if we're not running Vision, just display the frame from the current camera, or
-		// if the alternate camera is current, display its frame, even if we're doing vision on camera 0
-		if (!enableVision.get() || m_activeCamera != 0) LCameraServer::GetInstance()->SetImage(image);
-
-		if (enableVision.get()) {
-			// If we just asked camera zero to get a frame, don't do it again here
-			if (m_activeCamera != 0) Camera::GetCamera(0)->GetFrame();
-			mp_currentFrame = Camera::GetCamera(0)->GetStoredFrame();
-			// We don't do a SetImage here -- that's done in the Vision Processing thread
-		}
+	if (enableVision.get()) {
+		// If we just asked camera zero to get a frame, don't do it again here
+		if (m_activeCamera != 0) Camera::GetCamera(0)->GetFrame();
+		mp_currentFrame = Camera::GetCamera(0)->GetStoredFrame();
+		// We don't do a SetImage here -- that's done in the Vision Processing thread
 	}
 }
 
