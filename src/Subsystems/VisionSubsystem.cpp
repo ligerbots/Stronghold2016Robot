@@ -105,6 +105,10 @@ void VisionSubsystem::setCameraFeed(int whichCamera){
 	printf("Active camera: %d\n", m_activeCamera);
 }
 
+void VisionSubsystem::setVisionEnabled(bool enabled){
+	enableVision.set(enabled);
+}
+
 void VisionSubsystem::visionProcessingThread() {
 	printf("VisionSubsystem: Processing thread start\n");
 

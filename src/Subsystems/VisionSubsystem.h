@@ -86,6 +86,7 @@ public:
 	void setLedRingOn(bool on);
 	void toggleCameraFeed();
 	void setCameraFeed(int whichCamera);
+	void setVisionEnabled(bool enabled);
 
 	// empirical values for flap angle vs distance and curve fit for distance vs target y
 	static double angles[13];
