@@ -51,6 +51,7 @@
 #include "RobotMap.h"
 #include "Subsystems/CompressorSubsystem.h"
 #include "Subsystems/DriveSubsystem.h"
+#include "Subsystems/DummySubsystem.h"
 #include "Subsystems/FlapSubsystem.h"
 #include "Subsystems/IntakeSubsystem.h"
 #include "Subsystems/NavXSubsystem.h"
