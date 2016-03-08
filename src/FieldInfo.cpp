@@ -41,18 +41,18 @@ FieldInfo::FieldInfo() {
 }
 
 int FieldInfo::GetPosition() {
-	return *((int*) mp_position->GetSelected());
+	return (int) mp_position->GetSelected();
 }
 
 int FieldInfo::GetDefense() {
-	return *((int*) mp_defense->GetSelected());
+	return (int) mp_defense->GetSelected();
 }
 
 int FieldInfo::GetTarget() {
-	return *((int*) mp_target->GetSelected());
+	return (int) mp_target->GetSelected();
 }
 
 bool FieldInfo::CrossSlowly() {
-	return crossingSpeeds[mp_defense->GetSelected()] == SLOW;
+	return crossingSpeeds[(int)mp_defense->GetSelected()] == SLOW;
 }
 
