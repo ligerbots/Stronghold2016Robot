@@ -137,6 +137,9 @@ void Robot::AutonomousInit() {
 	printf("Autonomous: Position %d | Defense %d | Target %d\n", pos, def,
 			target);
 
+	// make sure we don't inadvertently leave the LED ring off
+	CommandBase::visionSubsystem->setLedRingOn(true);
+
 	if (mp_autonomousCommand != NULL) {
 		delete mp_autonomousCommand;
 		mp_autonomousCommand = NULL;

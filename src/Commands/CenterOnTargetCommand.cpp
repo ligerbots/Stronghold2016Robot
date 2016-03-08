@@ -19,6 +19,7 @@ CenterOnTargetCommand::CenterOnTargetCommand() :
 
 void CenterOnTargetCommand::Initialize() {
 	printf("CenterOnTarget: initialize\n");
+	visionSubsystem->setLedRingOn(true);
 	driveSubsystem->zeroMotors();
 	driveSubsystem->shiftDown(); // untested in high gear
 	SetTimeout(20);

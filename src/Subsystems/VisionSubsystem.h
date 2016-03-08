@@ -61,9 +61,11 @@ private:
 	// managed hardware object
 	std::unique_ptr<Relay> ledRingSpike;
 	double *m_pM;	// pixel measurement
+	bool m_First;	// first time through
 
 
 	void visionProcessingThread();
+	void measureAndMark(Image *mark, Image *image);
 
 public:
 	// Subsystem
