@@ -3,7 +3,11 @@
 CenterOnTargetCommand::CenterOnTargetCommand() :
 		CommandBase("CenterOnTargetCommand"), mp_softwarePID(
 				NULL), centerTo(
-				0), izone("PIDCenterIZone") {
+				0), centerMediumZone("CenterMediumZone"),
+				centerSlowZone("CenterSlowZone"),
+				slowSpeed("CenterSlowSpeed"),
+				mediumSpeed("CenterMediumSpeed"),
+				fastSpeed("CenterFastSpeed") {
 	Requires(visionSubsystem.get());
 	Requires(driveSubsystem.get());
 //	if (mp_softwarePID == NULL) {
@@ -55,10 +59,12 @@ void CenterOnTargetCommand::Execute() {
 
 	double error = centerTo - visionSubsystem->PIDGet();
 	double sign = error < 0 ? -1 : 1;
-	if (fabs(error) > izone.get()) {
-		driveSubsystem->turnPIDOutput->PIDWrite(0.7 * sign);
+	if (fabs(error) > centerMediumZone.get()) {
+		driveSubsystem->turnPIDOutput->PIDWrite(fastSpeed.get() * sign); // .7
+	} else if (fabs(error) > centerSlowZone.get()){
+		driveSubsystem->turnPIDOutput->PIDWrite(mediumSpeed.get() * sign); // .4
 	} else {
-		driveSubsystem->turnPIDOutput->PIDWrite(0.40 * sign);
+		driveSubsystem->turnPIDOutput->PIDWrite(slowSpeed.get() * sign); // .32
 	}
 }
 
