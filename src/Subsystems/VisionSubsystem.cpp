@@ -73,19 +73,18 @@ void VisionSubsystem::updateVision(int ticks) {
 
 	Image* image = NULL;
 	{
-		// Feed ticks asks for a new frame from the currently selected camera
-		Camera::Feed(ticks);
+		// Get a frame from the current camera
+		Camera::GetCamera(m_activeCamera)->GetFrame();
+		image = Camera::GetCamera(m_activeCamera)->GetStoredFrame();
+		// if we're not running Vision, just display the frame from the current camera, or
+		// if the alternate camera is current, display its frame, even if we're doing vision on camera 0
+		if (!enableVision.get() || m_activeCamera != 0) LCameraServer::GetInstance()->SetImage(image);
 
 		if (enableVision.get()) {
-			// If the active camera wasn't the Vision camera, then also get a new
-			// frame from the vision camera
+			// If we just asked camera zero to get a frame, don't do it again here
 			if (m_activeCamera != 0) Camera::GetCamera(0)->GetFrame();
 			mp_currentFrame = Camera::GetCamera(0)->GetStoredFrame();
-			// we don't display the vision camera frame here -- that's done in the Vision thread
-		}
-		else {
-			image = Camera::GetCamera(m_activeCamera)->GetStoredFrame();
-			LCameraServer::GetInstance()->SetImage(image);
+			// We don't do a SetImage here -- that's done in the Vision Processing thread
 		}
 	}
 }
@@ -212,6 +211,7 @@ void VisionSubsystem::measureAndMark(Image *mark, Image *image)
 				// Send the image to the dashboard with a target indicator
 				int width, height;
 				imaqGetImageSize(mark, &width, &height);
+				double setpoint = getSetpoint();
 				if (m_numParticles != 0) {
 					// draw a 6-pixel circle in red
 					imaqDrawShapeOnImage(mark, mark,
@@ -234,7 +234,6 @@ void VisionSubsystem::measureAndMark(Image *mark, Image *image)
 							(256.0*256.0)*255.0);
 				}
 
-				double setpoint = getSetpoint();
 				imaqDrawLineOnImage(mark, mark, DrawMode::IMAQ_DRAW_VALUE,
 						{ (int) (setpoint * width), 0 },
 						{ (int) (setpoint * width), height },
