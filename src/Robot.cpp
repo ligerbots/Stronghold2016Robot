@@ -7,6 +7,11 @@ bool Robot::isRoadkill = false;
 bool Robot::ROBOT_IS_ABOUT_TO_TIP = false;
 int Robot::I[];	// our identity array
 
+// see FieldInfo.h
+constexpr Robot::StartingLocations Robot::startingLocations[];
+constexpr Robot::TargetLocations Robot::targetLocations[];
+constexpr double Robot::targetLineUpAngles[];
+
 Robot::Robot() {
 	instance = this;
 
@@ -62,24 +67,7 @@ void Robot::RobotInit() {
 	else
 		CommandBase::compressorSubsystem->setCompressor(false);
 
-	printf("Writing i2c\n");
-	for (int i = 3; i < 4; i++) {
-		I2C i2c(I2C::kOnboard, i);
-
-		printf("%d\n", i);
-
-		uint8_t bytes[30 * 3 + 2];
-		bytes[0] = 0;
-		for (int j = 1; j < 30 * 3 + 1; j += 3) {
-			bytes[j] = j * 2;
-			bytes[j + 1] = j * 2;
-			bytes[j + 2] = j * 2;
-		}
-		bytes[30 * 3 + 1] = 254;
-		i2c.WriteBulk(bytes, sizeof(bytes));
-	}
-
-	CommandBase::flapSubsystem->setFlapsFraction(0.0); // default to flaps down
+	CommandBase::flapSubsystem->setFlapsFraction(1.0); // default to flaps down
 
 	printf("Done\n");
 }
@@ -122,6 +110,29 @@ void Robot::AlwaysPeriodic() {
 
 void Robot::DisabledInit() {
 	printf("Robot: DisabledInit\n");
+
+	printf("Writing i2c\n");
+	for (int i = 3; i < 4; i++) {
+		I2C i2c(I2C::kOnboard, i);
+
+		int numLeds = 23;
+//		int numStrips = 2;
+
+		printf("%d\n", i);
+
+		char startByte = 0xC0;
+		char r = 255, g = 0, b = 255;
+
+		uint8_t bytes[numLeds * 3 + 1];
+		bytes[0] = startByte;
+		for (int j = 1; j < numLeds * 3 + 1; j += 3) {
+			bytes[j] = r;
+			bytes[j + 1] = g;
+			bytes[j + 2] = b;
+		}
+		i2c.WriteBulk(bytes, numLeds * 3 + 1);
+	}
+
 }
 
 void Robot::DisabledPeriodic() {

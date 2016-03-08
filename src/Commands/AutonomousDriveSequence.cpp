@@ -28,7 +28,26 @@ AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense,
 	AddSequential(new ToggleCompressorCommand(true));
 	AddSequential(new PrepareForAutoCommand(wedgesUp, intakeUp));
 	AddSequential(new GearShiftCommand(GearShiftCommand::SHIFT_DOWN));
-	AddSequential(new DriveDistanceCommand(2));
-	AddSequential(new RotateIMUCommand(180));
+
+	double startX = Robot::startingLocations[position].x;
+	double startY = Robot::startingLocations[position].y;
+
+	double afterDefenseY = startY + Robot::StartToDefenseDistance;
+
+	double targetX = Robot::targetLocations[target].x;
+	double targetY = Robot::targetLocations[target].y;
+
+	double dx = targetX - startX;
+	double dy = targetY - afterDefenseY;
+
+	double firstAngle = atan2(dy, dx);
+	double distanceToShootingPosition = sqrt(dx * dx + dy * dy);
+
+	double secondAngle = Robot::targetLineUpAngles[target];
+
+	AddSequential(new DriveDistanceCommand(Robot::StartToDefenseDistance + Robot::DrivePastDefense));
+	AddSequential(new RotateIMUCommand(90 - firstAngle)); // correct field angles to navx angles
+	AddSequential(new DriveDistanceCommand(distanceToShootingPosition));
+	AddSequential(new RotateIMUCommand(secondAngle));
 	// handle going to specified target
 }

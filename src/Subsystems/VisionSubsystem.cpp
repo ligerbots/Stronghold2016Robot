@@ -71,7 +71,6 @@ void VisionSubsystem::updateVision(int ticks) {
 
 	Camera::GetCamera(0)->SetExposure(exposure.get());
 
-	Image* image = NULL;
 	{
 		// Get a frame from the current camera
 		Camera::GetCamera(m_activeCamera)->GetFrame();
@@ -86,6 +85,17 @@ void VisionSubsystem::updateVision(int ticks) {
 			mp_currentFrame = Camera::GetCamera(0)->GetStoredFrame();
 			// We don't do a SetImage here -- that's done in the Vision Processing thread
 		}
+<<<<<<< .mine
+
+
+
+
+=======
+		else {
+			Image* image = Camera::GetCamera(m_activeCamera)->GetStoredFrame();
+			LCameraServer::GetInstance()->SetImage(image);
+		}
+>>>>>>> .theirs
 	}
 }
 
@@ -191,8 +201,8 @@ void VisionSubsystem::measureAndMark(Image *mark, Image *image)
 			}
 			m_pM = mprArray->pixelMeasurements[largest];
 
-			m_frameCenterX = m_pM[COMX];
-			m_frameCenterY = m_pM[COMY];
+//			m_frameCenterX = m_pM[COMX];
+//			m_frameCenterY = m_pM[COMY];
 
 			//double areaConvexHull = m_pM[CHA];
 			//double areaParticle = m_pM[AREA];

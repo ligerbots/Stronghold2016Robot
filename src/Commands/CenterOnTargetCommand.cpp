@@ -1,13 +1,14 @@
 #include <Stronghold2016Robot.h>
 
 CenterOnTargetCommand::CenterOnTargetCommand() :
-		CommandBase("CenterOnTargetCommand"), mp_softwarePID(
-				NULL), centerTo(
-				0), centerMediumZone("CenterMediumZone"),
-				centerSlowZone("CenterSlowZone"),
-				slowSpeed("CenterSlowSpeed"),
-				mediumSpeed("CenterMediumSpeed"),
-				fastSpeed("CenterFastSpeed") {
+		CommandBase("CenterOnTargetCommand"),
+		mp_softwarePID(NULL),
+		centerTo(0),
+		centerMediumZone("CenterMediumZone"),
+		centerSlowZone("CenterSlowZone"),
+		fastSpeed("CenterFastSpeed"),
+		mediumSpeed("CenterMediumSpeed"),
+		slowSpeed("CenterSlowSpeed") {
 	Requires(visionSubsystem.get());
 	Requires(driveSubsystem.get());
 //	if (mp_softwarePID == NULL) {

@@ -46,7 +46,7 @@
 		double x, y;
 	};
 
-	static constexpr StartingLocations startingLocations[] = {
+	static constexpr StartingLocations startingLocations[5] = {
 			{-120.0, StartX },
 			{ -72.0, StartX },
 			{ -24.0, StartX },
@@ -66,10 +66,18 @@
 		double x, y;
 	};
 
-	static constexpr TargetLocations startlocations[] = {
+	static constexpr TargetLocations targetLocations[3] = {
 			{ -75.0, 275.00 },
 			{ 10.0, 225.0 },
 			{ 50.0, 110.0 }
+	};
+
+	// angles we need to move to roughly using the navx so that we can see the target
+	// in navx angles (clockwise is positive, forward at start of auto is 0)
+	static constexpr double targetLineUpAngles[3] = {
+			120,
+			180,
+			240
 	};
 
 	enum Defenses {
