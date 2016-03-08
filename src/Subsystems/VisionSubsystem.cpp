@@ -74,7 +74,7 @@ void VisionSubsystem::updateVision(int ticks) {
 	{
 		// Get a frame from the current camera
 		Camera::GetCamera(m_activeCamera)->GetFrame();
-		image = Camera::GetCamera(m_activeCamera)->GetStoredFrame();
+		Image *image = Camera::GetCamera(m_activeCamera)->GetStoredFrame();
 		// if we're not running Vision, just display the frame from the current camera, or
 		// if the alternate camera is current, display its frame, even if we're doing vision on camera 0
 		if (!enableVision.get() || m_activeCamera != 0) LCameraServer::GetInstance()->SetImage(image);
@@ -85,17 +85,6 @@ void VisionSubsystem::updateVision(int ticks) {
 			mp_currentFrame = Camera::GetCamera(0)->GetStoredFrame();
 			// We don't do a SetImage here -- that's done in the Vision Processing thread
 		}
-<<<<<<< .mine
-
-
-
-
-=======
-		else {
-			Image* image = Camera::GetCamera(m_activeCamera)->GetStoredFrame();
-			LCameraServer::GetInstance()->SetImage(image);
-		}
->>>>>>> .theirs
 	}
 }
 
@@ -201,8 +190,8 @@ void VisionSubsystem::measureAndMark(Image *mark, Image *image)
 			}
 			m_pM = mprArray->pixelMeasurements[largest];
 
-//			m_frameCenterX = m_pM[COMX];
-//			m_frameCenterY = m_pM[COMY];
+			m_frameCenterX = m_pM[COMX];
+			m_frameCenterY = m_pM[COMY];
 
 			//double areaConvexHull = m_pM[CHA];
 			//double areaParticle = m_pM[AREA];
@@ -223,25 +212,29 @@ void VisionSubsystem::measureAndMark(Image *mark, Image *image)
 				imaqGetImageSize(mark, &width, &height);
 				double setpoint = getSetpoint();
 				if (m_numParticles != 0) {
+					// If the target is centered in our field of view, paint it green; else red
+					double Xerror = fabs(setpoint = m_frameCenterX);
+					// Centered means no more than 1.5% off to either side
+					double color = Xerror < (width/0.015) ? GREEN : RED;
 					// draw a 6-pixel circle in red
 					imaqDrawShapeOnImage(mark, mark,
-							{ (int) m_frameCenterY - 3, (int) m_frameCenterX - 3, 6, 6}, IMAQ_PAINT_VALUE, IMAQ_SHAPE_OVAL, 255.0);
+							{ (int) m_frameCenterY - 3, (int) m_frameCenterX - 3, 6, 6}, IMAQ_PAINT_VALUE, IMAQ_SHAPE_OVAL, color);
 					if (false) {
 						// this code attempts to draw an X, but ...
 						imaqDrawLineOnImage(mark, mark, DrawMode::IMAQ_DRAW_VALUE,
 								{ (int) m_frameCenterX - 5, (int) m_frameCenterY },
 								{ (int) m_frameCenterX + 5, (int) m_frameCenterY },
-								200.0);
+								CYAN);
 						imaqDrawLineOnImage(mark, mark, DrawMode::IMAQ_DRAW_VALUE,
 								{ (int) m_frameCenterX, (int) m_frameCenterY - 5 },
 								{ (int) m_frameCenterX, (int) m_frameCenterY + 5 },
-							200.0);
+								CYAN);
 					}
 					// Draw the whole feret diagonal
 					imaqDrawLineOnImage(mark, mark, DrawMode::IMAQ_DRAW_VALUE,
 							{(int) feretStartX, (int) feretStartY},
 							{(int) feretEndX,   (int) feretEndY },
-							(256.0*256.0)*255.0);
+							YELLOW);
 				}
 
 				imaqDrawLineOnImage(mark, mark, DrawMode::IMAQ_DRAW_VALUE,

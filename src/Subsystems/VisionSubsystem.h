@@ -7,14 +7,14 @@
 // We believe the "float" color in the imaqDraw calls is BGR (Blue Green Red)
 // with ranges of 0.0 to just under 256.0 for each color
 #define COLOR(R, G, B) (16384.0*B + 256.0*G + R)
-#define BLUE (255, 0, 0)
-#define GREEN (0, 255, 0)
-#define RED (0, 0, 255)
-#define YELLOW (255, 255, 0)
-#define CYAN (0, 255, 255)
-#define MAGENTA (255, 0, 255)
-#define DODGERBLUE (30, 144, 255)
-#define ORANGERED (255, 69, 0)
+#define BLUE COLOR(255, 0, 0)
+#define GREEN COLOR(0, 255, 0)
+#define RED COLOR(0, 0, 255)
+#define YELLOW COLOR(255, 255, 0)
+#define CYAN COLOR(0, 255, 255)
+#define MAGENTA COLOR(255, 0, 255)
+#define DODGERBLUE COLOR(30, 144, 255)
+#define ORANGERED COLOR(255, 69, 0)
 
 class VisionSubsystem: public Subsystem, public PIDSource {
 private:
