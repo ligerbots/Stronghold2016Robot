@@ -15,7 +15,7 @@ rem Generate Stronghold2016Robot.h
 IF EXIST "C:\mingw\msys\1.0\bin" (
 echo Rebuilding index header
 more ..\src\Includes.h > ..\src\Stronghold2016Robot.h
-C:\mingw\msys\1.0\bin\find "../src/" -name "*.h" | sed -n "/Stronghold2016Robot\.h/!p" | sed -n "/FieldInfo\.h/!p" | sed -n "s|^\.\./src/|#include ""|p" | sed -n "s|$|""|p" >> ..\src\Stronghold2016Robot.h
+C:\mingw\msys\1.0\bin\find "../src/" -name "*.h" | sed -n "/Stronghold2016Robot\.h/!p" | sed -n "s|^\.\./src/|#include ""|p" | sed -n "s|$|""|p" >> ..\src\Stronghold2016Robot.h
 ) ELSE (
 echo No mingw, not generating Stronghold2016Robot.h
 echo Add new headers to Stronghold2016Robot.h manually

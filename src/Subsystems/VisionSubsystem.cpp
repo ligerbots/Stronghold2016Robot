@@ -189,8 +189,8 @@ void VisionSubsystem::measureAndMark(Image *mark, Image *image)
 			}
 			m_pM = mprArray->pixelMeasurements[largest];
 
-			m_frameCenterX = m_pM[COMX];
-			m_frameCenterY = m_pM[COMY];
+//			m_frameCenterX = m_pM[COMX];
+//			m_frameCenterY = m_pM[COMY];
 
 			//double areaConvexHull = m_pM[CHA];
 			//double areaParticle = m_pM[AREA];

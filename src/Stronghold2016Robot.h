@@ -21,9 +21,9 @@
 #include <string.h>
 #include <sys/time.h>
 #include "CommandBase.h"
+#include "Commands/AutonomousDriveAndShoot.h"
 #include "Commands/AutonomousDriveSequence.h"
 #include "Commands/AutonomousShootSequence.h"
-#include "Commands/AutonomousDriveAndShoot.h"
 #include "Commands/AutoSetFlapsCommand.h"
 #include "Commands/CenterOnTargetCommand.h"
 #include "Commands/DelayCommand.h"
@@ -46,6 +46,7 @@
 #include "Commands/ToggleLedCommand.h"
 #include "Commands/WaitForIntakeUpCommand.h"
 #include "Commands/WedgeToggleCommand.h"
+#include "FieldInfo.h"
 #include "Includes.h"
 #include "OI.h"
 #include "Robot.h"

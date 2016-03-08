@@ -1,5 +1,4 @@
 #include <Stronghold2016Robot.h>
-#include <FieldInfo.h>
 
 // Robot wide globals whose definitions live in the Robot class
 Robot* Robot::instance = NULL;
