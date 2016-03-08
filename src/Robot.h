@@ -2,6 +2,7 @@
 
 #include <WPILib.h>
 #include "OI.h"
+#include <FieldInfo.h>
 
 class Robot: public IterativeRobot {
 public:
@@ -14,12 +15,8 @@ public:
 	static bool isRoadkill;
 
 	OI* mp_operatorInterface;
-
-#include "FieldInfo.h"
-
-	SendableChooser* mp_position;
-	SendableChooser* mp_defense;
-	SendableChooser* mp_target;
+	// This "automatic" instance of fieldInfo is here just to ensure the constructor is run
+	FieldInfo fieldInfo;
 
 	Command* mp_autonomousCommand;
 

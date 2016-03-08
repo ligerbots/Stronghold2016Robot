@@ -1,7 +1,6 @@
 #include <Stronghold2016Robot.h>
 
-AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense,
-		int target) {
+AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense, int target) {
 	// Add Commands here:
 	// e.g. AddSequential(new Command1());
 	//      AddSequential(new Command2());
@@ -29,13 +28,13 @@ AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense,
 	AddSequential(new PrepareForAutoCommand(wedgesUp, intakeUp));
 	AddSequential(new GearShiftCommand(GearShiftCommand::SHIFT_DOWN));
 
-	double startX = Robot::startingLocations[position].x;
-	double startY = Robot::startingLocations[position].y;
+	double startX = FieldInfo::startingLocations[position].x;
+	double startY = FieldInfo::startingLocations[position].y;
 
-	double afterDefenseY = startY + Robot::StartToDefenseDistance;
+	double afterDefenseY = startY + FieldInfo::StartToDefenseDistance;
 
-	double targetX = Robot::targetLocations[target].x;
-	double targetY = Robot::targetLocations[target].y;
+	double targetX = FieldInfo::targetLocations[target].x;
+	double targetY = FieldInfo::targetLocations[target].y;
 
 	double dx = targetX - startX;
 	double dy = targetY - afterDefenseY;
@@ -43,9 +42,9 @@ AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense,
 	double firstAngle = atan2(dy, dx);
 	double distanceToShootingPosition = sqrt(dx * dx + dy * dy);
 
-	double secondAngle = Robot::targetLineUpAngles[target];
+	double secondAngle = FieldInfo::targetLineUpAngles[target];
 
-	AddSequential(new DriveDistanceCommand(Robot::StartToDefenseDistance + Robot::DrivePastDefense));
+	AddSequential(new DriveDistanceCommand(FieldInfo::StartToDefenseDistance + FieldInfo::DrivePastDefense));
 	AddSequential(new RotateIMUCommand(90 - firstAngle)); // correct field angles to navx angles
 	AddSequential(new DriveDistanceCommand(distanceToShootingPosition));
 	AddSequential(new RotateIMUCommand(secondAngle));

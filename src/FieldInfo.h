@@ -1,5 +1,4 @@
 #pragma once
-// include this file in robot.h once and only once.
 
 /* Ligerbots 2877 Stronghold2016 game
  *
@@ -17,16 +16,34 @@
  *  ALL MEASUREMENTS ARE IN INCHES!
  *
  */
+
+#include <WPILib.h>
+#include "OI.h"
+
+class FieldInfo {
+public:
+	FieldInfo();
+	int GetPosition();
+	int GetDefense();
+	int GetTarget();
+
+	SendableChooser* mp_position;
+	SendableChooser* mp_defense;
+	SendableChooser* mp_target;
+
 	static constexpr double RobotLength = 32.0;
 
 	// The back of our robot must start out touching the center starting tape
 	// That tape is 11" from the center of the field
-	static constexpr double StartX = 11.0;
+	static constexpr double StartY = 11.0;
 	// The distance from the starting tape to the starting ramp of each defense
 	// (We've rounded here, it's actually 0.4" longer)
 	static constexpr double StartingTapeToDefense = 86.0;
 	// How far we drive to get from start position to the start of the first defense
-	static constexpr double StartToDefenseDistance = StartingTapeToDefense - (RobotLength + StartX);
+	// (this is drive distance, we end up at a Y offset that's this + StartY)
+	static constexpr double StartToDefenseDistance = StartingTapeToDefense - RobotLength;
+	// Although the defenses are actually 47.2" wide, one drives the full 48" to get across
+	static constexpr double DefenseDepth = 48;
 	// After we cross the defense, drive one more foot in autonomous
 	static constexpr double DrivePastDefense = 12.0;
 
@@ -47,11 +64,11 @@
 	};
 
 	static constexpr StartingLocations startingLocations[5] = {
-			{-120.0, StartX },
-			{ -72.0, StartX },
-			{ -24.0, StartX },
-			{  24.0, StartX },
-			{  48.0, StartX }
+			{-120.0, StartY },
+			{ -72.0, StartY },
+			{ -24.0, StartY },
+			{  24.0, StartY },
+			{  48.0, StartY }
 	};
 
 	// Target LEFT & RIGHT positions are relative to the direction the robot is facing.
@@ -92,5 +109,4 @@
 		DEF_ROUGH_TERRAIN,
 		DEF_MAX
 	};
-
-
+};
