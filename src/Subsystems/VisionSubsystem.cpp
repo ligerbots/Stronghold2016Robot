@@ -39,6 +39,7 @@ VisionSubsystem::VisionSubsystem() :
 	mT[MFDSY] = IMAQ_MT_MAX_FERET_DIAMETER_START_Y;
 	mT[MFDEX] = IMAQ_MT_MAX_FERET_DIAMETER_END_X;
 	mT[MFDEY] = IMAQ_MT_MAX_FERET_DIAMETER_END_Y;
+	mT[ORIENT] = IMAQ_MT_ORIENTATION;
 }
 
 void VisionSubsystem::InitDefaultCommand() {
@@ -182,16 +183,31 @@ void VisionSubsystem::measureAndMark(Image *mark, Image *image)
 		}
 		else {
 			// Find the particle with the largest area
-			double partArea = 0.0;
+//			double partArea = 0.0;
+			double minOrientationOffset = DBL_MAX;
 			int particleToChoose = 0;
 //			double highestY = DBL_MAX;
 
 			for (int i = 0; i != m_numParticles; i++) {
 				double *pixelMeasurements = mprArray->pixelMeasurements[i];
-				if (pixelMeasurements[AREA] > partArea) {
-					partArea = pixelMeasurements[AREA];
+//				if (pixelMeasurements[AREA] > partArea) {
+//					partArea = pixelMeasurements[AREA];
+//					particleToChoose = i;
+//				}
+
+				// trying out yet another measurement of which particle is the best to go for
+				// we probably want the particle with its bottom side closest to horizontal
+				// IMAQ measures orientation as the angle of the lowest moment of inertia line
+				// to the horizontal
+				// for the target, the lowest moment should be along the bottom side
+				// IMAQ maps orientation to (0, 180) for you so we just need the smallest
+				// orientation
+				// another option would be to do something with max feret angle
+				if(pixelMeasurements[ORIENT] < minOrientationOffset){
 					particleToChoose = i;
+					minOrientationOffset = pixelMeasurements[ORIENT];
 				}
+
 //				double feretStartY = pixelMeasurements[MFDSY];
 //				double feretEndY = pixelMeasurements[MFDEY];
 //
@@ -278,8 +294,11 @@ double VisionSubsystem::getSetpoint(){
 			return 0; // no frame captured yet
 	}
 	double distInches = getDistanceToTarget() * 12;
-//	double f = (getFrameCenter()) / 1.54857776;
-	double dxPixels = camera_offset * 320 / distInches;
+	// fov_diag = 90deg http://www.logitech.com/assets/47868/logitech-webcam-c930e-data-sheet.pdf
+	// fov_horiz = 2 * atan2(16/2, sqrt(16*16+9*9)/2)
+	// tan(fov_horiz/2) = .8716
+	double f = (getFrameCenter() / .8716);
+	double dxPixels = camera_offset * f / distInches;
 	return (getFrameCenter() - dxPixels) / Camera::GetCamera(0)->GetWidth();
 }
 

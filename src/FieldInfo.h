@@ -95,9 +95,9 @@ public:
 	// angles we need to move to roughly using the navx so that we can see the target
 	// in navx angles (clockwise is positive, forward at start of auto is 0)
 	static constexpr double targetLineUpAngles[3] = {
-			120,
-			180,
-			240
+			60,
+			0,
+			300
 	};
 
 	enum Defenses {

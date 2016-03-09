@@ -64,9 +64,8 @@ void OI::registerSecondControllerButtons() {
 		registerButton(pFarmController, 16, PRESSED, new RotateIMUCommand(0));
 
 		registerButton(pFarmController, 12, PRESSED, new AutonomousDriveSequence(
-				FieldInfo::DefenseDepth,
+				FieldInfo::POS_TWO,
 				FieldInfo::DEF_MOAT,
-				-180.0,
 				FieldInfo::TARGET_CENTER));
 		registerButton(pFarmController, 14, PRESSED, new AutonomousShootSequence());
 
@@ -75,6 +74,9 @@ void OI::registerSecondControllerButtons() {
 		registerButton(pFarmController, 18, PRESSED, new IntakeToggleCommand(false));
 		registerButton(pFarmController, 19, PRESSED, new WedgeToggleCommand(true));
 		registerButton(pFarmController, 20, PRESSED, new WedgeToggleCommand(false));
+
+		// the big button
+		registerButton(pFarmController, 21, PRESSED, new AutonomousShootSequence());
 
 		// section 5 - cameras
 		registerButton(pFarmController, 22, PRESSED, new ToggleCameraFeedCommand(0));
@@ -154,7 +156,3 @@ void OI::registerButton(Joystick* pJoystick, int buttonNumber, ButtonEvent when,
 		break;
 	}
 }
-
-void OI::unregisterButton(Joystick* pJoystick, int buttonNumber) {
-}
-
