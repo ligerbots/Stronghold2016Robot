@@ -54,7 +54,7 @@ void FlapCommand::Execute() {
 			}
 		}
 
-		flapSubsystem->setFlapsFraction(flapPositionLeft.get(), flapPositionRight.get());
+		flapSubsystem->setFlapsFraction(/*flapPositionLeft.get(), */flapPositionRight.get());
 	}
 }
 

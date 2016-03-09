@@ -1,4 +1,5 @@
 #include <Stronghold2016Robot.h>
+#include <cfloat>
 
 double VisionSubsystem::angles[] = { -1, -1, -1, -1, .6, .5, .49, .48, .47, .455, .454, .453, .452 };
 
@@ -177,24 +178,32 @@ void VisionSubsystem::measureAndMark(Image *mark, Image *image)
 				imaqMeasureParticles(image, IMAQ_CALIBRATION_MODE_PIXEL, mT,MAXVAL);
 		if (NULL == mprArray) {
 			int imaqError = imaqGetLastError();
-			char *msg = imaqGetErrorText(imaqError);
-			printf("imaqMeasureParticles failed code=%d, msg=%s\n", imaqError, msg);
+			printf("imaqMeasureParticles failed code=%d\n", imaqError);
 		}
 		else {
 			// Find the particle with the largest area
-			double partArea = 0.0;
-			int largest = 0;
+//			double partArea = 0.0;
+//			int largest = 0;
+
+			int particleToChoose = 0;
+			double highestY = DBL_MAX;
+
 			for (int i = 0; i != m_numParticles; i++) {
 				double *pixelMeasurements = mprArray->pixelMeasurements[i];
-				if (pixelMeasurements[AREA] > partArea) {
-					partArea = pixelMeasurements[AREA];
-					largest = i;
+//				if (pixelMeasurements[AREA] > partArea) {
+//					partArea = pixelMeasurements[AREA];
+//					largest = i;
+//				}
+				double feretStartY = pixelMeasurements[MFDSY];
+				double feretEndY = pixelMeasurements[MFDEY];
+
+				double thisParticleY = (feretStartY + feretEndY) / 2;
+				if (thisParticleY < highestY) {
+					highestY = thisParticleY;
+					particleToChoose = i;
 				}
 			}
-			m_pM = mprArray->pixelMeasurements[largest];
-
-//			m_frameCenterX = m_pM[COMX];
-//			m_frameCenterY = m_pM[COMY];
+			m_pM = mprArray->pixelMeasurements[particleToChoose];
 
 			//double areaConvexHull = m_pM[CHA];
 			//double areaParticle = m_pM[AREA];
@@ -216,9 +225,10 @@ void VisionSubsystem::measureAndMark(Image *mark, Image *image)
 				double setpoint = getSetpoint();
 				if (m_numParticles != 0) {
 					// If the target is centered in our field of view, paint it green; else red
-					double Xerror = fabs(setpoint = m_frameCenterX);
+					double Xerror = fabs(setpoint * width - m_frameCenterX);
+//					printf("%f\n", Xerror);
 					// Centered means no more than 1.5% off to either side
-					double color = Xerror < (width/0.015) ? GREEN : RED;
+					double color = Xerror < (width * 0.015) ? GREEN : RED;
 					// draw a 6-pixel circle in red
 					imaqDrawShapeOnImage(mark, mark,
 							{ (int) m_frameCenterY - 3, (int) m_frameCenterX - 3, 6, 6}, IMAQ_PAINT_VALUE, IMAQ_SHAPE_OVAL, color);
@@ -243,7 +253,7 @@ void VisionSubsystem::measureAndMark(Image *mark, Image *image)
 				imaqDrawLineOnImage(mark, mark, DrawMode::IMAQ_DRAW_VALUE,
 						{ (int) (setpoint * width), 0 },
 						{ (int) (setpoint * width), height },
-						256.0*255.0+255.0);
+						YELLOW);
 			}
 		}
 	}
@@ -270,8 +280,8 @@ double VisionSubsystem::getSetpoint(){
 			return 0; // no frame captured yet
 	}
 	double distInches = getDistanceToTarget() * 12;
-	double f = (getFrameCenter()) / 1.54857776;
-	double dxPixels = camera_offset * f / distInches;
+//	double f = (getFrameCenter()) / 1.54857776;
+	double dxPixels = camera_offset * 350 / distInches;
 	return (getFrameCenter() - dxPixels) / Camera::GetCamera(0)->GetWidth();
 }
 
@@ -329,6 +339,7 @@ void VisionSubsystem::sendValuesToSmartDashboard() {
 	SmartDashboard::PutNumber("Target Y Pos", m_frameCenterY);
 	SmartDashboard::PutNumber("XPos", m_frameCenterX);
 	SmartDashboard::PutNumber("TargetsDetected", m_numParticles);
+	SmartDashboard::PutNumber("TargetDistance", getDistanceToTarget());
 }
 
 void VisionSubsystem::SetPIDSourceType(PIDSourceType pidSource) {

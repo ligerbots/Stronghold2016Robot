@@ -6,7 +6,7 @@ AutoSetFlapsCommand::AutoSetFlapsCommand() {
 }
 
 void AutoSetFlapsCommand::Initialize() {
-	SetTimeout(0.5); // enough time for servos to get into position
+	SetTimeout(0.25); // enough time for servos to get into position
 	flapsFractionToSet = visionSubsystem->getFlapsFractionForDistance(visionSubsystem->getDistanceToTarget());
 }
 

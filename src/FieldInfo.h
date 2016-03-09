@@ -27,6 +27,7 @@ public:
 	int GetDefense();
 	int GetTarget();
 	bool CrossSlowly();
+	void initSelectors();
 
 	SendableChooser* mp_position;
 	SendableChooser* mp_defense;

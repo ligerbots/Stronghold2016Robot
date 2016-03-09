@@ -40,7 +40,7 @@ protected:
 	static constexpr double NORMAL_SPEED = 0.7;
 	static constexpr double MAX_SPEED = 0.7;
 	static constexpr double TICKS_PER_FOOT = 7673; // empirically measured by driving 5 feet
-	static constexpr double DRIVE_GAIN = 0.04;	   // 4/100 -- taken from 2014 robot
+	static constexpr double DRIVE_GAIN = 0.06;	   // 4/100 -- taken from 2014 robot
 
 };
 

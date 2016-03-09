@@ -57,7 +57,7 @@ void DriveDistanceCommand::Execute() {
 	}
 
 	double angle = navXSubsystem->getYaw();
-	double angleCorrection = - (m_startAngle - angle) * DRIVE_GAIN;
+	double angleCorrection = (m_startAngle - angle) * DRIVE_GAIN;
 	//double err = left - right;
 	//double turn = err * 0.001;
 	driveSubsystem->drive(-m_speed, angleCorrection);

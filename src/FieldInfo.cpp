@@ -10,7 +10,12 @@ constexpr FieldInfo::Speeds FieldInfo::crossingSpeeds[];
 FieldInfo::FieldInfo() {
 	// initialize our identity array
 	for (int i=0; i!=sizeof(I)/sizeof(int); i++) I[i] = i;
+	mp_position = NULL;
+	mp_defense = NULL;
+	mp_target = NULL;
+}
 
+void FieldInfo::initSelectors(){
 	mp_position = new SendableChooser();
 	mp_defense = new SendableChooser();
 	mp_target = new SendableChooser();
@@ -34,7 +39,6 @@ FieldInfo::FieldInfo() {
 	mp_target->AddDefault("Left", &I[TARGET_LEFT]);
 	mp_target->AddObject("Center", &I[TARGET_CENTER]);
 	mp_target->AddObject("Right", &I[TARGET_RIGHT]);
-
 	SmartDashboard::PutData("Auto Position", mp_position);
 	SmartDashboard::PutData("Auto Defense", mp_defense);
 	SmartDashboard::PutData("Auto Target", mp_target);
