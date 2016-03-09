@@ -93,8 +93,7 @@ public:
 	static constexpr double distance_a = 2.333;
 	static constexpr double distance_b = 1.0052;
 	static constexpr double camera_offset = 3.25; // in
-
-
+	static constexpr double horizontal_field_of_view = 78.442;
 
 	double getFrameCenter();
 	double getSetpoint();

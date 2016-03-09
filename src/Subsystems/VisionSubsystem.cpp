@@ -271,16 +271,18 @@ double VisionSubsystem::getFrameCenter() {
 }
 
 double VisionSubsystem::getSetpoint(){
-	if (Camera::GetNumberOfCameras() < 1)
-			return 0;
-	else {
-		if (Camera::GetCamera(0)->GetWidth() == 0)
-			return 0; // no frame captured yet
-	}
+	if (Camera::GetNumberOfCameras() < 1)return 0;
+	int width = Camera::GetCamera(0)->GetWidth();
+
+	if (width == 0) return 0; // no frame captured yet
+
 	double distInches = getDistanceToTarget() * 12;
-//	double f = (getFrameCenter()) / 1.54857776;
-	double dxPixels = camera_offset * 320 / distInches;
-	return (getFrameCenter() - dxPixels) / Camera::GetCamera(0)->GetWidth();
+	double offsetAngle = atan2(camera_offset, distInches);
+	double ratio = offsetAngle/horizontal_field_of_view;
+	// ratio gives us the fraction of the field of view to adjust by.
+	// now turn it into pixels
+	double dxPixels = ratio * width;
+	return (getFrameCenter() - dxPixels);
 }
 
 double VisionSubsystem::getCenterOfMassX() {
