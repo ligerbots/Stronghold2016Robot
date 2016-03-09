@@ -2,8 +2,7 @@
 #include "AutonomousShootSequence.h"
 #include "AutonomousDriveAndShoot.h"
 
-AutonomousDriveAndShoot::AutonomousDriveAndShoot(int position, int defense, int target,
-												 double orientation, bool slow)
+AutonomousDriveAndShoot::AutonomousDriveAndShoot(int position, int defense, int target)
 {
 	// Add Commands here:
 	// e.g. AddSequential(new Command1());
@@ -21,6 +20,6 @@ AutonomousDriveAndShoot::AutonomousDriveAndShoot(int position, int defense, int 
 	// e.g. if Command1 requires chassis, and Command2 requires arm,
 	// a CommandGroup containing them would require both the chassis and the
 	// arm.
-	AddSequential(new AutonomousDriveSequence(position, defense, target, orientation, slow));
+	AddSequential(new AutonomousDriveSequence(position, defense, target));
 	AddSequential(new AutonomousShootSequence);
 }

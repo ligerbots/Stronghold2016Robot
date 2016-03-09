@@ -42,5 +42,4 @@ public:
 	void registerButton(Joystick* joystick, int buttonNumber, ButtonEvent when,
 			Command* command);
 	void registerSecondControllerButtons();
-	void unregisterButton(Joystick* pJoystick, int buttonNumber);
 };

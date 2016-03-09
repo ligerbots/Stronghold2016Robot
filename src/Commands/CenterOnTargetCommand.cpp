@@ -24,6 +24,7 @@ CenterOnTargetCommand::CenterOnTargetCommand() :
 
 void CenterOnTargetCommand::Initialize() {
 	printf("CenterOnTarget: initialize\n");
+	visionSubsystem->setVisionEnabled(true);
 	visionSubsystem->setLedRingOn(true);
 	driveSubsystem->zeroMotors();
 	driveSubsystem->shiftDown(); // untested in high gear
@@ -70,7 +71,7 @@ void CenterOnTargetCommand::Execute() {
 }
 
 bool CenterOnTargetCommand::IsFinished() {
-	return IsTimedOut() || fabs(centerTo - visionSubsystem->PIDGet()) < 0.02;
+	return IsTimedOut() || fabs(centerTo - visionSubsystem->PIDGet()) < ACCEPTABLE_ERROR;
 }
 
 void CenterOnTargetCommand::End() {

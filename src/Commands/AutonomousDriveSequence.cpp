@@ -1,7 +1,6 @@
 #include <Stronghold2016Robot.h>
 
-AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense, int target,
-												 double orientation, bool slow) {
+AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense, int target) {
 	// Add Commands here:
 	// e.g. AddSequential(new Command1());
 	//      AddSequential(new Command2());
@@ -44,10 +43,15 @@ AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense, int 
 	double distanceToShootingPosition = sqrt(dx * dx + dy * dy);
 
 	double secondAngle = FieldInfo::targetLineUpAngles[target];
-	double drivedirection = orientation == 0.0 ? 1.0 : -1.0;
+	double orientation = FieldInfo::defenseStrategy[defense].Orientation;
+	DriveDistanceCommand::SPEED speed = FieldInfo::defenseStrategy[defense].speed == FieldInfo::SLOW
+			? DriveDistanceCommand::SLOW
+			: DriveDistanceCommand::NORMAL;
+	double driveDirection = orientation == 0.0 ? 1.0 : -1.0;
 
-	AddSequential(new DriveDistanceCommand(drivedirection * FieldInfo::StartToDefenseDistance + FieldInfo::DrivePastDefense),
-			slow ? DriveDistanceCommand::SLOW : DriveDistanceCommand::NORMAL);
+	AddSequential(new DriveDistanceCommand(
+			driveDirection * FieldInfo::StartToDefenseDistance + FieldInfo::DrivePastDefense,
+			speed));
 
 	// NOTE!! Since our angles are absolute angles with respect to the field (as opposed to relative
 	// angles with respect to the current position of the robot), the RotateIMUCommand below will

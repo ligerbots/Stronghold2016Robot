@@ -18,4 +18,6 @@ public:
 	void Execute();bool IsFinished();
 	void End();
 	void Interrupted();
+
+	static constexpr double ACCEPTABLE_ERROR = 0.01;
 };

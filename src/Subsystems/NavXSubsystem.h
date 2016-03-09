@@ -18,7 +18,7 @@ class NavXSubsystem: public Subsystem, public AHRS  {
 private:
 	double m_yawOffset;
 public:
-	NavXSubsystem(SPI::Port);
+	explicit NavXSubsystem(SPI::Port);
 	void InitDefaultCommand();
 	double getYaw();
 	void zeroYaw(double yawOffset = 0.0);

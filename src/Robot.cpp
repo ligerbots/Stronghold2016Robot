@@ -119,7 +119,7 @@ void Robot::AutonomousInit() {
 		delete mp_autonomousCommand;
 		mp_autonomousCommand = NULL;
 	}
-	mp_autonomousCommand = new AutonomousDriveAndShoot(pos, def, target, slow);
+	mp_autonomousCommand = new AutonomousDriveAndShoot(pos, def, target);
 	mp_autonomousCommand->Start();
 
 	// Robot will start out wedges first, or intake first, depending on the defense
