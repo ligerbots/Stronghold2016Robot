@@ -182,26 +182,24 @@ void VisionSubsystem::measureAndMark(Image *mark, Image *image)
 		}
 		else {
 			// Find the particle with the largest area
-//			double partArea = 0.0;
-//			int largest = 0;
-
+			double partArea = 0.0;
 			int particleToChoose = 0;
-			double highestY = DBL_MAX;
+//			double highestY = DBL_MAX;
 
 			for (int i = 0; i != m_numParticles; i++) {
 				double *pixelMeasurements = mprArray->pixelMeasurements[i];
-//				if (pixelMeasurements[AREA] > partArea) {
-//					partArea = pixelMeasurements[AREA];
-//					largest = i;
-//				}
-				double feretStartY = pixelMeasurements[MFDSY];
-				double feretEndY = pixelMeasurements[MFDEY];
-
-				double thisParticleY = (feretStartY + feretEndY) / 2;
-				if (thisParticleY < highestY) {
-					highestY = thisParticleY;
+				if (pixelMeasurements[AREA] > partArea) {
+					partArea = pixelMeasurements[AREA];
 					particleToChoose = i;
 				}
+//				double feretStartY = pixelMeasurements[MFDSY];
+//				double feretEndY = pixelMeasurements[MFDEY];
+//
+//				double thisParticleY = (feretStartY + feretEndY) / 2;
+//				if (thisParticleY < highestY) {
+//					highestY = thisParticleY;
+//					particleToChoose = i;
+//				}
 			}
 			m_pM = mprArray->pixelMeasurements[particleToChoose];
 
@@ -281,7 +279,7 @@ double VisionSubsystem::getSetpoint(){
 	}
 	double distInches = getDistanceToTarget() * 12;
 //	double f = (getFrameCenter()) / 1.54857776;
-	double dxPixels = camera_offset * 350 / distInches;
+	double dxPixels = camera_offset * 320 / distInches;
 	return (getFrameCenter() - dxPixels) / Camera::GetCamera(0)->GetWidth();
 }
 
