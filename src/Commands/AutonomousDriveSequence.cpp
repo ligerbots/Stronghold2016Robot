@@ -43,9 +43,21 @@ AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense, int 
 	double distanceToShootingPosition = sqrt(dx * dx + dy * dy);
 
 	double secondAngle = FieldInfo::targetLineUpAngles[target];
+	
+	bool isIntakeFirst =
+		defense == FieldInfo::DEF_LOW_BAR ||
+		defense == FieldInfo::DEF_ROCK_WALL ||
+		defense == FieldInfo::DEF_ROUGH_TERRAIN ||
+		defense == FieldInfo::DEF_MOAT ||
+		defense == FieldInfo::DEF_RAMPARTS;
+	
+	double defensesDriveDistance = FieldInfo::StartToDefenseDistance + FieldInfo::DrivePastDefense;
+	if(!isIntakeFirst){
+		defensesDriveDistance = -defensesDriveDistance;
+	}
 
-	AddSequential(new DriveDistanceCommand(FieldInfo::StartToDefenseDistance + FieldInfo::DrivePastDefense),
-			slow ? DriveDistanceCommand::SLOW : DriveDistanceCommand::NORMAL);
+	AddSequential(new DriveDistanceCommand(defensesDriveDistance,
+			slow ? DriveDistanceCommand::SLOW : DriveDistanceCommand::NORMAL));
 	AddSequential(new RotateIMUCommand(90 - firstAngle)); // correct field angles to navx angles
 
 	// Drive to the target spot in high gear, but let's leave it low speed for now
