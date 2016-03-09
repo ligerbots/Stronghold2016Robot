@@ -48,7 +48,7 @@ void DriveDistanceCommand::Execute() {
 
 	// if we're in high gear, expect some overshoot and ramp down
 	if (m_gear==HIGH) {
-		double remaining = (m_distance - right) * TICKS_PER_FOOT;
+		double remaining = fabs(m_distance) - fabs(m_startPositionRight - right) * TICKS_PER_FOOT;
 		if (remaining < 2.0) {
 			m_gear = LOW;
 			m_speed = NORMAL_SPEED;
@@ -60,13 +60,16 @@ void DriveDistanceCommand::Execute() {
 	double angleCorrection = (m_startAngle - angle) * DRIVE_GAIN;
 	//double err = left - right;
 	//double turn = err * 0.001;
-	driveSubsystem->drive(-m_speed, angleCorrection);
+	driveSubsystem->drive(m_distance > 0 ? -m_speed : m_speed, angleCorrection);
 }
 
 bool DriveDistanceCommand::IsFinished() {
 	//double left = driveSubsystem->getLeftEncoderPosition();
 	double right = driveSubsystem->getRightEncoderPosition();
-	return right >= m_startPositionRight + m_distance * TICKS_PER_FOOT;
+	if(m_distance > 0)
+		return right >= m_startPositionRight + m_distance * TICKS_PER_FOOT;
+	else
+		return right <= m_startPositionRight + m_distance * TICKS_PER_FOOT;
 }
 
 void DriveDistanceCommand::End() {

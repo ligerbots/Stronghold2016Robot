@@ -46,7 +46,7 @@ AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense, int 
 	double secondAngle = FieldInfo::targetLineUpAngles[target];
 	double drivedirection = orientation == 0.0 ? 1.0 : -1.0;
 
-	AddSequential(new DriveDistanceCommand(orientation * FieldInfo::StartToDefenseDistance + FieldInfo::DrivePastDefense),
+	AddSequential(new DriveDistanceCommand(drivedirection * FieldInfo::StartToDefenseDistance + FieldInfo::DrivePastDefense),
 			slow ? DriveDistanceCommand::SLOW : DriveDistanceCommand::NORMAL);
 
 	// NOTE!! Since our angles are absolute angles with respect to the field (as opposed to relative
