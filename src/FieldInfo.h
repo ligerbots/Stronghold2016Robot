@@ -27,6 +27,7 @@ public:
 	int GetDefense();
 	int GetTarget();
 	bool CrossSlowly();
+	double GetInitialOrientation();
 	void initSelectors();
 
 	SendableChooser* mp_position;
@@ -117,16 +118,23 @@ public:
 		NORMAL
 	};
 
-	static constexpr Speeds crossingSpeeds[] = {
-		SLOW,		//			DEF_LOW_BAR,
-		SLOW,		//			DEF_PORTCULLIS,
-		SLOW,		//			DEF_CHEVAL,
-		NORMAL,		//			DEF_MOAT,
-		NORMAL,		//			DEF_RAMPARTS,
-		SLOW,		//			DEF_DRAWBRIDGE,
-		SLOW,		//			DEF_SALLY_PORT,
-		NORMAL,		//			DEF_ROCK_WALL,
-		NORMAL,		//			DEF_ROUGH_TERRAIN,
-		NORMAL		//			DEF_MAX
+	// For each defense, list whether we take it wedge side first, or intake side first
+	// and what speed
+	struct DefenseStrategy {
+		double Orientation;
+		Speeds speed;
+	};
+
+	static constexpr DefenseStrategy defenseStrategy[] = {
+		{  0.0, SLOW}, 		// DEF_LOW_BAR,
+		{  0.0, SLOW},		// DEF_PORTCULLIS,
+		{  0.0, SLOW},		// DEF_CHEVAL,
+		{180.0, NORMAL},	// DEF_MOAT,
+		{180.0, NORMAL},	// DEF_RAMPARTS,
+		{  0.0, SLOW},		// DEF_DRAWBRIDGE, should we actually just block this choice?
+		{  0.0, SLOW},		// DEF_SALLY_PORT, should we actually just block this choice?
+		{180.0, NORMAL},	// DEF_ROCK_WALL,
+		{180.0, NORMAL},	// DEF_ROUGH_TERRAIN,
+		{  0.0, NORMAL}		// DEF_MAX (there is no defense max, but just in case)
 	};
 };

@@ -13,9 +13,9 @@ DriveDistanceIMUCommand::DriveDistanceIMUCommand(double distanceMeters,
 
 void DriveDistanceIMUCommand::Initialize() {
 	printf("DriveDistanceIMUCommand: init\n");
-	startX = navXSubsystem->getNavX()->GetDisplacementX();
-	startY = navXSubsystem->getNavX()->GetDisplacementY();
-	startY = navXSubsystem->getNavX()->GetDisplacementZ();
+	startX = navXSubsystem->GetDisplacementX();
+	startY = navXSubsystem->GetDisplacementY();
+	startY = navXSubsystem->GetDisplacementZ();
 }
 
 void DriveDistanceIMUCommand::Execute() {
@@ -23,9 +23,9 @@ void DriveDistanceIMUCommand::Execute() {
 }
 
 bool DriveDistanceIMUCommand::IsFinished() {
-	float x = navXSubsystem->getNavX()->GetDisplacementX();
-	float y = navXSubsystem->getNavX()->GetDisplacementY();
-	float z = navXSubsystem->getNavX()->GetDisplacementZ();
+	float x = navXSubsystem->GetDisplacementX();
+	float y = navXSubsystem->GetDisplacementY();
+	float z = navXSubsystem->GetDisplacementZ();
 	return (x - startX) * (x - startX) + (y - startY) * (y - startY) + (z - startZ) * (z - startZ)
 			>= distanceMeters2;
 }

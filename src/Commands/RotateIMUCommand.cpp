@@ -34,7 +34,7 @@ void RotateIMUCommand::Initialize() {
 }
 
 void RotateIMUCommand::updateCurrentAngle() {
-	currentAngle = navXSubsystem->getNavX()->GetYaw();
+	currentAngle = navXSubsystem->GetYaw();
 	currentAngle = fmod(currentAngle + 360.0, 360.0); // turn -180,180 to 0,360
 }
 

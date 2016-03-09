@@ -7,7 +7,8 @@
 class AutonomousDriveAndShoot: public CommandGroup
 {
 public:
-	AutonomousDriveAndShoot(int position, int defense, int target, bool slow = false);
+	AutonomousDriveAndShoot(int position, int defense, int target,
+							double orientation, bool slow = false);
 };
 
 #endif

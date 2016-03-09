@@ -66,6 +66,7 @@ void OI::registerSecondControllerButtons() {
 		registerButton(pFarmController, 12, PRESSED, new AutonomousDriveSequence(
 				FieldInfo::DefenseDepth,
 				FieldInfo::DEF_MOAT,
+				-180.0,
 				FieldInfo::TARGET_CENTER));
 		registerButton(pFarmController, 14, PRESSED, new AutonomousShootSequence());
 

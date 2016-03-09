@@ -38,7 +38,7 @@ CommandBase::CommandBase() :
 void CommandBase::init() {
 	driveSubsystem.reset(new DriveSubsystem());
 	visionSubsystem.reset(new VisionSubsystem());
-	navXSubsystem.reset(new NavXSubsystem());
+	navXSubsystem.reset(new NavXSubsystem(SPI::Port::kMXP));
 	shooterSubsystem.reset(new ShooterSubsystem());
 	flapSubsystem.reset(new FlapSubsystem());
 	pdpSubsystem.reset(new PDPSubsystem());

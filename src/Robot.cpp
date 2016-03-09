@@ -37,7 +37,8 @@ void Robot::AlwaysPeriodic() {
 	ticks++;
 
 	// Check to see if the robot is about to tip
-	ROBOT_IS_ABOUT_TO_TIP = CommandBase::navXSubsystem->isRobotAboutToTip();
+	ROBOT_IS_ABOUT_TO_TIP = CommandBase::navXSubsystem->isRobotAboutToTip(RobotMap::MAX_PITCH_ANGLE);
+	SmartDashboard::PutBoolean("SafeToDrive", ROBOT_IS_ABOUT_TO_TIP);
 
 	// other stuff
 	CommandBase::visionSubsystem->updateVision(Robot::ticks);
@@ -51,6 +52,7 @@ void Robot::AlwaysPeriodic() {
 	CommandBase::compressorSubsystem->sendValuesToSmartDashboard();
 	CommandBase::wedgeSubsystem->sendValuesToSmartDashboard();
 	CommandBase::intakeSubsystem->sendValuesToSmartDashboard();
+
 
 //	if (mp_operatorInterface->joystickButtonPressed(
 //			mp_operatorInterface->pXboxController, 3)) {
@@ -120,8 +122,9 @@ void Robot::AutonomousInit() {
 	mp_autonomousCommand = new AutonomousDriveAndShoot(pos, def, target, slow);
 	mp_autonomousCommand->Start();
 
-	CommandBase::navXSubsystem->getNavX()->ZeroYaw(); // assume robot starts facing directly forward
-	CommandBase::navXSubsystem->getNavX()->ResetDisplacement();
+	// Robot will start out wedges first, or intake first, depending on the defense
+	CommandBase::navXSubsystem->zeroYaw(fieldInfo.GetInitialOrientation());
+	CommandBase::navXSubsystem->ResetDisplacement();
 
 	CommandBase::driveJoystickCommand->Cancel();
 	CommandBase::intakeRollerCommand->Cancel();
