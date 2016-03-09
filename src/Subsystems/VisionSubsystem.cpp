@@ -297,7 +297,9 @@ double VisionSubsystem::getSetpoint(){
 	// fov_diag = 90deg http://www.logitech.com/assets/47868/logitech-webcam-c930e-data-sheet.pdf
 	// fov_horiz = 2 * atan2(16/2, sqrt(16*16+9*9)/2)
 	// tan(fov_horiz/2) = .8716
-	double f = (getFrameCenter() / .8716);
+
+	// charles's fov calculation - 78.442
+	double f = (getFrameCenter() / 0.8162);
 	double dxPixels = camera_offset * f / distInches;
 	return (getFrameCenter() - dxPixels) / Camera::GetCamera(0)->GetWidth();
 }
