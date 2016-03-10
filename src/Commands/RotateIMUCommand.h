@@ -12,6 +12,7 @@ protected:
 	double lastAngle;
 	bool isClockwise;
 	bool isAbsolute;
+	int m_ticks;
 
 	void updateCurrentAngle();
 public:

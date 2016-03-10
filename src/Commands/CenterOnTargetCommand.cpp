@@ -71,6 +71,10 @@ void CenterOnTargetCommand::Execute() {
 }
 
 bool CenterOnTargetCommand::IsFinished() {
+	if(Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(28)){
+		return true;
+	}
+
 	return IsTimedOut() || fabs(centerTo - visionSubsystem->PIDGet()) < ACCEPTABLE_ERROR;
 }
 

@@ -71,7 +71,7 @@ public:
 			{ -72.0, StartY },
 			{ -24.0, StartY },
 			{  24.0, StartY },
-			{  48.0, StartY }
+			{  72.0, StartY }
 	};
 
 	// Target LEFT & RIGHT positions are relative to the direction the robot is facing.
@@ -87,9 +87,9 @@ public:
 	};
 
 	static constexpr TargetLocations targetLocations[] = {
-			{ -75.0, 275.00 },
-			{ 10.0, 225.0 },
-			{ 50.0, 275.0 }
+			{ -87.0, 236.0 },
+			{ 10.0, 200.0 },
+			{ 62.0, 236.0 }
 	};
 
 	// angles we need to move to roughly using the navx so that we can see the target
@@ -115,7 +115,8 @@ public:
 
 	enum Speeds {
 		SLOW,
-		NORMAL
+		NORMAL,
+		FAST
 	};
 
 	// For each defense, list whether we take it wedge side first, or intake side first
@@ -126,15 +127,15 @@ public:
 	};
 
 	static constexpr DefenseStrategy defenseStrategy[] = {
-		{  0.0, SLOW}, 		// DEF_LOW_BAR,
-		{  0.0, SLOW},		// DEF_PORTCULLIS,
-		{  0.0, SLOW},		// DEF_CHEVAL,
-		{180.0, NORMAL},	// DEF_MOAT,
-		{180.0, NORMAL},	// DEF_RAMPARTS,
-		{  0.0, SLOW},		// DEF_DRAWBRIDGE, should we actually just block this choice?
-		{  0.0, SLOW},		// DEF_SALLY_PORT, should we actually just block this choice?
-		{180.0, NORMAL},	// DEF_ROCK_WALL,
-		{180.0, NORMAL},	// DEF_ROUGH_TERRAIN,
-		{  0.0, NORMAL}		// DEF_MAX (there is no defense max, but just in case)
+		{  0.0, FAST}, 	// DEF_LOW_BAR,
+		{  0.0, FAST},	// DEF_PORTCULLIS,
+		{  0.0, FAST},	// DEF_CHEVAL,
+		{180.0, FAST},		// DEF_MOAT,
+		{180.0, FAST},		// DEF_RAMPARTS,
+		{  0.0, NORMAL},	// DEF_DRAWBRIDGE, should we actually just block this choice?
+		{  0.0, NORMAL},	// DEF_SALLY_PORT, should we actually just block this choice?
+		{180.0, FAST},		// DEF_ROCK_WALL,
+		{180.0, FAST},		// DEF_ROUGH_TERRAIN,
+		{  0.0, FAST}		// DEF_MAX (there is no defense max, but just in case)
 	};
 };

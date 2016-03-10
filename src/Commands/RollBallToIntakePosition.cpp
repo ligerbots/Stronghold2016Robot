@@ -8,7 +8,9 @@ RollBallToIntakePositionCommand::RollBallToIntakePositionCommand(IntakePosition 
 
 void RollBallToIntakePositionCommand::Initialize() {
 	printf("RollBallToIntakePositionCommand: init\n");
-	SetTimeout(3);
+	if(where != PICKUP){
+		SetTimeout(3);
+	}
 
 	if(where == LOW_GOAL
 			|| (intakeSubsystem->isBallInShooterPosition() && where == CROSSING_POSITION)
@@ -23,7 +25,7 @@ void RollBallToIntakePositionCommand::Initialize() {
 void RollBallToIntakePositionCommand::Execute() {
 	sensorFlag = false;
 
-	if(where == CROSSING_POSITION){
+	if(where == CROSSING_POSITION || where == PICKUP){
 		sensorFlag = intakeSubsystem->isBallInDefensesCrossingPosition();
 	} else if(where == SHOOTING_POSITION || where == BACK_TO_SHOOTING_POSITION){
 		sensorFlag = intakeSubsystem->isBallInShooterPosition();
@@ -34,7 +36,7 @@ void RollBallToIntakePositionCommand::Execute() {
 		return; // wait for flaps
 
 	double rollSpeed = moveUp ? -0.5: 0.5;
-	if(where == LOW_GOAL)
+	if(where == LOW_GOAL || where == PICKUP)
 		rollSpeed = 1; // max speed
 
 	// make sure this doesn't move the rollers on the first execute if the ball is already there

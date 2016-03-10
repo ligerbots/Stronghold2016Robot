@@ -24,7 +24,7 @@ float NavXSubsystem::GetYaw() {
 }
 
 bool NavXSubsystem::isRobotAboutToTip(float maxPitchAngle) {
-	return (GetPitch()>maxPitchAngle);
+	return GetRoll() > maxPitchAngle;
 }
 
 void NavXSubsystem::sendValuesToSmartDashboard() {
@@ -32,8 +32,8 @@ void NavXSubsystem::sendValuesToSmartDashboard() {
 	SmartDashboard::PutNumber("NavX/IMU_Yaw", GetYaw());
 	// Since the NavX is mounted on the side of the robot, we have
 	// swapped the roll and pitch axes.
-	SmartDashboard::PutNumber("NavX/IMU_Pitch", GetRoll());
-	SmartDashboard::PutNumber("NavX/IMU_Roll", GetPitch());
+	SmartDashboard::PutNumber("NavX/IMU_Pitch", GetPitch());
+	SmartDashboard::PutNumber("NavX/IMU_Roll", GetRoll());
 	SmartDashboard::PutNumber("NavX/IMU_CompassHeading", GetCompassHeading());
 	SmartDashboard::PutNumber("NavX/IMU_Update_Count", GetUpdateCount());
 	SmartDashboard::PutNumber("NavX/IMU_Byte_Count", GetByteCount());

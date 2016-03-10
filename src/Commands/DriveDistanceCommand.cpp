@@ -1,5 +1,7 @@
 #include <Stronghold2016Robot.h>
 
+constexpr double DriveDistanceCommand::speeds[];
+
 DriveDistanceCommand::DriveDistanceCommand(double distance, SPEED speed, GEAR gear) :
 		CommandBase("DriveDistanceCommand"),
 		driveStraightGain("Drive StraightGain"),
@@ -20,7 +22,7 @@ void DriveDistanceCommand::Initialize() {
 	m_startPositionLeft = driveSubsystem->getLeftEncoderPosition();
 	m_startPositionRight = driveSubsystem->getRightEncoderPosition();
 	m_startAngle = navXSubsystem->GetYaw();
-	m_speed = m_speedRequested==NORMAL ? NORMAL_SPEED : SLOW_SPEED;
+	m_speed = speeds[m_speedRequested];
 	m_gear = m_gearRequested;
 
 	// ignore top gear shift for distances less than 3 ft
@@ -57,7 +59,7 @@ void DriveDistanceCommand::Execute() {
 	}
 
 	double angle = navXSubsystem->GetYaw();
-	double angleCorrection = (m_startAngle - angle) * DRIVE_GAIN;
+	double angleCorrection = (m_startAngle - angle) * driveStraightGain.get();
 	//double err = left - right;
 	//double turn = err * 0.001;
 	driveSubsystem->drive(m_distance > 0 ? -m_speed : m_speed, angleCorrection);

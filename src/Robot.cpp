@@ -40,7 +40,7 @@ void Robot::AlwaysPeriodic() {
 
 	// Check to see if the robot is about to tip
 	ROBOT_IS_ABOUT_TO_TIP = CommandBase::navXSubsystem->isRobotAboutToTip(RobotMap::MAX_PITCH_ANGLE);
-	SmartDashboard::PutBoolean("SafeToDrive", ROBOT_IS_ABOUT_TO_TIP);
+	SmartDashboard::PutBoolean("SafeToDrive", !ROBOT_IS_ABOUT_TO_TIP);
 
 	// other stuff
 	CommandBase::visionSubsystem->updateVision(Robot::ticks);
@@ -54,6 +54,14 @@ void Robot::AlwaysPeriodic() {
 	CommandBase::compressorSubsystem->sendValuesToSmartDashboard();
 	CommandBase::wedgeSubsystem->sendValuesToSmartDashboard();
 	CommandBase::intakeSubsystem->sendValuesToSmartDashboard();
+
+	if(mp_operatorInterface->pFarmController->GetRawButton(28)){
+		printf("Cancelling centering/auto\n");
+		if(mp_autonomousCommand != NULL){
+			mp_autonomousCommand->Cancel();
+		}
+		CommandBase::centerOnTargetCommand->Cancel();
+	}
 
 
 //	if (mp_operatorInterface->joystickButtonPressed(
@@ -75,6 +83,10 @@ void Robot::AlwaysPeriodic() {
 
 void Robot::DisabledInit() {
 	printf("Robot: DisabledInit\n");
+
+	if (mp_autonomousCommand != NULL) {
+		mp_autonomousCommand->Cancel();
+	}
 
 	printf("Writing i2c\n");
 	for (int i = 3; i < 4; i++) {

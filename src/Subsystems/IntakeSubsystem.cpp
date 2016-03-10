@@ -20,9 +20,11 @@ IntakeSubsystem::IntakeSubsystem() :
 
 	mp_ballInShooterSwitch.reset(
 			new DigitalInput(RobotMap::LIMIT_SWITCH_INTAKE_BALL_IN_SHOOTER));
+//	mp_ballInShooterCounter.reset(new Counter(mp_ballInShooterSwitch.get()));
 	mp_ballInDefensePositionSwitch.reset(
 			new DigitalInput(
 					RobotMap::LIMIT_SWITCH_INTAKE_BALL_DEFENSES_POSITION));
+//	mp_ballInDefensePositionCounter.reset(new Counter(mp_ballInDefensePositionSwitch.get()));
 	mp_intakeUpSwitch.reset(new DigitalInput(RobotMap::LIMIT_SWITCH_INTAKE_UP));
 }
 

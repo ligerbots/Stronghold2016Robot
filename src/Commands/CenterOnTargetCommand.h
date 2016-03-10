@@ -19,5 +19,5 @@ public:
 	void End();
 	void Interrupted();
 
-	static constexpr double ACCEPTABLE_ERROR = 0.01;
+	static constexpr double ACCEPTABLE_ERROR = 0.005;
 };

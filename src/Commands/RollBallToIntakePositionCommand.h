@@ -6,6 +6,7 @@
 class RollBallToIntakePositionCommand: public CommandBase {
 public:
 	enum IntakePosition {
+		PICKUP,
 		LOW_GOAL, // shoot out max speed
 		CROSSING_POSITION, // if shooter switch pressed, pull down. Otherwise pull up
 		SHOOTING_POSITION, // pull up to shooter

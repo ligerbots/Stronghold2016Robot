@@ -8,9 +8,9 @@ OI::OI() :
 
 void OI::registerCommands() {
 	// XBox A command
-	registerButton(pXboxController, 1, PRESSED,CommandBase::toggleCameraFeedCommand.get());
+	registerButton(pXboxController, 1, PRESSED, new RollBallToIntakePositionCommand(RollBallToIntakePositionCommand::PICKUP));
 	// XBox B command
-//	registerButton(pXboxController, 2, PRESSED, CommandBase::flapCommand.get());
+	registerButton(pXboxController, 2, PRESSED, new AutonomousShootSequence());
 	// XBox X command
 	registerButton(pXboxController, 3, PRESSED, CommandBase::shootCommand.get());
 	// XBox Y command
@@ -60,7 +60,7 @@ void OI::registerSecondControllerButtons() {
 		registerButton(pFarmController, 13, PRESSED, new CenterOnTargetCommand());
 
 		// test commands
-		registerButton(pFarmController, 15, PRESSED, new DriveDistanceCommand(9));
+		registerButton(pFarmController, 15, PRESSED, new DriveDistanceCommand(9 * 12));
 		registerButton(pFarmController, 16, PRESSED, new RotateIMUCommand(0));
 
 		registerButton(pFarmController, 12, PRESSED, new AutonomousDriveSequence(

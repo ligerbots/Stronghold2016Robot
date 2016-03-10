@@ -5,6 +5,7 @@ RotateIMUCommand::RotateIMUCommand(double targetAngle, bool absolute) :
 				0), lastAngle(0), isClockwise(false), isAbsolute(absolute) {
 	Requires(driveSubsystem.get());
 	SetInterruptible(false);
+	m_ticks = 0;
 }
 
 void RotateIMUCommand::Initialize() {
@@ -30,7 +31,7 @@ void RotateIMUCommand::Initialize() {
 
 	lastAngle = currentAngle;
 
-	SetTimeout(15);
+	SetTimeout(5);
 }
 
 void RotateIMUCommand::updateCurrentAngle() {
@@ -40,11 +41,14 @@ void RotateIMUCommand::updateCurrentAngle() {
 
 void RotateIMUCommand::Execute() {
 	double speed = 1;
+	m_ticks++;
 
 	double error = fabs(currentAngle - targetAngle);
 	if(error > 180) error = 360 - error; // we always try to go the minimum number of degrees
 	if(error < 30){
 		speed = error * (1 - .45) / 30 + .45;
+	} else if(m_ticks < 20){
+		speed = .45 + (.55 * m_ticks / 20.0);
 	}
 
 	driveSubsystem->drive(0, isClockwise ? speed : -speed);
@@ -57,13 +61,18 @@ bool RotateIMUCommand::IsFinished() {
 	// find if we passed the target angle (in mod 360)
 	printf("Rotate: %f %f %f\n", lastAngle, targetAngle, currentAngle);
 	if(lastAngle == currentAngle) return IsTimedOut(); // first iteration
-	if ((isClockwise && lastAngle < currentAngle) || (!isClockwise && currentAngle < lastAngle)) {
-		finished = isClockwise ? lastAngle <= targetAngle && targetAngle <= currentAngle
-				: lastAngle >= targetAngle && targetAngle >= currentAngle;
-	} else {
-		finished = !(isClockwise ? currentAngle <= targetAngle && targetAngle <= lastAngle
-				: currentAngle >= targetAngle && targetAngle >= lastAngle);
-	}
+//	if ((isClockwise && lastAngle < currentAngle) || (!isClockwise && currentAngle < lastAngle)) {
+//		finished = isClockwise ? lastAngle <= targetAngle && targetAngle <= currentAngle
+//				: lastAngle >= targetAngle && targetAngle >= currentAngle;
+//	} else {
+//		finished = !(isClockwise ? currentAngle <= targetAngle && targetAngle <= lastAngle
+//				: currentAngle >= targetAngle && targetAngle >= lastAngle);
+//	}
+
+	double error1 = fabs(targetAngle - currentAngle);
+	double error2 = fabs(360 - error1);
+	finished = error1 < 1.5 || error2 < 1.5;
+
 	return IsTimedOut() || finished;
 }
 
