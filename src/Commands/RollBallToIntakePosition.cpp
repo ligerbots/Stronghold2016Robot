@@ -4,22 +4,24 @@ RollBallToIntakePositionCommand::RollBallToIntakePositionCommand(IntakePosition 
 		CommandBase("RollBallToShooter"), where(where), sensorFlag(false), moveUp(false), ticks(0) {
 	Requires(intakeSubsystem.get());
 	Requires(flapSubsystem.get());
+	ticks_since_shooter_switch = 0;
 }
 
 void RollBallToIntakePositionCommand::Initialize() {
 	printf("RollBallToIntakePositionCommand: init\n");
 	if(where != PICKUP){
-		SetTimeout(3);
+		SetTimeout(2);
 	}
 
 	if(where == LOW_GOAL
-			|| (intakeSubsystem->isBallInShooterPosition() && where == CROSSING_POSITION)
+			|| where == CROSSING_POSITION
 			|| where == BACK_TO_SHOOTING_POSITION){
 		moveUp = false;
 	} else {
 		moveUp = true;
 	}
 	flapSubsystem->setFlapsFraction(1); // all the way down
+	intakeSubsystem->setIntakeArmDown();
 }
 
 void RollBallToIntakePositionCommand::Execute() {
@@ -31,21 +33,30 @@ void RollBallToIntakePositionCommand::Execute() {
 		sensorFlag = intakeSubsystem->isBallInShooterPosition();
 	} // else, always false for low goal shot
 
+	if(where == SHOOTING_POSITION && sensorFlag){
+		ticks_since_shooter_switch++;
+	} else {
+		ticks_since_shooter_switch = 0;
+	}
+
 	ticks++;
-	if(ticks < 10)
+	if(ticks < 20)
 		return; // wait for flaps
 
-	double rollSpeed = moveUp ? -0.5: 0.5;
+	double rollSpeed = 0.3;
 	if(where == LOW_GOAL || where == PICKUP)
 		rollSpeed = 1; // max speed
 
 	// make sure this doesn't move the rollers on the first execute if the ball is already there
 	if(!sensorFlag)
-		intakeSubsystem->setRollSpeed(rollSpeed); // roll slowly (TODO: test and adjust this value)
+		intakeSubsystem->setRollSpeed(moveUp ? rollSpeed : -rollSpeed); // roll slowly (TODO: test and adjust this value)
 }
 
 bool RollBallToIntakePositionCommand::IsFinished() {
-	return IsTimedOut() || sensorFlag;
+	if(where == SHOOTING_POSITION){
+		return IsTimedOut() || (sensorFlag && ticks_since_shooter_switch > 25);
+	} else
+		return IsTimedOut() || sensorFlag;
 }
 
 void RollBallToIntakePositionCommand::End() {

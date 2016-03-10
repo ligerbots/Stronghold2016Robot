@@ -42,6 +42,7 @@
 #include "Commands/ShootCommand.h"
 #include "Commands/TabulaRasaCommand.h"
 #include "Commands/ToggleCameraFeedCommand.h"
+#include "Commands/ToggleCommand.h"
 #include "Commands/ToggleCompressorCommand.h"
 #include "Commands/ToggleLedCommand.h"
 #include "Commands/WaitForIntakeUpCommand.h"

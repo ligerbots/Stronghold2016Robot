@@ -8,7 +8,7 @@ OI::OI() :
 
 void OI::registerCommands() {
 	// XBox A command
-	registerButton(pXboxController, 1, PRESSED, new RollBallToIntakePositionCommand(RollBallToIntakePositionCommand::PICKUP));
+	registerButton(pXboxController, 1, PRESSED, new ToggleCommand(new RollBallToIntakePositionCommand(RollBallToIntakePositionCommand::PICKUP)));
 	// XBox B command
 	registerButton(pXboxController, 2, PRESSED, new AutonomousShootSequence());
 	// XBox X command
@@ -76,12 +76,12 @@ void OI::registerSecondControllerButtons() {
 		registerButton(pFarmController, 20, PRESSED, new WedgeToggleCommand(false));
 
 		// the big button
-		registerButton(pFarmController, 21, PRESSED, new AutonomousShootSequence());
+//		registerButton(pFarmController, 21, PRESSED, new AutonomousShootSequence());
 
 		// section 5 - cameras
 		registerButton(pFarmController, 22, PRESSED, new ToggleCameraFeedCommand(0));
 		registerButton(pFarmController, 23, PRESSED, new ToggleCameraFeedCommand(1));
-		registerButton(pFarmController, 24, PRESSED, new ToggleCameraFeedCommand(2));
+//		registerButton(pFarmController, 24, PRESSED, new ToggleCameraFeedCommand(2));
 	}
 }
 

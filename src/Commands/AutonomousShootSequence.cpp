@@ -19,8 +19,8 @@ AutonomousShootSequence::AutonomousShootSequence()
 	// a CommandGroup containing them would require both the chassis and the
 	// arm.
 
+	AddParallel(new RollBallToIntakePositionCommand(RollBallToIntakePositionCommand::SHOOTING_POSITION));
 	AddSequential(new CenterOnTargetCommand());
-	AddSequential(new RollBallToIntakePositionCommand(RollBallToIntakePositionCommand::SHOOTING_POSITION));
 	AddSequential(new IntakeToggleCommand(true));
 	AddSequential(new WaitForIntakeUpCommand());
 	AddSequential(new AutoSetFlapsCommand());

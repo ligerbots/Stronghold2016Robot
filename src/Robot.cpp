@@ -63,6 +63,13 @@ void Robot::AlwaysPeriodic() {
 		CommandBase::centerOnTargetCommand->Cancel();
 	}
 
+	if(mp_operatorInterface->pFarmController->GetRawButton(21)){
+		CommandBase::visionSubsystem->setVisionEnabled(true);
+	}
+
+	if(mp_operatorInterface->pFarmController->GetRawButton(24)){
+		CommandBase::visionSubsystem->setVisionEnabled(false);
+	}
 
 //	if (mp_operatorInterface->joystickButtonPressed(
 //			mp_operatorInterface->pXboxController, 3)) {

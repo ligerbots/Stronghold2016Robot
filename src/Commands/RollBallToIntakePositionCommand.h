@@ -17,6 +17,7 @@ protected:
 	bool sensorFlag;
 	bool moveUp;
 	int ticks;
+	int ticks_since_shooter_switch;
 public:
 	explicit RollBallToIntakePositionCommand(IntakePosition where);
 	void Initialize();
