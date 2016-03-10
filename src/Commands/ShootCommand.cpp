@@ -42,7 +42,7 @@ bool ShootCommand::IsFinished() {
 
 void ShootCommand::End() {
 	shooterSubsystem->retractPistons();
-	if(DriverStation::GetInstance().IsOperatorControl())
+	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL)
 		CommandBase::intakeRollerCommand->Start();
 }
 

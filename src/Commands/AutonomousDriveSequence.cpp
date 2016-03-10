@@ -31,7 +31,7 @@ AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense, int 
 	double startX = FieldInfo::startingLocations[position].x;
 	double startY = FieldInfo::startingLocations[position].y;
 
-	double afterDefenseY = startY + FieldInfo::StartToDefenseDistance;
+	double afterDefenseY = startY + FieldInfo::StartToDefenseDistance + FieldInfo::DefenseDepth;
 
 	double targetX = FieldInfo::targetLocations[target].x;
 	double targetY = FieldInfo::targetLocations[target].y;
@@ -39,29 +39,52 @@ AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense, int 
 	double dx = targetX - startX;
 	double dy = targetY - afterDefenseY;
 
-	double firstAngle = atan2(dy, dx);
+	printf("AutoDrive: %f %f %f %f\n", targetX, startX, targetY, afterDefenseY);
+
+	double firstAngle = atan2(dy, dx) * 180 / M_PI;
 	double distanceToShootingPosition = sqrt(dx * dx + dy * dy);
+	printf("%f\n", distanceToShootingPosition);
 
 	double secondAngle = FieldInfo::targetLineUpAngles[target];
 	double orientation = FieldInfo::defenseStrategy[defense].Orientation;
 	DriveDistanceCommand::SPEED speed = FieldInfo::defenseStrategy[defense].speed == FieldInfo::SLOW
 			? DriveDistanceCommand::SLOW
 			: DriveDistanceCommand::NORMAL;
-	double driveDirection = orientation == 0.0 ? 1.0 : -1.0;
+	double driveDirection = orientation != 0.0 ? 1.0 : -1.0;
 
 	AddSequential(new DriveDistanceCommand(
-			driveDirection * FieldInfo::StartToDefenseDistance + FieldInfo::DrivePastDefense,
+			driveDirection * (FieldInfo::StartToDefenseDistance + FieldInfo::DefenseDepth),
 			speed));
+	AddSequential(new DelayCommand(0.5));
 
 	// NOTE!! Since our angles are absolute angles with respect to the field (as opposed to relative
 	// angles with respect to the current position of the robot), the RotateIMUCommand below will
 	// make the correct turn regardless of the initial orientation of the robot
 	AddSequential(new RotateIMUCommand(90 - firstAngle)); // correct field angles to navx angles
 
+	AddSequential(new DelayCommand(0.5));
+
 	// Drive to the target spot in high gear, but let's leave it low speed for now
-	AddSequential(new DriveDistanceCommand(distanceToShootingPosition,
+	AddSequential(new DriveDistanceCommand(-distanceToShootingPosition,
 			DriveDistanceCommand::SLOW, DriveDistanceCommand::HIGH));
+	AddSequential(new DelayCommand(0.5));
 	AddSequential(new RotateIMUCommand(secondAngle));
 	// handle going to specified target
 
+}
+
+void AutonomousDriveSequence::End(){
+	CommandGroup::End();
+	cleanup();
+}
+
+void AutonomousDriveSequence::Interrupted(){
+	CommandGroup::Interrupted();
+	cleanup();
+}
+
+void AutonomousDriveSequence::cleanup(){
+	if(DriverStation::GetInstance().IsOperatorControl()){
+		CommandBase::driveJoystickCommand->Start();
+	}
 }

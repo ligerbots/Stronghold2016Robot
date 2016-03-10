@@ -89,7 +89,7 @@ public:
 	static constexpr TargetLocations targetLocations[] = {
 			{ -75.0, 275.00 },
 			{ 10.0, 225.0 },
-			{ 50.0, 110.0 }
+			{ 50.0, 275.0 }
 	};
 
 	// angles we need to move to roughly using the navx so that we can see the target

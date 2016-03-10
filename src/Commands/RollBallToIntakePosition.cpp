@@ -25,7 +25,7 @@ void RollBallToIntakePositionCommand::Execute() {
 
 	if(where == CROSSING_POSITION){
 		sensorFlag = intakeSubsystem->isBallInDefensesCrossingPosition();
-	} else if(where == SHOOTING_POSITION){
+	} else if(where == SHOOTING_POSITION || where == BACK_TO_SHOOTING_POSITION){
 		sensorFlag = intakeSubsystem->isBallInShooterPosition();
 	} // else, always false for low goal shot
 
@@ -48,7 +48,7 @@ bool RollBallToIntakePositionCommand::IsFinished() {
 
 void RollBallToIntakePositionCommand::End() {
 	intakeSubsystem->rollStop();
-	if(DriverStation::GetInstance().IsOperatorControl()){
+	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL){
 		CommandBase::intakeRollerCommand->Start();
 		CommandBase::flapCommand->Start();
 	}
@@ -57,7 +57,7 @@ void RollBallToIntakePositionCommand::End() {
 void RollBallToIntakePositionCommand::Interrupted() {
 	printf("RollBallToIntakePositionCommand: interrupted\n");
 	intakeSubsystem->rollStop();
-	if(DriverStation::GetInstance().IsOperatorControl()){
+	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL){
 		CommandBase::intakeRollerCommand->Start();
 		CommandBase::flapCommand->Start();
 	}

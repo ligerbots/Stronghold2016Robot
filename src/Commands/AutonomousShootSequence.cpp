@@ -26,3 +26,20 @@ AutonomousShootSequence::AutonomousShootSequence()
 	AddSequential(new AutoSetFlapsCommand());
 	AddSequential(new ShootCommand());
 }
+
+void AutonomousShootSequence::Interrupted(){
+	CommandGroup::Interrupted();
+	cleanup();
+}
+
+void AutonomousShootSequence::End(){
+	CommandGroup::End();
+	cleanup();
+}
+
+void AutonomousShootSequence::cleanup(){
+	if(DriverStation::GetInstance().IsOperatorControl()){
+		CommandBase::intakeRollerCommand->Start();
+		CommandBase::driveJoystickCommand->Start();
+	}
+}

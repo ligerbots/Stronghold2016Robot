@@ -70,7 +70,7 @@ bool RotateIMUCommand::IsFinished() {
 void RotateIMUCommand::End() {
 	printf("RotateIMUCommand: end\n");
 	driveSubsystem->zeroMotors();
-	if(DriverStation::GetInstance().IsOperatorControl()){
+	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL){
 		CommandBase::driveJoystickCommand->Start();
 	}
 }
@@ -78,7 +78,7 @@ void RotateIMUCommand::End() {
 void RotateIMUCommand::Interrupted() {
 	printf("RotateIMUCommand: interrupted\n");
 	driveSubsystem->zeroMotors();
-	if(DriverStation::GetInstance().IsOperatorControl()){
+	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL){
 		CommandBase::driveJoystickCommand->Start();
 	}
 }

@@ -30,6 +30,8 @@ void Robot::RobotInit() {
 
 	CommandBase::flapSubsystem->setFlapsFraction(1.0); // default to flaps down
 
+	fieldInfo.initSelectors();
+
 	printf("Done\n");
 }
 
@@ -144,6 +146,7 @@ void Robot::TeleopInit() {
 	CommandBase::driveJoystickCommand->Start();
 	CommandBase::intakeRollerCommand->Start();
 	CommandBase::flapCommand->Start();
+	CommandBase::navXSubsystem->zeroYaw(Robot::instance->fieldInfo.GetInitialOrientation());
 }
 
 void Robot::TeleopPeriodic() {

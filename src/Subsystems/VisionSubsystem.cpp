@@ -183,30 +183,27 @@ void VisionSubsystem::measureAndMark(Image *mark, Image *image)
 		}
 		else {
 			// Find the particle with the largest area
-//			double partArea = 0.0;
-			double minOrientationOffset = DBL_MAX;
+			double partArea = 0.0;
+//			double minOrientationOffset = DBL_MAX;
 			int particleToChoose = 0;
 //			double highestY = DBL_MAX;
 
 			for (int i = 0; i != m_numParticles; i++) {
 				double *pixelMeasurements = mprArray->pixelMeasurements[i];
-//				if (pixelMeasurements[AREA] > partArea) {
-//					partArea = pixelMeasurements[AREA];
+				if (pixelMeasurements[AREA] > partArea) {
+					partArea = pixelMeasurements[AREA];
+					particleToChoose = i;
+				}
+
+//				if(pixelMeasurements[ORIENT] < minOrientationOffset){
 //					particleToChoose = i;
+//					minOrientationOffset = pixelMeasurements[ORIENT];
 //				}
 
-				// trying out yet another measurement of which particle is the best to go for
-				// we probably want the particle with its bottom side closest to horizontal
-				// IMAQ measures orientation as the angle of the lowest moment of inertia line
-				// to the horizontal
-				// for the target, the lowest moment should be along the bottom side
-				// IMAQ maps orientation to (0, 180) for you so we just need the smallest
-				// orientation
-				// another option would be to do something with max feret angle
-				if(pixelMeasurements[ORIENT] < minOrientationOffset){
-					particleToChoose = i;
-					minOrientationOffset = pixelMeasurements[ORIENT];
-				}
+//				if(pixelMeasurements[MFDO] < minOrientationOffset){
+//					particleToChoose = i;
+//					minOrientationOffset = pixelMeasurements[MFDO];
+//				}
 
 //				double feretStartY = pixelMeasurements[MFDSY];
 //				double feretEndY = pixelMeasurements[MFDEY];

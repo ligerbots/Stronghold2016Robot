@@ -20,7 +20,7 @@ private:
 public:
 	explicit NavXSubsystem(SPI::Port);
 	void InitDefaultCommand();
-	double getYaw();
+	float GetYaw();
 	void zeroYaw(double yawOffset = 0.0);
 	void sendValuesToSmartDashboard();
 	bool isRobotAboutToTip(float maxPitchAngle);

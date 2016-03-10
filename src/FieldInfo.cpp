@@ -45,23 +45,24 @@ void FieldInfo::initSelectors(){
 }
 
 int FieldInfo::GetPosition() {
-	return (int) mp_position->GetSelected();
+	return *((int*)mp_position->GetSelected());
 }
 
 int FieldInfo::GetDefense() {
-	return (int) mp_defense->GetSelected();
+	return *((int*)mp_defense->GetSelected());
 }
 
 int FieldInfo::GetTarget() {
-	return (int) mp_target->GetSelected();
+	return *((int*)mp_target->GetSelected());
 }
 
 bool FieldInfo::CrossSlowly() {
-	return defenseStrategy[(int)mp_defense->GetSelected()].speed == SLOW;
+	return defenseStrategy[*((int*)mp_defense->GetSelected())].speed == SLOW;
 }
 
 double FieldInfo::GetInitialOrientation() {
-	return defenseStrategy[(int)mp_defense->GetSelected()].Orientation;
+	double orient = defenseStrategy[*((int*)mp_defense->GetSelected())].Orientation;
+	return orient;
 }
 
 

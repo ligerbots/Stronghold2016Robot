@@ -7,6 +7,9 @@
 class AutonomousShootSequence: public CommandGroup {
 public:
 	AutonomousShootSequence();
+	void End();
+	void Interrupted();
+	void cleanup();
 };
 
 #endif

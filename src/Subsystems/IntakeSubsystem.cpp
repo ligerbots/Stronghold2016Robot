@@ -84,13 +84,11 @@ bool IntakeSubsystem::isIntakeArmUp() {
 }
 
 bool IntakeSubsystem::isBallInShooterPosition() {
-	// flip value so that it's false if it's not connected
-	return !mp_ballInShooterSwitch->Get();
+	return mp_ballInShooterSwitch->Get();
 }
 
 bool IntakeSubsystem::isBallInDefensesCrossingPosition(){
-	// flip value so that it's false if it's not connected
-	return !mp_ballInDefensePositionSwitch->Get();
+	return mp_ballInDefensePositionSwitch->Get();
 }
 
 bool IntakeSubsystem::isIntakeReadyToFire() {

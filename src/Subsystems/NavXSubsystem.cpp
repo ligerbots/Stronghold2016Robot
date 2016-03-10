@@ -15,12 +15,12 @@ void NavXSubsystem::zeroYaw(double yawOffset) {
 	AHRS::ZeroYaw();
 }
 
-double NavXSubsystem::getYaw() {
+float NavXSubsystem::GetYaw() {
 	// The NavX calibration routine sets the Z axis to be pointing down, so  clockwise turn
 	// corresponds to a positive change in the yaw angle.
 	// Also, we wrap the AHRS base GetYaw class with our own so we can maintain our own
 	// starting position offset.
-	return m_yawOffset + AHRS::GetYaw();
+	return (float) (m_yawOffset + AHRS::GetYaw());
 }
 
 bool NavXSubsystem::isRobotAboutToTip(float maxPitchAngle) {
@@ -97,5 +97,5 @@ PIDSourceType NavXSubsystem::GetPIDSourceType() const {
 }
 
 double NavXSubsystem::PIDGet() {
-	return getYaw();
+	return GetYaw();
 }

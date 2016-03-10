@@ -3,7 +3,7 @@
 DriveDistanceCommand::DriveDistanceCommand(double distance, SPEED speed, GEAR gear) :
 		CommandBase("DriveDistanceCommand"),
 		driveStraightGain("Drive StraightGain"),
-		m_distance(distance),
+		m_distance(distance / 12),
 		m_startPositionLeft(0),
 		m_startPositionRight(0),
 		m_startAngle(0),
@@ -19,7 +19,7 @@ DriveDistanceCommand::DriveDistanceCommand(double distance, SPEED speed, GEAR ge
 void DriveDistanceCommand::Initialize() {
 	m_startPositionLeft = driveSubsystem->getLeftEncoderPosition();
 	m_startPositionRight = driveSubsystem->getRightEncoderPosition();
-	m_startAngle = navXSubsystem->getYaw();
+	m_startAngle = navXSubsystem->GetYaw();
 	m_speed = m_speedRequested==NORMAL ? NORMAL_SPEED : SLOW_SPEED;
 	m_gear = m_gearRequested;
 
@@ -56,7 +56,7 @@ void DriveDistanceCommand::Execute() {
 		}
 	}
 
-	double angle = navXSubsystem->getYaw();
+	double angle = navXSubsystem->GetYaw();
 	double angleCorrection = (m_startAngle - angle) * DRIVE_GAIN;
 	//double err = left - right;
 	//double turn = err * 0.001;
@@ -74,14 +74,14 @@ bool DriveDistanceCommand::IsFinished() {
 
 void DriveDistanceCommand::End() {
 	driveSubsystem->zeroMotors();
-	if(DriverStation::GetInstance().IsOperatorControl()){
+	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL){
 		CommandBase::driveJoystickCommand->Start();
 	}
 }
 
 void DriveDistanceCommand::Interrupted() {
 	driveSubsystem->zeroMotors();
-	if(DriverStation::GetInstance().IsOperatorControl()){
+	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL){
 		CommandBase::driveJoystickCommand->Start();
 	}
 }

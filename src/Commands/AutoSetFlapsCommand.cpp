@@ -19,13 +19,13 @@ bool AutoSetFlapsCommand::IsFinished() {
 }
 
 void AutoSetFlapsCommand::End() {
-	if(DriverStation::GetInstance().IsOperatorControl()){
+	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL){
 		CommandBase::flapCommand->Start();
 	}
 }
 
 void AutoSetFlapsCommand::Interrupted() {
-	if(DriverStation::GetInstance().IsOperatorControl()){
+	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL){
 		CommandBase::flapCommand->Start();
 	}
 }
