@@ -9,7 +9,7 @@ IntakeToggleCommand::IntakeToggleCommand() :
 IntakeToggleCommand::IntakeToggleCommand(bool intakeUp) :
 		CommandBase("IntakeToggleCommand_") {
 	Requires(intakeSubsystem.get());
-	mode = !intakeUp;
+	mode = intakeUp;
 }
 
 void IntakeToggleCommand::Initialize() {

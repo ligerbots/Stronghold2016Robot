@@ -21,7 +21,7 @@ void RollBallToIntakePositionCommand::Initialize() {
 		moveUp = true;
 	}
 	flapSubsystem->setFlapsFraction(1); // all the way down
-	intakeSubsystem->setIntakeArmUp();
+	intakeSubsystem->setIntakeArmDown();
 }
 
 void RollBallToIntakePositionCommand::Execute() {
@@ -54,7 +54,7 @@ void RollBallToIntakePositionCommand::Execute() {
 
 bool RollBallToIntakePositionCommand::IsFinished() {
 	if(where == SHOOTING_POSITION){
-		return IsTimedOut() || (sensorFlag && ticks_since_shooter_switch > 25);
+		return IsTimedOut() || (sensorFlag && ticks_since_shooter_switch > 10);
 	} else
 		return IsTimedOut() || sensorFlag;
 }

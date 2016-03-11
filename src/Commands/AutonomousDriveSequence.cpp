@@ -19,7 +19,7 @@ AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense, int 
 	// arm.
 
 	bool intakeUp = false;
-	bool wedgesUp = false;
+	bool wedgesUp = FieldInfo::defenseStrategy[defense].wedgesUp;
 
 //	double driveSpeed = 0.8;
 
@@ -55,6 +55,8 @@ AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense, int 
 				driveDirection * (FieldInfo::StartToDefenseDistance + FieldInfo::DefenseDepth),
 				speed));
 
+		AddSequential(new WedgeToggleCommand(true));
+
 		if(defense == FieldInfo::DEF_LOW_BAR || defense == FieldInfo::DEF_PORTCULLIS){
 			AddParallel(new RollBallToIntakePositionCommand(RollBallToIntakePositionCommand::CROSSING_POSITION));
 		}
@@ -70,7 +72,7 @@ AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense, int 
 
 		// Drive to the target spot in high gear, but let's leave it low speed for now
 		AddSequential(new DriveDistanceCommand(-distanceToShootingPosition,
-				FieldInfo::FAST, DriveDistanceCommand::LOW));
+				FieldInfo::SLOW, DriveDistanceCommand::HIGH));
 		AddSequential(new DelayCommand(0.1));
 		AddSequential(new RotateIMUCommand(secondAngle));
 		AddSequential(new DelayCommand(0.1));

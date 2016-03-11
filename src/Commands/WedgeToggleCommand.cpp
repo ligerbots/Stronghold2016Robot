@@ -20,7 +20,7 @@ void WedgeToggleCommand::Execute() {
 	if (action == 2)
 		lift = wedgeSubsystem->getWedgeValue() != DoubleSolenoid::kReverse;
 	else
-		lift = !action;
+		lift = action;
 	if (lift) {
 		printf("WedgeToggleCommand: lifting wedges\n");
 		wedgeSubsystem->liftWedge();
