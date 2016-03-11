@@ -52,7 +52,7 @@ AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense, int 
 
 	if (!speed==FieldInfo::NOGO) {
 		AddSequential(new DriveDistanceCommand(
-				driveDirection * (FieldInfo::StartToDefenseDistance + FieldInfo::DefenseDepth),
+				driveDirection * (FieldInfo::StartToDefenseDistance + FieldInfo::DefenseDepth + FieldInfo::DrivePastDefense),
 				speed));
 
 		AddSequential(new WedgeToggleCommand(true));
