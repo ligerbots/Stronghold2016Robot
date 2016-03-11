@@ -35,6 +35,7 @@ void FieldInfo::initSelectors(){
 	mp_defense->AddObject("Sally Port", &I[DEF_SALLY_PORT]);
 	mp_defense->AddObject("Rock Wall", &I[DEF_ROCK_WALL]);
 	mp_defense->AddObject("Rough Terrain", &I[DEF_ROUGH_TERRAIN]);
+	mp_defense->AddObject("NO AUTONOMOUS", &I[DEF_NO_AUTO]);
 
 	mp_target->AddDefault("Left", &I[TARGET_LEFT]);
 	mp_target->AddObject("Center", &I[TARGET_CENTER]);

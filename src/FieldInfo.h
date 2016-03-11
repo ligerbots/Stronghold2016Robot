@@ -18,7 +18,7 @@
  */
 
 #include <WPILib.h>
-#include "OI.h"
+//#include "OI.h"
 
 class FieldInfo {
 public:
@@ -30,9 +30,9 @@ public:
 	double GetInitialOrientation();
 	void initSelectors();
 
-	SendableChooser* mp_position;
-	SendableChooser* mp_defense;
-	SendableChooser* mp_target;
+	SendableChooser *mp_position;
+	SendableChooser *mp_defense;
+	SendableChooser *mp_target;
 
 	static constexpr double RobotLength = 32.0;
 
@@ -110,10 +110,12 @@ public:
 		DEF_SALLY_PORT,
 		DEF_ROCK_WALL,
 		DEF_ROUGH_TERRAIN,
+		DEF_NO_AUTO,
 		DEF_MAX
 	};
 
 	enum Speeds {
+		NOGO,
 		SLOW,
 		NORMAL,
 		FAST

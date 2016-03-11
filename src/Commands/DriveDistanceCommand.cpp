@@ -2,14 +2,14 @@
 
 constexpr double DriveDistanceCommand::speeds[];
 
-DriveDistanceCommand::DriveDistanceCommand(double distance, SPEED speed, GEAR gear) :
+DriveDistanceCommand::DriveDistanceCommand(double distance, FieldInfo::Speeds speed, GEAR gear) :
 		CommandBase("DriveDistanceCommand"),
 		driveStraightGain("Drive StraightGain"),
 		m_distance(distance / 12),
 		m_startPositionLeft(0),
 		m_startPositionRight(0),
 		m_startAngle(0),
-		m_speed(NORMAL),
+		m_speed(FieldInfo::NORMAL),
 		m_gear(LOW),
 		m_speedRequested(speed),
 		m_gearRequested(gear)
@@ -68,7 +68,7 @@ void DriveDistanceCommand::Execute() {
 bool DriveDistanceCommand::IsFinished() {
 	//double left = driveSubsystem->getLeftEncoderPosition();
 	double right = driveSubsystem->getRightEncoderPosition();
-	if(m_distance > 0)
+	if (m_distance > 0)
 		return right >= m_startPositionRight + m_distance * TICKS_PER_FOOT;
 	else
 		return right <= m_startPositionRight + m_distance * TICKS_PER_FOOT;
@@ -76,7 +76,7 @@ bool DriveDistanceCommand::IsFinished() {
 
 void DriveDistanceCommand::End() {
 	driveSubsystem->zeroMotors();
-	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL){
+	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL) {
 		CommandBase::driveJoystickCommand->Start();
 	}
 }

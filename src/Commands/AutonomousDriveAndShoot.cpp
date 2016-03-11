@@ -1,6 +1,7 @@
 #include "AutonomousDriveSequence.h"
 #include "AutonomousShootSequence.h"
 #include "AutonomousDriveAndShoot.h"
+#include "../FieldInfo.h"
 
 AutonomousDriveAndShoot::AutonomousDriveAndShoot(int position, int defense, int target)
 {
@@ -20,6 +21,9 @@ AutonomousDriveAndShoot::AutonomousDriveAndShoot(int position, int defense, int 
 	// e.g. if Command1 requires chassis, and Command2 requires arm,
 	// a CommandGroup containing them would require both the chassis and the
 	// arm.
-	AddSequential(new AutonomousDriveSequence(position, defense, target));
-	AddSequential(new AutonomousShootSequence);
+	FieldInfo::Speeds speed = FieldInfo::defenseStrategy[defense].speed;
+	if (speed!=FieldInfo::NOGO) {
+		AddSequential(new AutonomousDriveSequence(position, defense, target));
+		AddSequential(new AutonomousShootSequence);
+	}
 }

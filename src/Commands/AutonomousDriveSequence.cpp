@@ -47,33 +47,35 @@ AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense, int 
 
 	double secondAngle = FieldInfo::targetLineUpAngles[target];
 	double orientation = FieldInfo::defenseStrategy[defense].Orientation;
-	DriveDistanceCommand::SPEED speed = (DriveDistanceCommand::SPEED) FieldInfo::defenseStrategy[defense].speed;
+	FieldInfo::Speeds speed = FieldInfo::defenseStrategy[defense].speed;
 	double driveDirection = orientation != 0.0 ? 1.0 : -1.0;
 
-	AddSequential(new DriveDistanceCommand(
-			driveDirection * (FieldInfo::StartToDefenseDistance + FieldInfo::DefenseDepth),
-			speed));
+	if (!speed==FieldInfo::NOGO) {
+		AddSequential(new DriveDistanceCommand(
+				driveDirection * (FieldInfo::StartToDefenseDistance + FieldInfo::DefenseDepth),
+				speed));
 
-	if(defense == FieldInfo::DEF_LOW_BAR || defense == FieldInfo::DEF_PORTCULLIS){
-		AddParallel(new RollBallToIntakePositionCommand(RollBallToIntakePositionCommand::CROSSING_POSITION));
+		if(defense == FieldInfo::DEF_LOW_BAR || defense == FieldInfo::DEF_PORTCULLIS){
+			AddParallel(new RollBallToIntakePositionCommand(RollBallToIntakePositionCommand::CROSSING_POSITION));
+		}
+
+		AddSequential(new DelayCommand(0.1));
+
+		// NOTE!! Since our angles are absolute angles with respect to the field (as opposed to relative
+		// angles with respect to the current position of the robot), the RotateIMUCommand below will
+		// make the correct turn regardless of the initial orientation of the robot
+		AddSequential(new RotateIMUCommand(90 - firstAngle)); // correct field angles to navx angles
+
+		AddSequential(new DelayCommand(0.1));
+
+		// Drive to the target spot in high gear, but let's leave it low speed for now
+		AddSequential(new DriveDistanceCommand(-distanceToShootingPosition,
+				FieldInfo::FAST, DriveDistanceCommand::LOW));
+		AddSequential(new DelayCommand(0.1));
+		AddSequential(new RotateIMUCommand(secondAngle));
+		AddSequential(new DelayCommand(0.1));
+		// handle going to specified target
 	}
-
-	AddSequential(new DelayCommand(0.1));
-
-	// NOTE!! Since our angles are absolute angles with respect to the field (as opposed to relative
-	// angles with respect to the current position of the robot), the RotateIMUCommand below will
-	// make the correct turn regardless of the initial orientation of the robot
-	AddSequential(new RotateIMUCommand(90 - firstAngle)); // correct field angles to navx angles
-
-	AddSequential(new DelayCommand(0.1));
-
-	// Drive to the target spot in high gear, but let's leave it low speed for now
-	AddSequential(new DriveDistanceCommand(-distanceToShootingPosition,
-			DriveDistanceCommand::FAST, DriveDistanceCommand::LOW));
-	AddSequential(new DelayCommand(0.1));
-	AddSequential(new RotateIMUCommand(secondAngle));
-	AddSequential(new DelayCommand(0.1));
-	// handle going to specified target
 
 }
 
