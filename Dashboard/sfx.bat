@@ -1,0 +1,3 @@
+rem Move to %userprofile%\wpilib\tools
+start "" "C:\Program Files (x86)\VideoLAN\VLC\vlc.exe" --network-caching=200 --video-x=1440 --video-y=1 --width=300 --height=300 --fullscreen --no-video-title-show --no-embedded-video --no-qt-fs-controller --qt-start-minimized "rtsp://ligerbots:ligerbots@192.168.1.10:554/user=ligerbots&password=ligerbots&channel=1&stream=0.sdp?"
+java -jar "%userprofile%\wpilib\tools\sfx.jar" "c:\Ligerbots\Stronghold2016Robot\Dashboard\Stronghold2016.fxsdash"
