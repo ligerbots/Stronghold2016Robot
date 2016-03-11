@@ -21,7 +21,7 @@ void RollBallToIntakePositionCommand::Initialize() {
 		moveUp = true;
 	}
 	flapSubsystem->setFlapsFraction(1); // all the way down
-	intakeSubsystem->setIntakeArmDown();
+	intakeSubsystem->setIntakeArmUp();
 }
 
 void RollBallToIntakePositionCommand::Execute() {

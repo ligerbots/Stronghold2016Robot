@@ -108,6 +108,7 @@ void VisionSubsystem::setCameraFeed(int whichCamera){
 }
 
 void VisionSubsystem::setVisionEnabled(bool enabled){
+	printf("Vision state: %d\n", enabled);
 	enableVision.set(enabled);
 }
 
