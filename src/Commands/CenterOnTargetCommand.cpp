@@ -28,7 +28,7 @@ void CenterOnTargetCommand::Initialize() {
 	visionSubsystem->setLedRingOn(true);
 	driveSubsystem->zeroMotors();
 	driveSubsystem->shiftDown(); // untested in high gear
-	SetTimeout(20);
+	SetTimeout(5);
 
 //	Preferences::GetInstance()->PutDouble("CenterOnTargetP",
 //			mp_softwarePID->GetP());
@@ -72,6 +72,7 @@ void CenterOnTargetCommand::Execute() {
 
 bool CenterOnTargetCommand::IsFinished() {
 	if(Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(28)){
+		printf("Center: ending command\n");
 		return true;
 	}
 

@@ -51,15 +51,16 @@ AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense, int 
 	double driveDirection = orientation != 0.0 ? 1.0 : -1.0;
 
 	if (!speed==FieldInfo::NOGO) {
+		if(defense == FieldInfo::DEF_LOW_BAR || defense == FieldInfo::DEF_PORTCULLIS){
+			AddParallel(new RollBallToIntakePositionCommand(RollBallToIntakePositionCommand::CROSSING_POSITION));
+		}
 		AddSequential(new DriveDistanceCommand(
 				driveDirection * (FieldInfo::StartToDefenseDistance + FieldInfo::DefenseDepth + FieldInfo::DrivePastDefense),
 				speed, DriveDistanceCommand::LOW));
 
 		AddSequential(new WedgeToggleCommand(true));
 
-		if(defense == FieldInfo::DEF_LOW_BAR || defense == FieldInfo::DEF_PORTCULLIS){
-			AddParallel(new RollBallToIntakePositionCommand(RollBallToIntakePositionCommand::CROSSING_POSITION));
-		}
+		AddParallel(new RollBallToIntakePositionCommand(RollBallToIntakePositionCommand::SHOOTING_POSITION));
 
 		AddSequential(new DelayCommand(0.1));
 

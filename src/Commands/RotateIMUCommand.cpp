@@ -11,6 +11,8 @@ RotateIMUCommand::RotateIMUCommand(double targetAngle, bool absolute) :
 void RotateIMUCommand::Initialize() {
 	printf("RotateIMUCommand: init\n");
 
+	driveSubsystem->shiftDown();
+
 	updateCurrentAngle();
 	if(isAbsolute)
 		targetAngle = angle;

@@ -169,8 +169,16 @@ void Robot::TeleopInit() {
 }
 
 void Robot::TeleopPeriodic() {
+	timeval startTime;
+	timeval endTime;
+	gettimeofday(&startTime, 0);
 	AlwaysPeriodic();
 	Scheduler::GetInstance()->Run();
+	gettimeofday(&endTime, 0);
+	__suseconds_t diff = endTime.tv_usec - startTime.tv_usec;
+	if (diff > -50000) {
+		SmartDashboard::PutNumber("RobotLoop", 1/diff);
+	}
 }
 
 void Robot::TestPeriodic() {

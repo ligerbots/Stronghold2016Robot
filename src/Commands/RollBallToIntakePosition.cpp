@@ -19,6 +19,8 @@ void RollBallToIntakePositionCommand::Initialize() {
 		SetTimeout(3);
 	}
 
+	intakeSubsystem->rollStop();
+
 	if(where == SHOOTING_POSITION){
 		shooter_switch_state = STATE_UP;
 	}
@@ -91,7 +93,7 @@ bool RollBallToIntakePositionCommand::IsFinished() {
 	if(where == SHOOTING_POSITION){
 		return IsTimedOut() || (shooter_switch_state == STATE_BACK && sensorFlag);
 	} else if(where == CROSSING_POSITION){
-		return IsTimedOut() || (sensorFlag && ticks_since_crossing_position > 10);
+		return IsTimedOut() || (sensorFlag && ticks_since_crossing_position > 15);
 	} else
 		return IsTimedOut() || sensorFlag;
 }

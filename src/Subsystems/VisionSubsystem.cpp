@@ -79,7 +79,7 @@ void VisionSubsystem::updateVision(int ticks) {
 	Image *image = Camera::GetCamera(m_activeCamera)->GetStoredFrame();
 	// if we're not running Vision, just display the frame from the current camera, or
 	// if the alternate camera is current, display its frame, even if we're doing vision on camera 0
-	if (!enableVision.get() || m_activeCamera != 0) LCameraServer::GetInstance()->SetImage(image);
+	if (/*!enableVision.get() ||*/ m_activeCamera != 0) LCameraServer::GetInstance()->SetImage(image);
 
 	if (enableVision.get()) {
 		// If we just asked camera zero to get a frame, don't do it again here

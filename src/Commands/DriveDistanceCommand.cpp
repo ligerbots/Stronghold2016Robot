@@ -25,6 +25,8 @@ void DriveDistanceCommand::Initialize() {
 	m_speed = speeds[m_speedRequested];
 	m_gear = m_gearRequested;
 
+	printf("DriveDistance: moving %f feet\n", m_distance);
+
 	// ignore top gear shift for distances less than 3 ft
 	if (m_gear==HIGH) {
 		if (fabs(m_distance) > 2.0) driveSubsystem->shiftUp();
@@ -49,14 +51,14 @@ void DriveDistanceCommand::Execute() {
 	double right = driveSubsystem->getRightEncoderPosition();
 
 	// if we're in high gear, expect some overshoot and ramp down
-	if (m_gear==HIGH) {
-		double remaining = fabs(m_distance) - fabs(m_startPositionRight - right) * TICKS_PER_FOOT;
-		if (remaining < 2.0) {
-			m_gear = LOW;
-			m_speed = NORMAL_SPEED;
-			driveSubsystem->shiftDown();
-		}
-	}
+//	if (m_gear==HIGH) {
+//		double remaining = fabs(m_distance) - fabs(m_startPositionRight - right) * TICKS_PER_FOOT;
+//		if (remaining < 2.0) {
+//			m_gear = LOW;
+//			m_speed = NORMAL_SPEED;
+//			driveSubsystem->shiftDown();
+//		}
+//	}
 
 	double angle = navXSubsystem->GetYaw();
 	double angleCorrection = (m_startAngle - angle) * driveStraightGain.get();

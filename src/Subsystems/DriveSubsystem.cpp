@@ -169,6 +169,7 @@ void DriveSubsystem::zeroMotors() {
 }
 
 void DriveSubsystem::shiftUp() {
+	printf("Drive: shifting up\n");
 	mp_shifterSolenoid->Set(DoubleSolenoid::kForward);
 }
 

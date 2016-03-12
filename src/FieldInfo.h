@@ -87,9 +87,9 @@ public:
 	};
 
 	static constexpr TargetLocations targetLocations[] = {
-			{ -87.0, 236.0 },
+			{ -87.0, 212.0 },
 			{ 10.0, 176.0 },
-			{ 62.0, 236.0 }
+			{ 62.0, 212.0 }
 	};
 
 	// angles we need to move to roughly using the navx so that we can see the target
@@ -134,7 +134,7 @@ public:
 		{  0.0, FAST,   false},	// DEF_PORTCULLIS,
 		{  0.0, FAST,   false},	// DEF_CHEVAL,
 		{180.0, FAST,   true},	// DEF_MOAT,
-		{180.0, FAST,   true},	// DEF_RAMPARTS,
+		{180.0, NORMAL,   true},// DEF_RAMPARTS,
 		{  0.0, NORMAL, true},	// DEF_DRAWBRIDGE, should we actually just block this choice?
 		{  0.0, NORMAL, true},	// DEF_SALLY_PORT, should we actually just block this choice?
 		{180.0, FAST,   true},	// DEF_ROCK_WALL,
