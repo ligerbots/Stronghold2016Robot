@@ -1,7 +1,7 @@
 #include <Stronghold2016Robot.h>
 #include <cfloat>
 
-double VisionSubsystem::angles[] = { -1, -1, -1, -1, .6, .5, .49, .48, .47, .455, .454, .453, .452 };
+double VisionSubsystem::angles[] = { -1, -1, -1, -1, .65, .55, .54, .5, .48, .49, .5, .5, .5 };
 
 VisionSubsystem::VisionSubsystem() :
 		Subsystem("VisionSubsystem"),

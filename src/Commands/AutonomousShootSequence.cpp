@@ -24,6 +24,7 @@ AutonomousShootSequence::AutonomousShootSequence()
 	AddSequential(new IntakeToggleCommand(true));
 	AddSequential(new WaitForIntakeUpCommand());
 	AddSequential(new AutoSetFlapsCommand());
+	AddSequential(new DelayCommand(0.6));
 	AddSequential(new ShootCommand());
 }
 

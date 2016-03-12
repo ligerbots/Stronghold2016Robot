@@ -53,7 +53,7 @@ AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense, int 
 	if (!speed==FieldInfo::NOGO) {
 		AddSequential(new DriveDistanceCommand(
 				driveDirection * (FieldInfo::StartToDefenseDistance + FieldInfo::DefenseDepth + FieldInfo::DrivePastDefense),
-				speed));
+				speed, DriveDistanceCommand::LOW));
 
 		AddSequential(new WedgeToggleCommand(true));
 
@@ -72,7 +72,7 @@ AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense, int 
 
 		// Drive to the target spot in high gear, but let's leave it low speed for now
 		AddSequential(new DriveDistanceCommand(-distanceToShootingPosition,
-				FieldInfo::SLOW, DriveDistanceCommand::HIGH));
+				FieldInfo::NORMAL, DriveDistanceCommand::HIGH));
 		AddSequential(new DelayCommand(0.1));
 		AddSequential(new RotateIMUCommand(secondAngle));
 		AddSequential(new DelayCommand(0.1));

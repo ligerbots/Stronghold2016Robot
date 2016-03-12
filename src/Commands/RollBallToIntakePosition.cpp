@@ -4,13 +4,23 @@ RollBallToIntakePositionCommand::RollBallToIntakePositionCommand(IntakePosition 
 		CommandBase("RollBallToShooter"), where(where), sensorFlag(false), moveUp(false), ticks(0) {
 	Requires(intakeSubsystem.get());
 	Requires(flapSubsystem.get());
-	ticks_since_shooter_switch = 0;
+	shooter_switch_state = STATE_UP;
+	waiting_ticks = 0;
+	ticks_since_crossing_position = 0;
 }
 
 void RollBallToIntakePositionCommand::Initialize() {
 	printf("RollBallToIntakePositionCommand: init\n");
 	if(where != PICKUP){
-		SetTimeout(2);
+		SetTimeout(6);
+	}
+
+	if(where == LOW_GOAL){
+		SetTimeout(3);
+	}
+
+	if(where == SHOOTING_POSITION){
+		shooter_switch_state = STATE_UP;
 	}
 
 	if(where == LOW_GOAL
@@ -22,6 +32,9 @@ void RollBallToIntakePositionCommand::Initialize() {
 	}
 	flapSubsystem->setFlapsFraction(1); // all the way down
 	intakeSubsystem->setIntakeArmDown();
+
+	ticks = 0;
+	ticks_since_crossing_position = 0;
 }
 
 void RollBallToIntakePositionCommand::Execute() {
@@ -33,10 +46,10 @@ void RollBallToIntakePositionCommand::Execute() {
 		sensorFlag = intakeSubsystem->isBallInShooterPosition();
 	} // else, always false for low goal shot
 
-	if(where == SHOOTING_POSITION && sensorFlag){
-		ticks_since_shooter_switch++;
+	if(where == CROSSING_POSITION && sensorFlag){
+		ticks_since_crossing_position++;
 	} else {
-		ticks_since_shooter_switch = 0;
+		ticks_since_crossing_position = 0;
 	}
 
 	ticks++;
@@ -47,6 +60,28 @@ void RollBallToIntakePositionCommand::Execute() {
 	if(where == LOW_GOAL || where == PICKUP)
 		rollSpeed = 1; // max speed
 
+	if(where == SHOOTING_POSITION){
+		if(shooter_switch_state == STATE_BACK){
+			moveUp = false;
+		} else {
+			moveUp = true;
+		}
+		if(ticks > 75 && shooter_switch_state == STATE_UP){
+			shooter_switch_state = STATE_BACK;
+		}
+		if(shooter_switch_state == STATE_UP && sensorFlag){
+			shooter_switch_state = STATE_WAIT_FOR_RELEASE;
+		} else if(shooter_switch_state == STATE_WAIT_FOR_RELEASE && !sensorFlag){
+			shooter_switch_state = STATE_WAIT;
+			waiting_ticks = 0;
+		} else if(shooter_switch_state == STATE_WAIT){
+			waiting_ticks++;
+			if(waiting_ticks > 15){
+				shooter_switch_state = STATE_BACK;
+			}
+		}
+	}
+
 	// make sure this doesn't move the rollers on the first execute if the ball is already there
 	if(!sensorFlag)
 		intakeSubsystem->setRollSpeed(moveUp ? rollSpeed : -rollSpeed); // roll slowly (TODO: test and adjust this value)
@@ -54,7 +89,9 @@ void RollBallToIntakePositionCommand::Execute() {
 
 bool RollBallToIntakePositionCommand::IsFinished() {
 	if(where == SHOOTING_POSITION){
-		return IsTimedOut() || (sensorFlag && ticks_since_shooter_switch > 10);
+		return IsTimedOut() || (shooter_switch_state == STATE_BACK && sensorFlag);
+	} else if(where == CROSSING_POSITION){
+		return IsTimedOut() || (sensorFlag && ticks_since_crossing_position > 10);
 	} else
 		return IsTimedOut() || sensorFlag;
 }

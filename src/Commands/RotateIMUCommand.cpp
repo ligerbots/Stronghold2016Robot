@@ -46,7 +46,7 @@ void RotateIMUCommand::Execute() {
 	double error = fabs(currentAngle - targetAngle);
 	if(error > 180) error = 360 - error; // we always try to go the minimum number of degrees
 	if(error < 30){
-		speed = error * (1 - .45) / 30 + .45;
+		speed = error * (1 - .6) / 30 + .6;
 	} else if(m_ticks < 20){
 		speed = .45 + (.55 * m_ticks / 20.0);
 	}

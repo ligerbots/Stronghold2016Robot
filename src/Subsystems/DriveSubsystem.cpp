@@ -173,10 +173,12 @@ void DriveSubsystem::shiftUp() {
 }
 
 void DriveSubsystem::shiftDown() {
+	printf("Drive: shifting down\n");
 	mp_shifterSolenoid->Set(DoubleSolenoid::kReverse);
 }
 
 bool DriveSubsystem::isShiftedUp(){
+	printf("Drive: shifting down\n");
 	return mp_shifterSolenoid->Get() == DoubleSolenoid::kForward;
 }
 

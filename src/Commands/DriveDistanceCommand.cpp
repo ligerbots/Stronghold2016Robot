@@ -27,7 +27,7 @@ void DriveDistanceCommand::Initialize() {
 
 	// ignore top gear shift for distances less than 3 ft
 	if (m_gear==HIGH) {
-		if (m_distance > 2.0) driveSubsystem->shiftUp();
+		if (fabs(m_distance) > 2.0) driveSubsystem->shiftUp();
 		else {
 			// force low gear and normal speed
 			m_gear = LOW;

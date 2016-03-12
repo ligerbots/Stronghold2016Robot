@@ -17,7 +17,14 @@ protected:
 	bool sensorFlag;
 	bool moveUp;
 	int ticks;
-	int ticks_since_shooter_switch;
+	int shooter_switch_state;
+	int waiting_ticks;
+
+	int ticks_since_crossing_position;
+	static constexpr int STATE_UP = 0;
+	static constexpr int STATE_WAIT_FOR_RELEASE = 1;
+	static constexpr int STATE_BACK = 2;
+	static constexpr int STATE_WAIT = 3;
 public:
 	explicit RollBallToIntakePositionCommand(IntakePosition where);
 	void Initialize();

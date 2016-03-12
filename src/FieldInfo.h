@@ -88,7 +88,7 @@ public:
 
 	static constexpr TargetLocations targetLocations[] = {
 			{ -87.0, 236.0 },
-			{ 10.0, 200.0 },
+			{ 10.0, 176.0 },
 			{ 62.0, 236.0 }
 	};
 
