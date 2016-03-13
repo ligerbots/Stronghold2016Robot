@@ -98,6 +98,7 @@ public:
 
 	double getFrameCenter();
 	double getSetpoint();
+	bool isTargetVisible();
 
 	double getCenterOfMassX();
 	double getCenterOfMassY();

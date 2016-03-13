@@ -81,7 +81,8 @@ bool IntakeSubsystem::isIntakeArmUp() {
 	return true;
 #else
 	// flip value so that it's false if it's not connected
-	return !mp_intakeUpSwitch->Get();
+	// TODO: DANGER
+	return mp_intakeArmSolenoid->Get() == DoubleSolenoid::kReverse;//!mp_intakeUpSwitch->Get();
 #endif
 }
 
@@ -98,7 +99,7 @@ bool IntakeSubsystem::isIntakeReadyToFire() {
 }
 
 void IntakeSubsystem::sendValuesToSmartDashboard() {
-	SmartDashboard::PutBoolean("Intake/Arm_Clear", isIntakeArmUp());
+	SmartDashboard::PutBoolean("Intake/Arm_Clear", !mp_intakeUpSwitch->Get());
 	SmartDashboard::PutBoolean("Intake/Ball_In", isBallInShooterPosition());
 	SmartDashboard::PutBoolean("Intake/Ball_Defenses", isBallInDefensesCrossingPosition());
 	SmartDashboard::PutNumber("Intake/Roller_Revolutions",

@@ -172,6 +172,7 @@ void Robot::TeleopPeriodic() {
 	timeval startTime;
 	timeval endTime;
 	gettimeofday(&startTime, 0);
+	lastLoopRunTime = startTime;
 	AlwaysPeriodic();
 	Scheduler::GetInstance()->Run();
 	gettimeofday(&endTime, 0);

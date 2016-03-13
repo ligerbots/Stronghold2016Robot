@@ -57,6 +57,11 @@ void CenterOnTargetCommand::Execute() {
 //				mp_softwarePID->GetD());
 //	}
 
+	if(!visionSubsystem->isTargetVisible()){
+		driveSubsystem->zeroMotors();
+		return;
+	}
+
 	centerTo = visionSubsystem->getSetpoint();
 
 	double error = centerTo - visionSubsystem->PIDGet();

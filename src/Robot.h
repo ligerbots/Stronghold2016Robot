@@ -14,6 +14,8 @@ public:
 	 */
 	static bool isRoadkill;
 
+	timeval lastLoopRunTime;
+
 	OI* mp_operatorInterface;
 
 	FieldInfo fieldInfo;

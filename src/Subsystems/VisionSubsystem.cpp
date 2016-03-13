@@ -82,6 +82,7 @@ void VisionSubsystem::updateVision(int ticks) {
 	if (/*!enableVision.get() ||*/ m_activeCamera != 0) LCameraServer::GetInstance()->SetImage(image);
 
 	if (enableVision.get()) {
+		std::lock_guard<std::mutex> lock(m_frameMutex);
 		// If we just asked camera zero to get a frame, don't do it again here
 		if (m_activeCamera != 0) Camera::GetCamera(0)->GetFrame();
 		mp_currentFrame = Camera::GetCamera(0)->GetStoredFrame();
@@ -135,8 +136,10 @@ void VisionSubsystem::visionProcessingThread() {
 				mp_processingFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
 			}
 
-			imaqDuplicate(mp_processingFrame, mp_currentFrame);
-
+			{
+				std::lock_guard<std::mutex> lock(m_frameMutex);
+				imaqDuplicate(mp_processingFrame, mp_currentFrame);
+			}
 			int err = IVA_ProcessImage(mp_processingFrame); // run vision script
 			SmartDashboard::PutNumber("Vision/imaq_err", err);
 
@@ -151,6 +154,7 @@ void VisionSubsystem::visionProcessingThread() {
 			// if we didn't process any images, display something
 			// this probably only gets executed the first time
 			//LCameraServer::GetInstance()->SetImage(mp_currentFrame);
+			m_numParticles = 0;
 		}
 
 		gettimeofday(&endTime, 0);
@@ -158,6 +162,12 @@ void VisionSubsystem::visionProcessingThread() {
 		if (diff > -50000) {
 			SmartDashboard::PutNumber("Vision/processingTime", diff);
 		}
+
+		__suseconds_t mainThreadDelta = endTime.tv_usec - Robot::instance->lastLoopRunTime.tv_usec;
+		if(mainThreadDelta > 2000000){
+			return;
+		}
+
 		int endTicks = Robot::ticks;
 		double framesPerSec = 50.0/(endTicks - startTicks);
 		SmartDashboard::PutNumber("Vision/FPS", framesPerSec);
@@ -165,6 +175,9 @@ void VisionSubsystem::visionProcessingThread() {
 	}
 }
 
+bool VisionSubsystem::isTargetVisible(){
+	return m_numParticles > 0;
+}
 
 // Measure particles and mark target
 // image is the image to process
@@ -231,6 +244,7 @@ void VisionSubsystem::measureAndMark(Image *mark, Image *image)
 			m_frameCenterY = (feretStartY + feretEndY) / 2;
 
 			if (paintTarget.get()) {
+				std::lock_guard<std::mutex> lock(m_frameMutex);
 				// Send the image to the dashboard with a target indicator
 				int width, height;
 				imaqGetImageSize(mark, &width, &height);

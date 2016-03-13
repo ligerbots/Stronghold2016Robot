@@ -1,6 +1,6 @@
 #include <Stronghold2016Robot.h>
 
-AutonomousShootSequence::AutonomousShootSequence()
+CenterAndRollBallSequence::CenterAndRollBallSequence()
 {
 	// Add Commands here:
 	// e.g. AddSequential(new Command1());
@@ -19,26 +19,22 @@ AutonomousShootSequence::AutonomousShootSequence()
 	// a CommandGroup containing them would require both the chassis and the
 	// arm.
 
-	AddSequential(new CenterAndRollBallSequence());
-	AddSequential(new IntakeToggleCommand(true));
-	AddSequential(new WaitForIntakeUpCommand());
-	AddSequential(new AutoSetFlapsCommand());
-	AddSequential(new DelayCommand(0.6));
-	AddSequential(new ShootCommand());
+	AddParallel(new RollBallToIntakePositionCommand(RollBallToIntakePositionCommand::SHOOTING_POSITION));
+	AddSequential(new CenterOnTargetCommand());
 }
 
-void AutonomousShootSequence::Interrupted(){
+void CenterAndRollBallSequence::Interrupted(){
 	CommandGroup::Interrupted();
 	cleanup();
 }
 
-void AutonomousShootSequence::End(){
+void CenterAndRollBallSequence::End(){
 	CommandGroup::End();
 	cleanup();
 }
 
-void AutonomousShootSequence::cleanup(){
-	if(DriverStation::GetInstance().IsOperatorControl()){
+void CenterAndRollBallSequence::cleanup(){
+	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL){
 		CommandBase::intakeRollerCommand->Start();
 		CommandBase::driveJoystickCommand->Start();
 	}

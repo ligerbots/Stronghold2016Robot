@@ -25,6 +25,7 @@
 #include "Commands/AutonomousDriveSequence.h"
 #include "Commands/AutonomousShootSequence.h"
 #include "Commands/AutoSetFlapsCommand.h"
+#include "Commands/CenterAndRollBallSequence.h"
 #include "Commands/CenterOnTargetCommand.h"
 #include "Commands/DelayCommand.h"
 #include "Commands/DriveDistanceCommand.h"

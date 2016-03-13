@@ -7,10 +7,12 @@ RollBallToIntakePositionCommand::RollBallToIntakePositionCommand(IntakePosition 
 	shooter_switch_state = STATE_UP;
 	waiting_ticks = 0;
 	ticks_since_crossing_position = 0;
+	SetInterruptible(false);
 }
 
 void RollBallToIntakePositionCommand::Initialize() {
 	printf("RollBallToIntakePositionCommand: init\n");
+	SetInterruptible(false);
 	if(where != PICKUP){
 		SetTimeout(6);
 	}
