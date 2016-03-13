@@ -99,7 +99,7 @@ bool IntakeSubsystem::isIntakeReadyToFire() {
 }
 
 void IntakeSubsystem::sendValuesToSmartDashboard() {
-	SmartDashboard::PutBoolean("Intake/Arm_Clear", !mp_intakeUpSwitch->Get());
+	SmartDashboard::PutBoolean("Intake/Arm_Clear", isIntakeArmUp() /*!mp_intakeUpSwitch->Get()*/);
 	SmartDashboard::PutBoolean("Intake/Ball_In", isBallInShooterPosition());
 	SmartDashboard::PutBoolean("Intake/Ball_Defenses", isBallInDefensesCrossingPosition());
 	SmartDashboard::PutNumber("Intake/Roller_Revolutions",

@@ -7,6 +7,7 @@ RollBallToIntakePositionCommand::RollBallToIntakePositionCommand(IntakePosition 
 	shooter_switch_state = STATE_UP;
 	waiting_ticks = 0;
 	ticks_since_crossing_position = 0;
+	needsToWaitForFlaps = true;
 	SetInterruptible(false);
 }
 
@@ -34,7 +35,13 @@ void RollBallToIntakePositionCommand::Initialize() {
 	} else {
 		moveUp = true;
 	}
-	flapSubsystem->setFlapsFraction(1); // all the way down
+
+	if(flapSubsystem->getRightFlapFraction() == 1.0 && flapSubsystem->getLeftFlapFraction() == 1.0){
+		needsToWaitForFlaps = false;
+	} else {
+		flapSubsystem->setFlapsFraction(1); // all the way down
+		needsToWaitForFlaps = true;
+	}
 	intakeSubsystem->setIntakeArmDown();
 
 	ticks = 0;
@@ -57,7 +64,7 @@ void RollBallToIntakePositionCommand::Execute() {
 	}
 
 	ticks++;
-	if(ticks < 20)
+	if(ticks < 20 && needsToWaitForFlaps)
 		return; // wait for flaps
 
 	double rollSpeed = 0.3;
@@ -70,18 +77,25 @@ void RollBallToIntakePositionCommand::Execute() {
 		} else {
 			moveUp = true;
 		}
-		if(ticks > 75 && shooter_switch_state == STATE_UP){
+		int ticksTimeout = 45;
+		if(needsToWaitForFlaps)
+			ticksTimeout += 20;
+		if(ticks > ticksTimeout && shooter_switch_state == STATE_UP){
 			shooter_switch_state = STATE_BACK;
+			printf("RollBall: State = STATE_BACK\n");
 		}
 		if(shooter_switch_state == STATE_UP && sensorFlag){
 			shooter_switch_state = STATE_WAIT_FOR_RELEASE;
+			printf("RollBall: State = STATE_WAIT_FOR_RELEASE\n");
 		} else if(shooter_switch_state == STATE_WAIT_FOR_RELEASE && !sensorFlag){
 			shooter_switch_state = STATE_WAIT;
+			printf("RollBall: State = STATE_WAIT\n");
 			waiting_ticks = 0;
 		} else if(shooter_switch_state == STATE_WAIT){
 			waiting_ticks++;
 			if(waiting_ticks > 15){
 				shooter_switch_state = STATE_BACK;
+				printf("RollBall: State = STATE_BACK\n");
 			}
 		}
 	}
@@ -101,6 +115,7 @@ bool RollBallToIntakePositionCommand::IsFinished() {
 }
 
 void RollBallToIntakePositionCommand::End() {
+	printf("RollBallToIntakePositionCommand: End\n");
 	intakeSubsystem->rollStop();
 	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL){
 		CommandBase::intakeRollerCommand->Start();

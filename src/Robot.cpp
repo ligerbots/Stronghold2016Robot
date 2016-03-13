@@ -96,27 +96,23 @@ void Robot::DisabledInit() {
 	}
 
 	printf("Writing i2c\n");
-	for (int i = 3; i < 4; i++) {
-		I2C i2c(I2C::kOnboard, i);
+	I2C i2c(I2C::kOnboard, 10);
 
-		int numLeds = 23;
-//		int numStrips = 2;
+	int numLeds = 23;
+//	int numStrips = 2;
 
-		printf("%d\n", i);
 
-		char startByte = 0xC0;
-		char r = 255, g = 0, b = 255;
+	char startByte = 0b11000000;
+	char r = 0, g = 0, b = 0;
 
-		uint8_t bytes[numLeds * 3 + 1];
-		bytes[0] = startByte;
-		for (int j = 1; j < numLeds * 3 + 1; j += 3) {
-			bytes[j] = r;
-			bytes[j + 1] = g;
-			bytes[j + 2] = b;
-		}
-		i2c.WriteBulk(bytes, numLeds * 3 + 1);
+	uint8_t bytes[numLeds * 3 + 1];
+	bytes[0] = startByte;
+	for (int j = 1; j < numLeds * 3 + 1; j += 3) {
+		bytes[j] = r;
+		bytes[j + 1] = g;
+		bytes[j + 2] = b;
 	}
-
+	i2c.WriteBulk(bytes, numLeds * 3 + 1);
 }
 
 void Robot::DisabledPeriodic() {

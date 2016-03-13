@@ -19,6 +19,7 @@ protected:
 	int ticks;
 	int shooter_switch_state;
 	int waiting_ticks;
+	bool needsToWaitForFlaps;
 
 	int ticks_since_crossing_position;
 	static constexpr int STATE_UP = 0;
