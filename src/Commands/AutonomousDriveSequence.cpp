@@ -60,8 +60,6 @@ AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense, int 
 
 		AddSequential(new WedgeToggleCommand(true));
 
-		AddParallel(new RollBallToIntakePositionCommand(RollBallToIntakePositionCommand::SHOOTING_POSITION));
-
 		AddSequential(new DelayCommand(0.1));
 
 		// NOTE!! Since our angles are absolute angles with respect to the field (as opposed to relative
@@ -69,11 +67,13 @@ AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense, int 
 		// make the correct turn regardless of the initial orientation of the robot
 		AddSequential(new RotateIMUCommand(90 - firstAngle)); // correct field angles to navx angles
 
+		AddParallel(new RollBallToIntakePositionCommand(RollBallToIntakePositionCommand::SHOOTING_POSITION));
+
 		AddSequential(new DelayCommand(0.1));
 
 		// Drive to the target spot in high gear, but let's leave it low speed for now
 		AddSequential(new DriveDistanceCommand(-distanceToShootingPosition,
-				FieldInfo::NORMAL, DriveDistanceCommand::HIGH));
+				FieldInfo::FAST, DriveDistanceCommand::HIGH));
 		AddSequential(new DelayCommand(0.1));
 		AddSequential(new RotateIMUCommand(secondAngle));
 		AddSequential(new DelayCommand(0.1));

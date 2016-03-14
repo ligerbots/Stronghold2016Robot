@@ -8,12 +8,13 @@ RollBallToIntakePositionCommand::RollBallToIntakePositionCommand(IntakePosition 
 	waiting_ticks = 0;
 	ticks_since_crossing_position = 0;
 	needsToWaitForFlaps = true;
-	SetInterruptible(false);
+	switchAlreadyPressed = false;
+//	SetInterruptible(false);
 }
 
 void RollBallToIntakePositionCommand::Initialize() {
 	printf("RollBallToIntakePositionCommand: init\n");
-	SetInterruptible(false);
+//	SetInterruptible(false);
 	if(where != PICKUP){
 		SetTimeout(6);
 	}
@@ -43,6 +44,10 @@ void RollBallToIntakePositionCommand::Initialize() {
 		needsToWaitForFlaps = true;
 	}
 	intakeSubsystem->setIntakeArmDown();
+
+	if(where == SHOOTING_POSITION){
+		switchAlreadyPressed = intakeSubsystem->isBallInShooterPosition();
+	}
 
 	ticks = 0;
 	ticks_since_crossing_position = 0;
@@ -107,7 +112,9 @@ void RollBallToIntakePositionCommand::Execute() {
 
 bool RollBallToIntakePositionCommand::IsFinished() {
 	if(where == SHOOTING_POSITION){
-		return IsTimedOut() || (shooter_switch_state == STATE_BACK && sensorFlag);
+		return IsTimedOut() ||
+				switchAlreadyPressed ||
+				(shooter_switch_state == STATE_BACK && sensorFlag);
 	} else if(where == CROSSING_POSITION){
 		return IsTimedOut() || (sensorFlag && ticks_since_crossing_position > 15);
 	} else

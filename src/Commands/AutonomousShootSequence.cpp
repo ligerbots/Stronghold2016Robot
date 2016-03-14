@@ -19,6 +19,7 @@ AutonomousShootSequence::AutonomousShootSequence()
 	// a CommandGroup containing them would require both the chassis and the
 	// arm.
 
+	//TODO: switch back
 	AddSequential(new CenterAndRollBallSequence());
 	AddSequential(new IntakeToggleCommand(true));
 	AddSequential(new WaitForIntakeUpCommand());
