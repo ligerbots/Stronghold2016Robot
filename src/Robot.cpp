@@ -104,8 +104,10 @@ void Robot::DisabledInit() {
 	printf("Robot: Disabled at %f seconds, %d ticks", startTime, ticks);
 	// If we'd previously run an autonomous, record how long it lasted
 	if (m_startTicks > 0) {
-		printf(", prior state ran for %f seconds, %d ticks.",
-				startTime - m_startTime, ticks-m_startTicks);
+		double elapsedTime = startTime - m_startTime;
+		int elapsedTicks = ticks - m_startTicks;
+		printf(", prior state ran for %f seconds, %d ticks, %5.2f tps.",
+				elapsedTime, elapsedTicks, elapsedTicks/elapsedTime);
 	}
 	printf("\n");
 	m_startTicks = ticks;
@@ -181,8 +183,10 @@ void Robot::TeleopInit() {
 	printf("Robot: TeleopInit at %f seconds, %d ticks", startTime, ticks);
 	// If we'd previously run an autonomous, record how long it lasted
 	if (m_startTicks > 0) {
-		printf(", prior autonomous ran for %f seconds, %d ticks.",
-				startTime - m_startTime, ticks-m_startTicks);
+		double elapsedTime = startTime - m_startTime;
+		int elapsedTicks = ticks - m_startTicks;
+		printf(", prior autonomous ran for %f seconds, %d ticks, %5.2f tps.",
+				elapsedTime, elapsedTicks, elapsedTicks/elapsedTime);
 	}
 	printf("\n");
 	m_startTicks = ticks;
