@@ -117,6 +117,8 @@ void Robot::DisabledInit() {
 		mp_autonomousCommand->Cancel();
 	}
 
+	// cbf -- commented this all out so we don't keep on getting SPI CRC errors
+	// spamming our logs
 	printf("Writing i2c\n");
 	I2C i2c(I2C::kOnboard, 10);
 
