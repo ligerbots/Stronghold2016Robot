@@ -117,7 +117,6 @@ void Robot::DisabledInit() {
 		mp_autonomousCommand->Cancel();
 	}
 
-#if FALSE
 	// cbf -- commented this all out so we don't keep on getting SPI CRC errors
 	// spamming our logs
 	printf("Writing i2c\n");
@@ -138,7 +137,6 @@ void Robot::DisabledInit() {
 		bytes[j + 2] = b;
 	}
 	i2c.WriteBulk(bytes, numLeds * 3 + 1);
-#endif
 }
 
 void Robot::DisabledPeriodic() {
