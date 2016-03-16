@@ -67,7 +67,7 @@ void Robot::AlwaysPeriodic() {
 	CommandBase::intakeSubsystem->sendValuesToSmartDashboard();
 
 	if(mp_operatorInterface->pFarmController->GetRawButton(28)){
-		printf("Cancelling centering/auto\n");
+		printf("Canceling centering/auto\n");
 		if(mp_autonomousCommand != NULL){
 			mp_autonomousCommand->Cancel();
 		}

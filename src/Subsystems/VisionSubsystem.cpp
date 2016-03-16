@@ -115,10 +115,16 @@ void VisionSubsystem::setVisionEnabled(bool enabled){
 
 void VisionSubsystem::visionProcessingThread() {
 	printf("VisionSubsystem: Processing thread start\n");
+	int loopCounter = 0;
+	clockid_t cid;
+	pthread_getcpuclockid(pthread_self(), &cid);
 
 	while (true) {
+		loopCounter++;
 		int startTicks = Robot::ticks;
 		double startTime = Robot::GetRTC();
+		timespec startCPUTime, endCPUTime;
+		clock_gettime(cid, &startCPUTime);
 
 		if (enableVision.get()) {
 			if (mp_currentFrame == NULL) {
@@ -146,9 +152,18 @@ void VisionSubsystem::visionProcessingThread() {
 			// Display the marked frame, or the processing frame
 			if (m_activeCamera == 0)
 				LCameraServer::GetInstance()->SetImage(showVision.get() ? mp_processingFrame : mp_currentFrame);
-			double elapsedTime = Robot::GetRTC() - startTime;
-			int elapsedTicks = Robot::ticks - startTicks;
-			printf("Vision frame done in %f seconds, %d ticks\n", elapsedTime, elapsedTicks);
+
+			// print out CPU statistics periodically, but not so often as to spam the console
+			if (loopCounter%15 == 0) {
+				double elapsedTime = Robot::GetRTC() - startTime;
+				int elapsedTicks = Robot::ticks - startTicks;
+				clock_gettime(cid, &endCPUTime);
+				double startCPU = (double) startCPUTime.tv_sec + (double) startCPUTime.tv_nsec/1.0E9;
+				double endCPU = (double) endCPUTime.tv_sec + (double) endCPUTime.tv_nsec/1.0E9;
+				double elapsedCPUTime = endCPU - startCPU;
+				printf("Vision frame done in %f seconds, %f CPU seconds, %d ticks\n",
+						elapsedTime, elapsedCPUTime, elapsedTicks);
+			}
 		}
 		else {
 			// if we didn't process any images, display something
