@@ -169,8 +169,7 @@ bool VisionSubsystem::isTargetVisible(){
 // mark is the image we mark the target on
 void VisionSubsystem::measureAndMark(Image *mark, Image *image)
 {
-	// TODO: refactor into a single imaqMeasureParticles(...) call
-	// also use largest particle only, and check (convex hull area)/(particle area)
+	//  use largest particle only, and check (convex hull area)/(particle area)
 	// to make sure it's about 2.2
 	imaqCountParticles(image, true, &m_numParticles);
 	if (m_numParticles != 0) {
