@@ -116,13 +116,10 @@ void VisionSubsystem::setVisionEnabled(bool enabled){
 void VisionSubsystem::visionProcessingThread() {
 	printf("VisionSubsystem: Processing thread start\n");
 
-	timeval startTime;
-	timeval endTime;
-	int startTicks = Robot::ticks;
-
-	gettimeofday(&startTime, 0);
-
 	while (true) {
+		int startTicks = Robot::ticks;
+		double startTime = Robot::GetRTC();
+
 		if (enableVision.get()) {
 			if (mp_currentFrame == NULL) {
 				// wait for first frame
@@ -149,6 +146,9 @@ void VisionSubsystem::visionProcessingThread() {
 			// Display the marked frame, or the processing frame
 			if (m_activeCamera == 0)
 				LCameraServer::GetInstance()->SetImage(showVision.get() ? mp_processingFrame : mp_currentFrame);
+			double elapsedTime = Robot::GetRTC() - startTime;
+			int elapsedTicks = Robot::ticks - startTicks;
+			printf("Vision frame done in %f seconds, %d ticks\n", elapsedTime, elapsedTicks);
 		}
 		else {
 			// if we didn't process any images, display something
@@ -156,21 +156,6 @@ void VisionSubsystem::visionProcessingThread() {
 			//LCameraServer::GetInstance()->SetImage(mp_currentFrame);
 			m_numParticles = 0;
 		}
-
-		gettimeofday(&endTime, 0);
-		__suseconds_t diff = endTime.tv_usec - startTime.tv_usec;
-		if (diff > -50000) {
-			SmartDashboard::PutNumber("Vision/processingTime", diff);
-		}
-
-		__suseconds_t mainThreadDelta = endTime.tv_usec - Robot::instance->lastLoopRunTime.tv_usec;
-		if(mainThreadDelta > 2000000){
-			return;
-		}
-
-		int endTicks = Robot::ticks;
-		double framesPerSec = 50.0/(endTicks - startTicks);
-		SmartDashboard::PutNumber("Vision/FPS", framesPerSec);
 		usleep(33000);
 	}
 }

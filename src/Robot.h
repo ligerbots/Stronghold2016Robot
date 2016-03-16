@@ -8,13 +8,17 @@ class Robot: public IterativeRobot {
 public:
 	static Robot* instance;
 	static int ticks;		// make this globally available
+	static timespec resolution;
 	/**
 	 * True if the program is currently running on roadkill
 	 * Only useful after CommandBase::init()
 	 */
 	static bool isRoadkill;
 
-	timeval lastLoopRunTime;
+	int m_startTicks;
+	timespec m_startSpec;
+	double m_startTime;
+	//timeval lastLoopRunTime;
 
 	OI* mp_operatorInterface;
 
@@ -41,4 +45,5 @@ public:
 	void TeleopInit();
 	void TeleopPeriodic();
 	void TestPeriodic();
+	static double GetRTC();
 };

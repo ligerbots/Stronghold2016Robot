@@ -51,14 +51,19 @@ void DriveDistanceCommand::Execute() {
 	double right = driveSubsystem->getRightEncoderPosition();
 
 	// if we're in high gear, expect some overshoot and ramp down
-//	if (m_gear==HIGH) {
-//		double remaining = fabs(m_distance) - fabs(m_startPositionRight - right) * TICKS_PER_FOOT;
-//		if (remaining < 2.0) {
-//			m_gear = LOW;
-//			m_speed = NORMAL_SPEED;
-//			driveSubsystem->shiftDown();
-//		}
-//	}
+	if (m_gear==HIGH) {
+		double remaining;
+		// if m_distance is positive, m_startRightPosition is positive, right is positive and increasing
+		// if m_distance is negative, m_startRightPosition is negative, right is negative and decreasing
+		//  negative example: -400 - (-600 - -300), so -400 - -300 = 100
+		//  positive example: 400 - (600 - 300) = 400 - 300 = 100
+		remaining = m_distance - (right - m_startPositionRight);
+		if (remaining*TICKS_PER_FOOT < 2.0) {
+			m_gear = LOW;
+			m_speed = NORMAL_SPEED;
+			driveSubsystem->shiftDown();
+		}
+	}
 
 	double angle = navXSubsystem->GetYaw();
 	double angleCorrection = (m_startAngle - angle) * driveStraightGain.get();

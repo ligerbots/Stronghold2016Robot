@@ -1,10 +1,12 @@
 #include <Stronghold2016Robot.h>
+#include <time.h>
 
 // Robot wide globals whose definitions live in the Robot class
 Robot* Robot::instance = NULL;
 int Robot::ticks;
 bool Robot::isRoadkill = false;
 bool Robot::ROBOT_IS_ABOUT_TO_TIP = false;
+timespec Robot::resolution;
 
 Robot::Robot() {
 	instance = this;
@@ -12,12 +14,21 @@ Robot::Robot() {
 	mp_autonomousCommand = NULL;
 	mp_operatorInterface = new OI();
 	ticks = 0;
+	m_startTicks = 0;
+	m_startTime = 0.0;
+	clock_getres(CLOCK_REALTIME, &resolution);
+	printf("Robot::Robot clock resolution %ld nanoseconds", resolution.tv_nsec);
 }
 
 Robot::~Robot() {
 }
 
 void Robot::RobotInit() {
+	// We zero our measuring counters here. We're only interested in how long
+	// an autonomous or teleop session takes, not how long the robot sits idle.
+	m_startTicks = 0;
+	m_startTime = 0.0;
+
 	CommandBase::init();
 
 	mp_operatorInterface->registerCommands();
@@ -89,7 +100,16 @@ void Robot::AlwaysPeriodic() {
 }
 
 void Robot::DisabledInit() {
-	printf("Robot: DisabledInit\n");
+	double startTime = GetRTC();
+	printf("Robot: Disabled at %f seconds, %d ticks", startTime, ticks);
+	// If we'd previously run an autonomous, record how long it lasted
+	if (m_startTicks > 0) {
+		printf(", prior state ran for %f seconds, %d ticks.",
+				startTime - m_startTime, ticks-m_startTicks);
+	}
+	printf("\n");
+	m_startTicks = ticks;
+	m_startTime = startTime;
 
 	if (mp_autonomousCommand != NULL) {
 		mp_autonomousCommand->Cancel();
@@ -120,7 +140,10 @@ void Robot::DisabledPeriodic() {
 }
 
 void Robot::AutonomousInit() {
-	printf("Robot: AutononmousInit\n");
+	m_startTicks = ticks;
+	m_startTime = GetRTC();
+	printf("Robot: AutononmousInit at %f seconds, %d ticks\n",
+			m_startTime, ticks);
 
 	int pos = fieldInfo.GetPosition();
 	int def = fieldInfo.GetDefense();
@@ -154,7 +177,17 @@ void Robot::AutonomousPeriodic() {
 }
 
 void Robot::TeleopInit() {
-	printf("Robot: TeleopInit\n");
+	double startTime = GetRTC();
+	printf("Robot: TeleopInit at %f seconds, %d ticks", startTime, ticks);
+	// If we'd previously run an autonomous, record how long it lasted
+	if (m_startTicks > 0) {
+		printf(", prior autonomous ran for %f seconds, %d ticks.",
+				startTime - m_startTime, ticks-m_startTicks);
+	}
+	printf("\n");
+	m_startTicks = ticks;
+	m_startTime = startTime;
+
 	if (mp_autonomousCommand != NULL) {
 		mp_autonomousCommand->Cancel();
 	}
@@ -165,21 +198,18 @@ void Robot::TeleopInit() {
 }
 
 void Robot::TeleopPeriodic() {
-	timeval startTime;
-	timeval endTime;
-	gettimeofday(&startTime, 0);
-	lastLoopRunTime = startTime;
 	AlwaysPeriodic();
 	Scheduler::GetInstance()->Run();
-	gettimeofday(&endTime, 0);
-	__suseconds_t diff = endTime.tv_usec - startTime.tv_usec;
-	if (diff > -50000) {
-		SmartDashboard::PutNumber("RobotLoop", 1/diff);
-	}
 }
 
 void Robot::TestPeriodic() {
 	LiveWindow::GetInstance()->Run();
+}
+
+double Robot::GetRTC() {
+	timespec timeSpec;
+	clock_gettime(CLOCK_REALTIME, &timeSpec);
+	return (double)timeSpec.tv_sec + (double)timeSpec.tv_nsec/1.0E9;
 }
 
 START_ROBOT_CLASS(Robot)
