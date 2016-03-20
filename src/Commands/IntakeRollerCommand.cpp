@@ -22,7 +22,7 @@ void IntakeRollerCommand::Execute() {
 //		// This is to avoid endless messages if it's not plugged in, or plugged-in late
 //		oi->registerSecondControllerButtons();
 //	}
-	if (oi->m_secondControllerPresent) {
+	if (oi->m_secondControllerButtonCount > 4) {
 		if (oi->pFarmController->GetRawButton(4)) {
 			speed = 1;
 		} else if(oi->pFarmController->GetRawButton(5)) {

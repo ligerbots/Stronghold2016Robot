@@ -66,7 +66,7 @@ void Robot::AlwaysPeriodic() {
 	CommandBase::wedgeSubsystem->sendValuesToSmartDashboard();
 	CommandBase::intakeSubsystem->sendValuesToSmartDashboard();
 
-	if(mp_operatorInterface->pFarmController->GetRawButton(28)){
+	if (mp_operatorInterface->get2ndControllerButton(28)) {
 		printf("Canceling centering/auto\n");
 		if(mp_autonomousCommand != NULL){
 			mp_autonomousCommand->Cancel();
@@ -74,11 +74,11 @@ void Robot::AlwaysPeriodic() {
 		CommandBase::centerOnTargetCommand->Cancel();
 	}
 
-	if(mp_operatorInterface->pFarmController->GetRawButton(21)){
+	if (mp_operatorInterface->get2ndControllerButton(21)) {
 		CommandBase::visionSubsystem->setVisionEnabled(true);
 	}
 
-	if(mp_operatorInterface->pFarmController->GetRawButton(24)){
+	if (mp_operatorInterface->get2ndControllerButton(24)) {
 		CommandBase::visionSubsystem->setVisionEnabled(false);
 	}
 

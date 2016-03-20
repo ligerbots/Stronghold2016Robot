@@ -76,7 +76,7 @@ void CenterOnTargetCommand::Execute() {
 }
 
 bool CenterOnTargetCommand::IsFinished() {
-	if(Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(28)){
+	if(Robot::instance->mp_operatorInterface->get2ndControllerButton(28)){
 		printf("Center: ending command\n");
 		return true;
 	}
