@@ -3,6 +3,7 @@
 #include "Commands/Subsystem.h"
 #include "WPILib.h"
 #include <Utils/Parameter.h>
+#include <pthread.h>
 
 // We believe the "float" color in the imaqDraw calls is BGR (Blue Green Red)
 // with ranges of 0.0 to just under 256.0 for each color
@@ -23,15 +24,7 @@ private:
 	Parameter<bool> paintTarget;
 	Parameter<bool> enableVision;
 	Parameter<double> color;
-//	Parameter<double> boundingBoxWidth;
-//	Parameter<double> boundingBoxHeight;
-//	Parameter<double> convexHullSize;
-//	Parameter<double> convexHullPerArea;
-//	Parameter<double> feretDiameter;
-//	Parameter<double> feretStartX;
-//	Parameter<double> feretStartY;
-//	Parameter<double> feretEndX;
-//	Parameter<double> feretEndY;
+
 	// Define the indexes to our MeasuremeParticleReport
 	enum Measures {
 		COMX,	// IMAQ_MT_CENTER_OF_MASS_X
@@ -63,7 +56,12 @@ private:
 	double m_frameCenterY;
 	int m_numParticles;
 	std::thread m_processingThread;
-	// Take about 55 measures on each particle in one call
+	bool m_visionBusy;
+	pthread_cond_t m_threadCond;
+	pthread_mutex_t m_threadMutex;
+	int m_lastVisionTick;
+
+	// Take all the particple measurements in one call
 	// Q: Does taking extra measurements slow things down?
 	MeasurementType mT[MAXVAL];
 

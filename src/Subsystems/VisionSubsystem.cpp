@@ -16,6 +16,8 @@ VisionSubsystem::VisionSubsystem() :
 		m_frameCenterY(0),
 		m_numParticles(0),
 		m_processingThread(&VisionSubsystem::visionProcessingThread,this),
+		m_visionBusy(false),
+		m_lastVisionTick(0),
 		m_activeCamera(0),
 		m_pM(NULL)
 {
@@ -82,11 +84,22 @@ void VisionSubsystem::updateVision(int ticks) {
 	if (/*!enableVision.get() ||*/ m_activeCamera != 0) LCameraServer::GetInstance()->SetImage(image);
 
 	if (enableVision.get()) {
-		std::lock_guard<std::mutex> lock(m_frameMutex);
 		// If we just asked camera zero to get a frame, don't do it again here
 		if (m_activeCamera != 0) Camera::GetCamera(0)->GetFrame();
 		mp_currentFrame = Camera::GetCamera(0)->GetStoredFrame();
 		// We don't do a SetImage here -- that's done in the Vision Processing thread
+
+		// If it's been more than eight vision ticks since we last processed a grame, do one now
+		if ((Robot::ticks > m_lastVisionTick + 8) && !m_visionBusy) {
+			if (mp_processingFrame == NULL) {
+				// First time: create our processing frame
+				printf("VisionSubsystem: Creating second Image*\n");
+				mp_processingFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
+			}
+			// duplicate the current frame for image processing
+			imaqDuplicate(mp_processingFrame, mp_currentFrame);
+			pthread_cond_signal(&m_threadCond);
+		}
 	}
 }
 
@@ -120,6 +133,9 @@ void VisionSubsystem::visionProcessingThread() {
 	pthread_getcpuclockid(pthread_self(), &cid);
 
 	while (true) {
+		// wait here forever until we get a signal
+		pthread_cond_wait(&m_threadCond, &m_threadMutex);
+		m_visionBusy = true;
 		loopCounter++;
 		int startTicks = Robot::ticks;
 		double startTime = Robot::GetRTC();
@@ -133,16 +149,6 @@ void VisionSubsystem::visionProcessingThread() {
 				continue;
 			}
 
-			if (mp_processingFrame == NULL) {
-				// First time: create our processing frame
-				printf("VisionSubsystem: Creating second Image*\n");
-				mp_processingFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
-			}
-
-			{
-				std::lock_guard<std::mutex> lock(m_frameMutex);
-				imaqDuplicate(mp_processingFrame, mp_currentFrame);
-			}
 			int err = IVA_ProcessImage(mp_processingFrame); // run vision script
 			SmartDashboard::PutNumber("Vision/imaq_err", err);
 
@@ -171,7 +177,10 @@ void VisionSubsystem::visionProcessingThread() {
 			//LCameraServer::GetInstance()->SetImage(mp_currentFrame);
 			m_numParticles = 0;
 		}
-		usleep(33000);
+		m_visionBusy = false;
+		m_lastVisionTick = Robot::ticks;
+		// with pthread_cond_wait, we don't need Mutex anymore
+		//usleep(33000);
 	}
 }
 
