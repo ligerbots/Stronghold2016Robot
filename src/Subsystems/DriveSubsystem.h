@@ -38,7 +38,12 @@ public:
 		double Angle;
 	};
 	Position m_pos;
-	double m_lastDistance;	// encode value one tick ago
+	double m_originalDistance;	// original encoder value in inches
+
+	// m_prevDistance is adjusted by original distance, so it starts
+	// at zero and records the distance the robot traveled since
+	// the last tick
+	double m_prevDistance;
 
 	// empirically measured by driving 5 feet
 	static constexpr double TICKS_PER_INCH = 640;

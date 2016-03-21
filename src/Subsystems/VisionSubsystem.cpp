@@ -160,7 +160,7 @@ void VisionSubsystem::visionProcessingThread() {
 				LCameraServer::GetInstance()->SetImage(showVision.get() ? mp_processingFrame : mp_currentFrame);
 
 			// print out CPU statistics periodically, but not so often as to spam the console
-			if (loopCounter%15 == 0) {
+			if (loopCounter%40 == 0) {
 				double elapsedTime = Robot::GetRTC() - startTime;
 				int elapsedTicks = Robot::ticks - startTicks;
 				clock_gettime(cid, &endCPUTime);

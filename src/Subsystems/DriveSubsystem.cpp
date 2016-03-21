@@ -143,6 +143,10 @@ DriveSubsystem::DriveSubsystem() :
 	mp_leftEncoder = talonPtrs[RobotMap::CT_DRIVE_LEFT1];
 	mp_rightEncoder = talonPtrs[RobotMap::CT_DRIVE_RIGHT1];
 
+	// need to get initial encoder reading to make delta meangingful
+	m_originalDistance = getRightEncoderPosition() / TICKS_PER_INCH;
+	m_prevDistance = 0.0;
+
 	// the object that actually handles setting talons from Arcade Drive input
 	mp_robotDrive.reset(
 			new RobotDrive(talonPtrs[masterLeft], talonPtrs[masterRight]));
@@ -203,13 +207,16 @@ void DriveSubsystem::drive(double y, double x) {
 }
 
 void DriveSubsystem::updatePosition() {
-	double distance = (getRightEncoderPosition() * TICKS_PER_INCH) - m_lastDistance;
-	m_lastDistance += distance;
-	m_pos.Angle = 90 - CommandBase::navXSubsystem->GetYaw();
+	double distance = (getRightEncoderPosition() / TICKS_PER_INCH) -
+			(m_originalDistance + m_prevDistance);
+	m_prevDistance += distance;
+	m_pos.Angle = CommandBase::navXSubsystem->GetYaw();
 	double xMoved = cos(m_pos.Angle) * distance;
 	double yMoved = sqrt(distance*distance - xMoved*xMoved);
 	m_pos.X += xMoved;
 	m_pos.Y += yMoved;
+	if (Robot::ticks%50==0)
+		printf("POSITION: X=%5.2f Y=%5.2f Angle=%5.2f\n", m_pos.X, m_pos.Y, m_pos.Angle);
 }
 
 void DriveSubsystem::SetInitialPosition(double x, double y) {
