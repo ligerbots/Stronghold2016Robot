@@ -21,6 +21,7 @@
 #include <string.h>
 #include <sys/time.h>
 #include "CommandBase.h"
+#include "Commands/AcquireTarget.h"
 #include "Commands/AutonomousDriveAndShoot.h"
 #include "Commands/AutonomousDriveSequence.h"
 #include "Commands/AutonomousShootSequence.h"

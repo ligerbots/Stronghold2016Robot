@@ -58,7 +58,10 @@ void OI::registerSecondControllerButtons() {
 
 		// section 3 - auto commands
 		registerButton(pFarmController, 11, PRESSED, new PrepareForCrossingSequence());
-		registerButton(pFarmController, 13, PRESSED, new RotateToTarget());
+		registerButton(pFarmController, 13, PRESSED, new AcquireTarget());
+		registerButton(pFarmController, 16, PRESSED, new RotateToTarget());
+
+		// registerButton(pFarmController, 16, PRESSED, new RotateIMUCommand(0));
 
 		// test commands
 		registerButton(pFarmController, 15, PRESSED, new DriveDistanceCommand(9 * 12));
@@ -73,7 +76,6 @@ void OI::registerSecondControllerButtons() {
 		// if the farm controller isn't available, we might be using a Logitech Thurstmaster or something
 		// that likely gives out around 16 buttons
 		if (m_secondControllerButtonCount > 16) {
-			registerButton(pFarmController, 16, PRESSED, new RotateIMUCommand(0));
 			// section 4 - intake & wedge up/down
 			registerButton(pFarmController, 17, PRESSED, new IntakeToggleCommand(true));
 			registerButton(pFarmController, 18, PRESSED, new IntakeToggleCommand(false));
