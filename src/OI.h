@@ -16,7 +16,7 @@ private:
 public:
 	Joystick* pXboxController;
 	Joystick* pFarmController;
-	bool m_secondControllerPresent;
+	int m_secondControllerButtonCount;
 	OI();
 	OI(OI& otherOI);
 
@@ -42,4 +42,5 @@ public:
 	void registerButton(Joystick* joystick, int buttonNumber, ButtonEvent when,
 			Command* command);
 	void registerSecondControllerButtons();
+	bool get2ndControllerButton(int num);
 };

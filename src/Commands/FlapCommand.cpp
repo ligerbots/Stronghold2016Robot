@@ -5,6 +5,7 @@ FlapCommand::FlapCommand() :
 				false), flapPositionRight("FlapCommandPositionRight", false) {
 	Requires(flapSubsystem.get());
 	SetInterruptible(true);
+	oi = Robot::instance->mp_operatorInterface;
 
 	flapPositionLeft = 0;
 	flapPositionRight = 0;
@@ -21,11 +22,11 @@ void FlapCommand::Execute() {
 //	int hat = Robot::instance->mp_operatorInterface->pXboxController->GetPOV(0);
 
 	int flapButtons =
-			Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(6) ? 0 :
-			Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(7) ? 4 :
-			Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(8) ? 5 :
-			Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(3) ? 6 :
-			Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(2) ? 8 : -1;
+			oi->get2ndControllerButton(6) ? 0 :
+					oi->get2ndControllerButton(7) ? 4 :
+							oi->get2ndControllerButton(8) ? 5 :
+									oi->get2ndControllerButton(3) ? 6 :
+											oi->get2ndControllerButton(2) ? 8 : -1;
 
 	if (flapButtons != -1) {
 		double fraction = 1;
@@ -41,14 +42,13 @@ void FlapCommand::Execute() {
 		// to ignore
 		flapSubsystem->setFlapsFraction(fraction);
 	} else {
-
-		if(Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(25)){
-			if(Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(26)){
+		if (oi->get2ndControllerButton(25)) {
+			if (oi->get2ndControllerButton(26)) {
 				flapPositionLeft -= .01;
 				flapPositionRight -= .01;
 			}
 
-			if(Robot::instance->mp_operatorInterface->pFarmController->GetRawButton(27)){
+			if (oi->get2ndControllerButton(27)) {
 				flapPositionLeft += .01;
 				flapPositionRight += .01;
 			}
