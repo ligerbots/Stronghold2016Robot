@@ -58,7 +58,7 @@ void OI::registerSecondControllerButtons() {
 
 		// section 3 - auto commands
 		registerButton(pFarmController, 11, PRESSED, new PrepareForCrossingSequence());
-		registerButton(pFarmController, 13, PRESSED, new CenterOnTargetCommand());
+		registerButton(pFarmController, 13, PRESSED, new RotateToTarget());
 
 		// test commands
 		registerButton(pFarmController, 15, PRESSED, new DriveDistanceCommand(9 * 12));

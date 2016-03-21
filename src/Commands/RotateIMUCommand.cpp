@@ -14,7 +14,7 @@ void RotateIMUCommand::Initialize() {
 	driveSubsystem->shiftDown();
 
 	updateCurrentAngle();
-	if(isAbsolute)
+	if (isAbsolute)
 		targetAngle = angle;
 	else
 		targetAngle = currentAngle + angle;

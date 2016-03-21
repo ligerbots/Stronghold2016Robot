@@ -40,6 +40,7 @@
 #include "Commands/PrepareForCrossingSequence.h"
 #include "Commands/RollBallToIntakePositionCommand.h"
 #include "Commands/RotateIMUCommand.h"
+#include "Commands/RotateToTarget.h"
 #include "Commands/ShootCommand.h"
 #include "Commands/TabulaRasaCommand.h"
 #include "Commands/ToggleCameraFeedCommand.h"

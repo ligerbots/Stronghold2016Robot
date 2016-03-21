@@ -14,9 +14,11 @@ VisionSubsystem::VisionSubsystem() :
 		mp_processingFrame(NULL),
 		m_frameCenterX(0),
 		m_frameCenterY(0),
+		m_frameWidth(640.0), 		// guess
 		m_numParticles(0),
 		m_processingThread(&VisionSubsystem::visionProcessingThread,this),
 		m_visionBusy(false),
+		m_visionRequested(true),	// run one vision frame on startup
 		m_lastVisionTick(0),
 		m_activeCamera(0),
 		m_pM(NULL)
@@ -96,10 +98,13 @@ void VisionSubsystem::updateVision(int ticks) {
 		}
 	}
 
-	if (enableVision.get()) {
+	if (m_visionRequested) {
 		// If we just asked camera zero to get a frame, don't do it again here
 		if (m_activeCamera != 0) Camera::GetCamera(0)->GetFrame();
 		mp_currentFrame = Camera::GetCamera(0)->GetStoredFrame();
+		int width, height;
+		imaqGetImageSize(mp_currentFrame, &width, &height);
+		m_frameWidth = (double) width;
 		// We don't do a SetImage here -- that's done in the Vision Processing thread
 
 		// If it's been more than eight vision ticks since we last processed a grame, do one now
@@ -112,8 +117,14 @@ void VisionSubsystem::updateVision(int ticks) {
 			// duplicate the current frame for image processing
 			imaqDuplicate(mp_processingFrame, mp_currentFrame);
 			pthread_cond_signal(&m_threadCond);
+			// if a vision request came in while we were still processing, cancel it
+			m_visionRequested = false;
 		}
 	}
+}
+
+void VisionSubsystem::runVision() {
+	m_visionRequested = true;
 }
 
 void VisionSubsystem::toggleCameraFeed() {
@@ -155,7 +166,8 @@ void VisionSubsystem::visionProcessingThread() {
 		timespec startCPUTime, endCPUTime;
 		clock_gettime(cid, &startCPUTime);
 
-		if (enableVision.get()) {
+		// for now in the new scheme we don't allow Vision disable
+		if (true && enableVision.get()) {
 			if (mp_currentFrame == NULL) {
 				// wait for first frame
 				usleep(34000); 	// 34 ms - about a tick and half
@@ -188,6 +200,7 @@ void VisionSubsystem::visionProcessingThread() {
 			m_numParticles = 0;
 		}
 		m_visionBusy = false;
+		m_visionRequested = false;
 		m_lastVisionTick = Robot::ticks;
 		// with pthread_cond_wait, we don't need Mutex anymore
 		//usleep(33000);
@@ -275,7 +288,7 @@ void VisionSubsystem::markTarget(Image *image) {
 		// Send the image to the dashboard with a target indicator
 		int width, height;
 		imaqGetImageSize(image, &width, &height);
-		double setpoint = getSetpoint();
+		double setpoint = getCorrectedFrameCenter();
 		if (m_numParticles != 0) {
 			// If the target is centered in our field of view, paint it green; else red
 			double Xerror = fabs(setpoint * width - m_frameCenterX);
@@ -310,43 +323,36 @@ void VisionSubsystem::markTarget(Image *image) {
 	}
 }
 
-double VisionSubsystem::getFrameCenter() {
-	if (Camera::GetNumberOfCameras() < 1)
-		return 0;
-	else {
-		int width = Camera::GetCamera(0)->GetWidth();
-		if (width == 0)
-			return 0; // no frame captured yet
-		else {
-			return width / 2.0;
-		}
-	}
-}
-
-double VisionSubsystem::getSetpoint(){
-	if (Camera::GetNumberOfCameras() < 1)return 0;
+double VisionSubsystem::getCorrectedFrameCenter() {
+	if (Camera::GetNumberOfCameras() < 1) return 0;
 	int width = Camera::GetCamera(0)->GetWidth();
 
 	if (width == 0) return 0; // no frame captured yet
+	int center = width/2;
+	double fCenter = (double) center;
 
-	double distInches = getDistanceToTarget() * 12;
-/*
-	Charles' version ...
-	double offsetAngle = atan2(camera_offset, distInches);
-	double ratio = offsetAngle/horizontal_field_of_view;
-	// ratio gives us the fraction of the field of view to adjust by.
-	// now turn it into pixels
-	double dxPixels = ratio * width;
-	return (getFrameCenter() - dxPixels);
-*/
-	// fov_diag = 90deg http://www.logitech.com/assets/47868/logitech-webcam-c930e-data-sheet.pdf
-	// fov_horiz = 2 * atan2(16/2, sqrt(16*16+9*9)/2)
-	// tan(fov_horiz/2) = .8716
+	// no target, no correction
+	if (m_numParticles>0) {
+		double distInches = getDistanceToTarget() * 12;
+	/*
+		Charles' version ...
+		double offsetAngle = atan2(camera_offset, distInches);
+		double ratio = offsetAngle/horizontal_field_of_view;
+		// ratio gives us the fraction of the field of view to adjust by.
+		// now turn it into pixels
+		double dxPixels = ratio * width;
+		return (fCenter - dxPixels);
+	*/
+		// fov_diag = 90deg http://www.logitech.com/assets/47868/logitech-webcam-c930e-data-sheet.pdf
+		// fov_horiz = 2 * atan2(16/2, sqrt(16*16+9*9)/2)
+		// tan(fov_horiz/2) = .8716
 
-	// charles's fov calculation - 78.442
-	double f = (getFrameCenter() / 0.8162);
-	double dxPixels = camera_offset * f / distInches;
-	return (getFrameCenter() - dxPixels) / width;
+		// charles's fov calculation - 78.442, tan(78.442/2) = 0.8162
+		double f = (fCenter / 0.8162);
+		double dxPixels = camera_offset * f / distInches;
+		fCenter = (fCenter - dxPixels) / width;
+	}
+	return fCenter;
 }
 
 double VisionSubsystem::getCenterOfMassX() {
@@ -414,7 +420,18 @@ PIDSourceType VisionSubsystem::GetPIDSourceType() const {
 	return PIDSourceType::kDisplacement;
 }
 
+// m_frameCenterX is where Vision put the target
+//
 double VisionSubsystem::PIDGet() {
-	return m_frameCenterX / (getFrameCenter() * 2);
+	return m_frameCenterX / (getCorrectedFrameCenter() * 2);
 }
 
+// returns the TargetAngle RELATIVE to the current robot angle
+double VisionSubsystem::TargetAngle() {
+	if (m_numParticles==0) return 0.0;
+	double targetX = getCorrectedFrameCenter();
+	double angle = ((targetX - m_frameWidth/2.0)/m_frameWidth) * horizontal_field_of_view;
+	printf("---> Angle to target relative %5.2f absolute: %5.2f\n", angle, (90 - m_robotPos.Angle) + angle);
+	SmartDashboard::PutNumber("AngleToTarget", angle);
+	return angle;
+}

@@ -62,7 +62,7 @@ void CenterOnTargetCommand::Execute() {
 		return;
 	}
 
-	centerTo = visionSubsystem->getSetpoint();
+	centerTo = visionSubsystem->getCorrectedFrameCenter();
 
 	double error = centerTo - visionSubsystem->PIDGet();
 	double sign = error < 0 ? -1 : 1;

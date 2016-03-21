@@ -55,9 +55,11 @@ private:
 
 	double m_frameCenterX;
 	double m_frameCenterY;
+	double m_frameWidth;
 	int m_numParticles;
 	std::thread m_processingThread;
 	bool m_visionBusy;
+	bool m_visionRequested;
 	pthread_cond_t m_threadCond;
 	pthread_mutex_t m_threadMutex;
 	int m_lastVisionTick;
@@ -97,8 +99,8 @@ public:
 	static constexpr double camera_offset = 3.25; // in
 	static constexpr double horizontal_field_of_view = 78.442;
 
-	double getFrameCenter();
-	double getSetpoint();
+	void runVision();
+	double getCorrectedFrameCenter();
 	bool isTargetVisible();
 
 	double getCenterOfMassX();
@@ -123,4 +125,5 @@ public:
 	void SetPIDSourceType(PIDSourceType pidSource);
 	PIDSourceType GetPIDSourceType() const;
 	double PIDGet();
+	double TargetAngle();
 };
