@@ -68,6 +68,13 @@ protected:
 			CANTalon& r_talon);
 
 public:
+	// empirically measured by driving 5 feet
+	static constexpr double TICKS_PER_INCH = 640;
+
+	// the coordinates and direction of the robot at all times
+	double X, Y;			// inches
+	double Angle;			// degrees
+	double m_lastDistance;	// encode value one tick ago
 	DriveSubsystem();
 	virtual ~DriveSubsystem();
 	void InitDefaultCommand();
@@ -87,6 +94,9 @@ public:
 	bool isShiftedUp();
 	double getLeftEncoderPosition();
 	double getRightEncoderPosition();
+	void updatePosition();
+	void SetInitialPosition(double x, double y);
+
 
 	/**
 	 * PIDOutput instance to use for turning

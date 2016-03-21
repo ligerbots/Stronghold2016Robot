@@ -41,8 +41,7 @@ protected:
 										 SLOW_SPEED,
 										 NORMAL_SPEED,
 										 FAST_SPEED};
-
-	static constexpr double TICKS_PER_FOOT = 7673; // empirically measured by driving 5 feet
+	static constexpr double TICKS_PER_FOOT = 7673;
 	static constexpr double DRIVE_GAIN = 0.06;	   // 4/100 -- taken from 2014 robot
 
 };

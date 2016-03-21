@@ -43,6 +43,9 @@ void Robot::RobotInit() {
 
 	fieldInfo.initSelectors();
 
+	// set the robot initial position (perhaps)
+	CommandBase::navXSubsystem->zeroYaw(fieldInfo.GetInitialOrientation());
+
 	printf("Done\n");
 }
 
@@ -170,6 +173,9 @@ void Robot::AutonomousInit() {
 	CommandBase::navXSubsystem->zeroYaw(fieldInfo.GetInitialOrientation());
 	CommandBase::navXSubsystem->ResetDisplacement();
 
+	CommandBase::driveSubsystem->SetInitialPosition(FieldInfo::startingLocations[pos].x,
+													FieldInfo::startingLocations[pos].y);
+
 	CommandBase::driveJoystickCommand->Cancel();
 	CommandBase::intakeRollerCommand->Cancel();
 	CommandBase::flapCommand->Cancel();
@@ -200,7 +206,6 @@ void Robot::TeleopInit() {
 	CommandBase::driveJoystickCommand->Start();
 	CommandBase::intakeRollerCommand->Start();
 	CommandBase::flapCommand->Start();
-	CommandBase::navXSubsystem->zeroYaw(Robot::instance->fieldInfo.GetInitialOrientation());
 }
 
 void Robot::TeleopPeriodic() {
