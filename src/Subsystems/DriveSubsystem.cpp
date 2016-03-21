@@ -2,7 +2,7 @@
 
 DriveSubsystem::DriveSubsystem() :
 		Subsystem("DriveSubsystem"),
-		X(0.0), Y(0.0), Angle(0.0)
+		m_pos({ 0.0, 0.0, 0.0 })
 {
 	printf("DriveSubsystem: initialize\n");
 	turnPIDOutput.reset(new DriveTurnPIDOutput(*this));
@@ -205,16 +205,20 @@ void DriveSubsystem::drive(double y, double x) {
 void DriveSubsystem::updatePosition() {
 	double distance = (getRightEncoderPosition() * TICKS_PER_INCH) - m_lastDistance;
 	m_lastDistance += distance;
-	Angle = 90 - CommandBase::navXSubsystem->GetYaw();
-	double xMoved = cos(Angle) * distance;
+	m_pos.Angle = 90 - CommandBase::navXSubsystem->GetYaw();
+	double xMoved = cos(m_pos.Angle) * distance;
 	double yMoved = sqrt(distance*distance - xMoved*xMoved);
-	X += xMoved;
-	Y += yMoved;
+	m_pos.X += xMoved;
+	m_pos.Y += yMoved;
 }
 
 void DriveSubsystem::SetInitialPosition(double x, double y) {
-	X = x;
-	Y = y;
+	m_pos.X = x;
+	m_pos.Y = y;
+}
+
+DriveSubsystem::Position DriveSubsystem::GetPosition() {
+	return m_pos;
 }
 
 void DriveSubsystem::driveDirect(double left, double right){
@@ -281,9 +285,9 @@ void DriveSubsystem::sendValuesToSmartDashboard() {
 							0.0);
 		}
 
-		SmartDashboard::PutNumber("X", X);
-		SmartDashboard::PutNumber("Y", Y);
-		SmartDashboard::PutNumber("Angle", Angle);
+		SmartDashboard::PutNumber("X", m_pos.X);
+		SmartDashboard::PutNumber("Y", m_pos.Y);
+		SmartDashboard::PutNumber("Angle", m_pos.Angle);
 
 		SmartDashboard::PutNumber("Drive/LeftPosition",
 				getLeftEncoderPosition());

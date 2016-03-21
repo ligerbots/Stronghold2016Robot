@@ -4,24 +4,6 @@
 #include "WPILib.h"
 
 class DriveSubsystem: public Subsystem {
-private:
-	std::unique_ptr<CANTalon> mp_left1;
-	std::unique_ptr<CANTalon> mp_left2;
-	std::unique_ptr<CANTalon> mp_left3;
-	std::unique_ptr<CANTalon> mp_right1;
-	std::unique_ptr<CANTalon> mp_right2;
-	std::unique_ptr<CANTalon> mp_right3;
-
-	std::unique_ptr<RobotDrive> mp_robotDrive;
-
-	std::unique_ptr<DoubleSolenoid> mp_shifterSolenoid;
-
-	CANTalon *talonPtrs[7];
-	bool talonsPresent[7];
-
-	CANTalon *mp_leftEncoder;
-	CANTalon *mp_rightEncoder;
-
 protected:
 	class DriveTurnPIDOutput: public PIDOutput {
 	protected:
@@ -48,33 +30,19 @@ protected:
 		}
 	};
 
-	/**
-	 * Initialize a talon as a master
-	 * @param r_talon The talon
-	 */
-	void TalonMasterInit(CANTalon& r_talon);
-	/**
-	 * Initialize a talon as a slave
-	 * @param r_slaveTalon The talon
-	 * @param masterId The CAN ID of the master talon to copy from
-	 */
-	void TalonSlaveInit(CANTalon& r_slaveTalon, int masterId);
-	/**
-	 * Checks if a talon is present (responds to CAN bus messages)
-	 * @param r_talon The talon to check
-	 * @return True if the talon is present, false otherwise
-	 */
-	bool IsTalonPresent(CANTalon& r_talon);bool IsEncoderPresent(
-			CANTalon& r_talon);
-
 public:
+
+	// structure used for tracking robot position
+	struct Position {
+		double X, Y;
+		double Angle;
+	};
+	Position m_pos;
+	double m_lastDistance;	// encode value one tick ago
+
 	// empirically measured by driving 5 feet
 	static constexpr double TICKS_PER_INCH = 640;
 
-	// the coordinates and direction of the robot at all times
-	double X, Y;			// inches
-	double Angle;			// degrees
-	double m_lastDistance;	// encode value one tick ago
 	DriveSubsystem();
 	virtual ~DriveSubsystem();
 	void InitDefaultCommand();
@@ -96,13 +64,51 @@ public:
 	double getRightEncoderPosition();
 	void updatePosition();
 	void SetInitialPosition(double x, double y);
-
+	Position GetPosition();
 
 	/**
-	 * PIDOutput instance to use for turning
+	 * PIDOutput instance to use for turning (not really)
 	 */
 	std::shared_ptr<DriveTurnPIDOutput> turnPIDOutput;
 
 	void sendValuesToSmartDashboard();
+
+private:
+	std::unique_ptr<CANTalon> mp_left1;
+	std::unique_ptr<CANTalon> mp_left2;
+	std::unique_ptr<CANTalon> mp_left3;
+	std::unique_ptr<CANTalon> mp_right1;
+	std::unique_ptr<CANTalon> mp_right2;
+	std::unique_ptr<CANTalon> mp_right3;
+
+	std::unique_ptr<RobotDrive> mp_robotDrive;
+
+	std::unique_ptr<DoubleSolenoid> mp_shifterSolenoid;
+
+	CANTalon *talonPtrs[7];
+	bool talonsPresent[7];
+
+	CANTalon *mp_leftEncoder;
+	CANTalon *mp_rightEncoder;
+
+	/**
+	 * Initialize a talon as a master
+	 * @param r_talon The talon
+	 */
+	void TalonMasterInit(CANTalon& r_talon);
+	/**
+	 * Initialize a talon as a slave
+	 * @param r_slaveTalon The talon
+	 * @param masterId The CAN ID of the master talon to copy from
+	 */
+	void TalonSlaveInit(CANTalon& r_slaveTalon, int masterId);
+	/**
+	 * Checks if a talon is present (responds to CAN bus messages)
+	 * @param r_talon The talon to check
+	 * @return True if the talon is present, false otherwise
+	 */
+	bool IsTalonPresent(CANTalon& r_talon);bool IsEncoderPresent(
+			CANTalon& r_talon);
+
 
 };
