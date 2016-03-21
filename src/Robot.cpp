@@ -141,6 +141,16 @@ void Robot::DisabledInit() {
 
 void Robot::DisabledPeriodic() {
 	AlwaysPeriodic();
+
+	if(ticks % 50 == 0){
+		printf("Selected auto parameters:\n");
+		printf("\tPosition: %s\n",
+				FieldInfo::StartingPositionNames[fieldInfo.GetPosition()].c_str());
+		printf("\tDefense: %s\n",
+				FieldInfo::DefenseNames[fieldInfo.GetDefense()].c_str());
+		printf("\tTarget: %s\n",
+				FieldInfo::TargetNames[fieldInfo.GetTarget()].c_str());
+	}
 }
 
 void Robot::AutonomousInit() {
