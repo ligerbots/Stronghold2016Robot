@@ -18,6 +18,7 @@ VisionSubsystem::VisionSubsystem() :
 		m_processingThread(&VisionSubsystem::visionProcessingThread,this),
 		m_visionBusy(false),
 		m_lastVisionTick(0),
+
 		m_activeCamera(0),
 		m_pM(NULL)
 {
@@ -81,7 +82,20 @@ void VisionSubsystem::updateVision(int ticks) {
 	Image *image = Camera::GetCamera(m_activeCamera)->GetStoredFrame();
 	// if we're not running Vision, just display the frame from the current camera, or
 	// if the alternate camera is current, display its frame, even if we're doing vision on camera 0
-	if (/*!enableVision.get() ||*/ m_activeCamera != 0) LCameraServer::GetInstance()->SetImage(image);
+	if (m_activeCamera != 0) LCameraServer::GetInstance()->SetImage(image);
+	else {
+		if (mp_processingFrame != NULL && showVision.get())
+			LCameraServer::GetInstance()->SetImage(mp_processingFrame);
+		else {
+			DriveSubsystem::Position pos = CommandBase::driveSubsystem->GetPosition();
+			if (fabs(pos.Angle - m_robotPos.Angle < 1.5)) {
+				// If the robot hasn't shifted more than 1.5 degrees off the orientation
+				// it had when we last took a vision position, then display the target markup
+				markTarget(mp_currentFrame);
+			}
+			LCameraServer::GetInstance()->SetImage(mp_currentFrame);
+		}
+	}
 
 	if (enableVision.get()) {
 		// If we just asked camera zero to get a frame, don't do it again here
@@ -153,11 +167,8 @@ void VisionSubsystem::visionProcessingThread() {
 			SmartDashboard::PutNumber("Vision/imaq_err", err);
 
 			// compute the distance, angle, etc. and mark target on currentFrame
-			measureAndMark(mp_currentFrame, mp_processingFrame);
-
-			// Display the marked frame, or the processing frame
-			if (m_activeCamera == 0)
-				LCameraServer::GetInstance()->SetImage(showVision.get() ? mp_processingFrame : mp_currentFrame);
+			measureTarget(mp_processingFrame);
+			m_robotPos = CommandBase::driveSubsystem->GetPosition();
 
 			// print out CPU statistics periodically, but not so often as to spam the console
 			if (loopCounter%40 == 0) {
@@ -191,7 +202,7 @@ bool VisionSubsystem::isTargetVisible(){
 // Measure particles and mark target
 // image is the image to process
 // mark is the image we mark the target on
-void VisionSubsystem::measureAndMark(Image *mark, Image *image)
+void VisionSubsystem::measureTarget(Image *image)
 {
 	//  use largest particle only, and check (convex hull area)/(particle area)
 	// to make sure it's about 2.2
@@ -250,46 +261,53 @@ void VisionSubsystem::measureAndMark(Image *mark, Image *image)
 
 			m_frameCenterX = (feretStartX + feretEndX) / 2;
 			m_frameCenterY = (feretStartY + feretEndY) / 2;
-
-			if (paintTarget.get()) {
-				std::lock_guard<std::mutex> lock(m_frameMutex);
-				// Send the image to the dashboard with a target indicator
-				int width, height;
-				imaqGetImageSize(mark, &width, &height);
-				double setpoint = getSetpoint();
-				if (m_numParticles != 0) {
-					// If the target is centered in our field of view, paint it green; else red
-					double Xerror = fabs(setpoint * width - m_frameCenterX);
-//					printf("%f\n", Xerror);
-					// Centered means no more than 1.5% off to either side
-					double color = Xerror < (width * 0.015) ? GREEN : RED;
-					// draw a 6-pixel circle in red
-					imaqDrawShapeOnImage(mark, mark,
-							{ (int) m_frameCenterY - 3, (int) m_frameCenterX - 3, 6, 6}, IMAQ_PAINT_VALUE, IMAQ_SHAPE_OVAL, color);
-					if (false) {
-						// this code attempts to draw an X, but ...
-						imaqDrawLineOnImage(mark, mark, DrawMode::IMAQ_DRAW_VALUE,
-								{ (int) m_frameCenterX - 5, (int) m_frameCenterY },
-								{ (int) m_frameCenterX + 5, (int) m_frameCenterY },
-								CYAN);
-						imaqDrawLineOnImage(mark, mark, DrawMode::IMAQ_DRAW_VALUE,
-								{ (int) m_frameCenterX, (int) m_frameCenterY - 5 },
-								{ (int) m_frameCenterX, (int) m_frameCenterY + 5 },
-								CYAN);
-					}
-					// Draw the whole feret diagonal
-					imaqDrawLineOnImage(mark, mark, DrawMode::IMAQ_DRAW_VALUE,
-							{(int) feretStartX, (int) feretStartY},
-							{(int) feretEndX,   (int) feretEndY },
-							YELLOW);
-				}
-
-				imaqDrawLineOnImage(mark, mark, DrawMode::IMAQ_DRAW_VALUE,
-						{ (int) (setpoint * width), 0 },
-						{ (int) (setpoint * width), height },
-						YELLOW);
-			}
 		}
+	}
+}
+
+void VisionSubsystem::markTarget(Image *image) {
+	if (paintTarget.get()) {
+		double feretStartX = m_pM[MFDSX];
+		double feretStartY = m_pM[MFDSY];
+		double feretEndX = m_pM[MFDEX];
+		double feretEndY = m_pM[MFDEY];
+		// Mutex below is commented out because we're now painting the target on the main thread
+		// std::lock_guard<std::mutex> lock(m_frameMutex);
+		// Send the image to the dashboard with a target indicator
+		int width, height;
+		imaqGetImageSize(image, &width, &height);
+		double setpoint = getSetpoint();
+		if (m_numParticles != 0) {
+			// If the target is centered in our field of view, paint it green; else red
+			double Xerror = fabs(setpoint * width - m_frameCenterX);
+//					printf("%f\n", Xerror);
+			// Centered means no more than 1.5% off to either side
+			double color = Xerror < (width * 0.015) ? GREEN : RED;
+			// draw a 6-pixel circle in red
+			imaqDrawShapeOnImage(image, image,
+					{ (int) m_frameCenterY - 3, (int) m_frameCenterX - 3, 6, 6}, IMAQ_PAINT_VALUE, IMAQ_SHAPE_OVAL, color);
+			if (false) {
+				// this code attempts to draw an X, but ...
+				imaqDrawLineOnImage(image, image, DrawMode::IMAQ_DRAW_VALUE,
+						{ (int) m_frameCenterX - 5, (int) m_frameCenterY },
+						{ (int) m_frameCenterX + 5, (int) m_frameCenterY },
+						CYAN);
+				imaqDrawLineOnImage(image, image, DrawMode::IMAQ_DRAW_VALUE,
+						{ (int) m_frameCenterX, (int) m_frameCenterY - 5 },
+						{ (int) m_frameCenterX, (int) m_frameCenterY + 5 },
+						CYAN);
+			}
+			// Draw the whole feret diagonal
+			imaqDrawLineOnImage(image, image, DrawMode::IMAQ_DRAW_VALUE,
+					{(int) feretStartX, (int) feretStartY},
+					{(int) feretEndX,   (int) feretEndY },
+					YELLOW);
+		}
+
+		imaqDrawLineOnImage(image, image, DrawMode::IMAQ_DRAW_VALUE,
+				{ (int) (setpoint * width), 0 },
+				{ (int) (setpoint * width), height },
+				YELLOW);
 	}
 }
 

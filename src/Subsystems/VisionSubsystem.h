@@ -4,6 +4,7 @@
 #include "WPILib.h"
 #include <Utils/Parameter.h>
 #include <pthread.h>
+#include "DriveSubsystem.h"
 
 // We believe the "float" color in the imaqDraw calls is BGR (Blue Green Red)
 // with ranges of 0.0 to just under 256.0 for each color
@@ -60,6 +61,7 @@ private:
 	pthread_cond_t m_threadCond;
 	pthread_mutex_t m_threadMutex;
 	int m_lastVisionTick;
+	DriveSubsystem::Position m_robotPos;
 
 	// Take all the particple measurements in one call
 	// Q: Does taking extra measurements slow things down?
@@ -73,7 +75,8 @@ private:
 
 
 	void visionProcessingThread();
-	void measureAndMark(Image *mark, Image *image);
+	void measureTarget(Image *image);
+	void markTarget(Image *image);
 
 public:
 	// Subsystem
