@@ -9,6 +9,7 @@ AcquireTarget::AcquireTarget() : CommandBase("AcquireTarget")
 // Called just before this Command runs the first time
 void AcquireTarget::Initialize()
 {
+	printf("Acquire Target!!!!!\n");
 	visionSubsystem->runVision();
 }
 

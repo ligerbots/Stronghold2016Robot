@@ -429,8 +429,10 @@ double VisionSubsystem::PIDGet() {
 // returns the TargetAngle RELATIVE to the current robot angle
 double VisionSubsystem::TargetAngle() {
 	if (m_numParticles==0) return 0.0;
-	double targetX = getCorrectedFrameCenter();
-	double angle = ((targetX - m_frameWidth/2.0)/m_frameWidth) * horizontal_field_of_view;
+	double targetFraction = getCorrectedFrameCenter();
+	double position = 0.5 - targetFraction;
+	double angle = position * horizontal_field_of_view;
+	//printf("---> targetX = %5.2f, fraction = %5.2f position = %5.2f, angle = %5.2f\n", targetX, fraction, position, angle);
 	printf("---> Angle to target relative %5.2f absolute: %5.2f\n", angle, (90 - m_robotPos.Angle) + angle);
 	SmartDashboard::PutNumber("AngleToTarget", angle);
 	return angle;
