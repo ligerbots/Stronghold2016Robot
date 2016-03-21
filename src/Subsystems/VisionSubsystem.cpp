@@ -18,7 +18,6 @@ VisionSubsystem::VisionSubsystem() :
 		m_processingThread(&VisionSubsystem::visionProcessingThread,this),
 		m_visionBusy(false),
 		m_lastVisionTick(0),
-
 		m_activeCamera(0),
 		m_pM(NULL)
 {
@@ -91,9 +90,9 @@ void VisionSubsystem::updateVision(int ticks) {
 			if (fabs(pos.Angle - m_robotPos.Angle < 1.5)) {
 				// If the robot hasn't shifted more than 1.5 degrees off the orientation
 				// it had when we last took a vision position, then display the target markup
-				markTarget(mp_currentFrame);
+				markTarget(image);
 			}
-			LCameraServer::GetInstance()->SetImage(mp_currentFrame);
+			LCameraServer::GetInstance()->SetImage(image);
 		}
 	}
 
@@ -266,7 +265,7 @@ void VisionSubsystem::measureTarget(Image *image)
 }
 
 void VisionSubsystem::markTarget(Image *image) {
-	if (paintTarget.get()) {
+	if (paintTarget.get() && image!=NULL && m_pM!=NULL) {
 		double feretStartX = m_pM[MFDSX];
 		double feretStartY = m_pM[MFDSY];
 		double feretEndX = m_pM[MFDEX];

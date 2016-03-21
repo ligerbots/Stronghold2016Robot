@@ -2,6 +2,7 @@
 
 #include "Commands/Subsystem.h"
 #include "WPILib.h"
+#include "Robot.h"
 
 class DriveSubsystem: public Subsystem {
 protected:
@@ -25,7 +26,7 @@ protected:
 
 			pidOutput = -pidOutput;
 
-			printf("TurnPIDOutput %f\n", pidOutput);
+			if (Robot::ticks%5==0) printf("TurnPIDOutput %f\n", pidOutput);
 			mr_parent.drive(0, pidOutput); // turn
 		}
 	};
