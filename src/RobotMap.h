@@ -62,6 +62,8 @@ public:
 	static constexpr int PWM_SERVO_SHOOTER_LEFT = 0;
 	static constexpr int PWM_SERVO_SHOOTER_RIGHT = 1;
 
+	static constexpr int AI_PRESSURE_SENSOR = 0;
+
 	// Maximum pitch angle. If the robot gets to this angle, we need to go
 	// backwards to keep the robot from tipping over.
 	static constexpr float MAX_PITCH_ANGLE = 45.0;
