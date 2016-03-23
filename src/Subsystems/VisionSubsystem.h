@@ -98,6 +98,7 @@ public:
 	static constexpr double distance_b = 1.0052;
 	static constexpr double camera_offset = 3.25; // in
 	static constexpr double horizontal_field_of_view = 78.442;
+	static constexpr double tan_half_horizontal_field_of_view = 0.8162;
 
 	void runVision();
 	double getCorrectedFrameCenter();

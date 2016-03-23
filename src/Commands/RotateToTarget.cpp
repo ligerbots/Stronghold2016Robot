@@ -7,6 +7,12 @@ RotateToTarget::RotateToTarget() :
 	Requires(driveSubsystem.get());
 	SetInterruptible(true);
 	m_ticks = 0;
+	angle = 0;
+	targetAngle = 0;
+	currentAngle = 0;
+	lastAngle = 0;
+	isClockwise = false;
+	isAbsolute = true;
 }
 
 void RotateToTarget::Initialize() {

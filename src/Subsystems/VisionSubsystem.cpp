@@ -44,6 +44,7 @@ VisionSubsystem::VisionSubsystem() :
 	mT[MFDEX] = IMAQ_MT_MAX_FERET_DIAMETER_END_X;
 	mT[MFDEY] = IMAQ_MT_MAX_FERET_DIAMETER_END_Y;
 	mT[ORIENT] = IMAQ_MT_ORIENTATION;
+	m_robotPos = {0, 0, 0};
 }
 
 void VisionSubsystem::InitDefaultCommand() {
@@ -348,7 +349,7 @@ double VisionSubsystem::getCorrectedFrameCenter() {
 		// tan(fov_horiz/2) = .8716
 
 		// charles's fov calculation - 78.442, tan(78.442/2) = 0.8162
-		double f = (fCenter / 0.8162);
+		double f = (fCenter / tan_half_horizontal_field_of_view);
 		double dxPixels = camera_offset * f / distInches;
 		fCenter = (fCenter - dxPixels) / width;
 	}
@@ -423,7 +424,7 @@ PIDSourceType VisionSubsystem::GetPIDSourceType() const {
 // m_frameCenterX is where Vision put the target
 //
 double VisionSubsystem::PIDGet() {
-	return m_frameCenterX / (getCorrectedFrameCenter() * 2);
+	return m_frameCenterX / m_frameWidth;
 }
 
 // returns the TargetAngle RELATIVE to the current robot angle
@@ -431,7 +432,7 @@ double VisionSubsystem::TargetAngle() {
 	if (m_numParticles==0) return 0.0;
 	double targetFraction = getCorrectedFrameCenter();
 	double position = 0.5 - targetFraction;
-	double angle = position * horizontal_field_of_view;
+	double angle = atan(position * tan_half_horizontal_field_of_view / 0.5);
 	//printf("---> targetX = %5.2f, fraction = %5.2f position = %5.2f, angle = %5.2f\n", targetX, fraction, position, angle);
 	printf("---> Angle to target relative %5.2f absolute: %5.2f\n", angle, (90 - m_robotPos.Angle) + angle);
 	SmartDashboard::PutNumber("AngleToTarget", angle);
