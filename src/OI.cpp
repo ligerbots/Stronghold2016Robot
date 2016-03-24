@@ -60,11 +60,10 @@ void OI::registerSecondControllerButtons() {
 		registerButton(pFarmController, 11, PRESSED, new PrepareForCrossingSequence());
 		registerButton(pFarmController, 13, PRESSED, new AcquireTarget());
 		registerButton(pFarmController, 16, PRESSED, new RotateToTarget());
-
-		// registerButton(pFarmController, 16, PRESSED, new RotateIMUCommand(0));
+//		registerButton(pFarmController, 16, PRESSED, new RotateIMUCommand(0));
 
 		// test commands
-		registerButton(pFarmController, 15, PRESSED, new DriveDistanceCommand(9 * 12));
+		registerButton(pFarmController, 15, PRESSED, new DriveDistanceCommand(9 * 12, FieldInfo::FAST, DriveDistanceCommand::HIGH));
 
 
 		registerButton(pFarmController, 12, PRESSED, new AutonomousDriveSequence(

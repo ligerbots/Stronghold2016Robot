@@ -215,7 +215,7 @@ void DriveSubsystem::updatePosition() {
 	double yMoved = sqrt(distance*distance - xMoved*xMoved);
 	m_pos.X += xMoved;
 	m_pos.Y += yMoved;
-	if (Robot::ticks%100==0)
+	if (Robot::ticks%300==0)
 		printf("POSITION: X=%5.2f Y=%5.2f Angle=%5.2f\n", m_pos.X, m_pos.Y, m_pos.Angle);
 }
 

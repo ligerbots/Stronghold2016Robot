@@ -25,7 +25,4 @@ void AutoSetFlapsCommand::End() {
 }
 
 void AutoSetFlapsCommand::Interrupted() {
-	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL){
-		CommandBase::flapCommand->Start();
-	}
 }

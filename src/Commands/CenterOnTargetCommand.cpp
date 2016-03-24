@@ -99,6 +99,4 @@ void CenterOnTargetCommand::Interrupted() {
 //	mp_softwarePID->Disable();
 	driveSubsystem->zeroMotors();
 //	SmartDashboard::PutData("CenterOnTargetPID", mp_softwarePID);
-	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL)
-		CommandBase::driveJoystickCommand->Start();
 }

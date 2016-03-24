@@ -25,7 +25,6 @@ CenterAndRollBallSequence::CenterAndRollBallSequence()
 
 void CenterAndRollBallSequence::Interrupted(){
 	CommandGroup::Interrupted();
-	cleanup();
 }
 
 void CenterAndRollBallSequence::End(){

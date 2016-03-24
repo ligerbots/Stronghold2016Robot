@@ -30,7 +30,6 @@ AutonomousShootSequence::AutonomousShootSequence()
 
 void AutonomousShootSequence::Interrupted(){
 	CommandGroup::Interrupted();
-	cleanup();
 }
 
 void AutonomousShootSequence::End(){

@@ -31,6 +31,7 @@ void DriveDistanceCommand::Initialize() {
 	if (m_gear==HIGH) {
 		if (fabs(m_distance) > 2.0) driveSubsystem->shiftUp();
 		else {
+			printf("m_distance: %f\n", fabs(m_distance));
 			// force low gear and normal speed
 			m_gear = LOW;
 			m_speed = NORMAL_SPEED;
@@ -90,7 +91,4 @@ void DriveDistanceCommand::End() {
 
 void DriveDistanceCommand::Interrupted() {
 	driveSubsystem->zeroMotors();
-	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL){
-		CommandBase::driveJoystickCommand->Start();
-	}
 }

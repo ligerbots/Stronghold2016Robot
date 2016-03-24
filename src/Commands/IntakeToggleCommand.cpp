@@ -49,7 +49,5 @@ void IntakeToggleCommand::End() {
 }
 
 void IntakeToggleCommand::Interrupted() {
-	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL)
-		CommandBase::intakeRollerCommand->Start();
 	printf("IntakeCommand: interrupted\n");
 }

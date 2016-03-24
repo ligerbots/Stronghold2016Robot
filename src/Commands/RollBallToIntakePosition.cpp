@@ -72,7 +72,7 @@ void RollBallToIntakePositionCommand::Execute() {
 	if(ticks < 20 && needsToWaitForFlaps)
 		return; // wait for flaps
 
-	double rollSpeed = 0.3;
+	double rollSpeed = 1;
 	if(where == LOW_GOAL || where == PICKUP)
 		rollSpeed = 1; // max speed
 
@@ -133,8 +133,4 @@ void RollBallToIntakePositionCommand::End() {
 void RollBallToIntakePositionCommand::Interrupted() {
 	printf("RollBallToIntakePositionCommand: interrupted\n");
 	intakeSubsystem->rollStop();
-	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL){
-		CommandBase::intakeRollerCommand->Start();
-		CommandBase::flapCommand->Start();
-	}
 }

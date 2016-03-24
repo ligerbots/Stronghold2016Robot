@@ -52,6 +52,10 @@ void Robot::RobotInit() {
 void Robot::AlwaysPeriodic() {
 	ticks++;
 
+//	if(ticks % 50 == 0){
+//		printf("Main thread running\n");
+//	}
+
 	// Check to see if the robot is about to tip
 	ROBOT_IS_ABOUT_TO_TIP = CommandBase::navXSubsystem->isRobotAboutToTip(RobotMap::MAX_PITCH_ANGLE);
 	SmartDashboard::PutBoolean("SafeToDrive", !ROBOT_IS_ABOUT_TO_TIP);
@@ -144,6 +148,13 @@ void Robot::DisabledInit() {
 
 void Robot::DisabledPeriodic() {
 	AlwaysPeriodic();
+	// the commands don't seem to run in disabled
+	if(mp_operatorInterface->pFarmController->GetRawButton(22)){
+		CommandBase::visionSubsystem->setCameraFeed(0);
+	}
+	if(mp_operatorInterface->pFarmController->GetRawButton(23)){
+		CommandBase::visionSubsystem->setCameraFeed(1);
+	}
 }
 
 void Robot::AutonomousInit() {
