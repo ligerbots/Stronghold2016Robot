@@ -14,6 +14,8 @@ VisionSubsystem::VisionSubsystem() :
 		mp_processingFrame(NULL),
 		m_frameCenterX(0),
 		m_frameCenterY(0),
+		m_distance(0),
+		m_angle(0),
 		m_frameWidth(640.0), 		// guess
 		m_numParticles(0),
 		m_processingThread(&VisionSubsystem::visionProcessingThread,this),
@@ -84,15 +86,16 @@ void VisionSubsystem::updateVision(int ticks) {
 	Image *image = Camera::GetCamera(m_activeCamera)->GetStoredFrame();
 	// if we're not running Vision, just display the frame from the current camera, or
 	// if the alternate camera is current, display its frame, even if we're doing vision on camera 0
-	if (m_activeCamera != 0) LCameraServer::GetInstance()->SetImage(image);
-	else {
-		if (mp_processingFrame != NULL && showVision.get())
+	if (m_activeCamera != 0) {
+		LCameraServer::GetInstance()->SetImage(image);
+	} else {
+		if (mp_processingFrame != NULL && showVision.get()) {
 			LCameraServer::GetInstance()->SetImage(mp_processingFrame);
-		else {
-			DriveSubsystem::Position pos = CommandBase::driveSubsystem->GetPosition();
-			if (fabs(pos.Angle - m_robotPos.Angle) < 1.5) {
+		} else {
+			if (!isVisionCalculationDirty()) {
 				// If the robot hasn't shifted more than 1.5 degrees off the orientation
-				// it had when we last took a vision position, then display the target markup
+				// it had when we last took a vision position, or more than 1 inch in position,
+				// then display the target markup
 				markTarget(image);
 			}
 			LCameraServer::GetInstance()->SetImage(image);
@@ -108,7 +111,7 @@ void VisionSubsystem::updateVision(int ticks) {
 		m_frameWidth = (double) width;
 		// We don't do a SetImage here -- that's done in the Vision Processing thread
 
-		// If it's been more than eight vision ticks since we last processed a grame, do one now
+		// If it's been more than eight vision ticks since we last processed a frame, do one now
 		if ((Robot::ticks > m_lastVisionTick + 8) && !m_visionBusy) {
 			if (mp_processingFrame == NULL) {
 				// First time: create our processing frame
@@ -117,6 +120,7 @@ void VisionSubsystem::updateVision(int ticks) {
 			}
 			// duplicate the current frame for image processing
 			imaqDuplicate(mp_processingFrame, mp_currentFrame);
+			m_visionBusy = true;
 			pthread_cond_signal(&m_threadCond);
 			// if a vision request came in while we were still processing, cancel it
 			m_visionRequested = false;
@@ -274,6 +278,7 @@ void VisionSubsystem::measureTarget(Image *image)
 
 			m_frameCenterX = (feretStartX + feretEndX) / 2;
 			m_frameCenterY = (feretStartY + feretEndY) / 2;
+			calculateDistanceAndAngle(m_frameCenterX, m_frameCenterY, &m_distance, &m_angle);
 		}
 	}
 }
@@ -289,7 +294,7 @@ void VisionSubsystem::markTarget(Image *image) {
 		// Send the image to the dashboard with a target indicator
 		int width, height;
 		imaqGetImageSize(image, &width, &height);
-		double setpoint = getCorrectedFrameCenter();
+		double setpoint = getCorrectedFrameCenter(m_distance);
 		if (m_numParticles != 0) {
 			// If the target is centered in our field of view, paint it green; else red
 			double Xerror = fabs(setpoint * width - m_frameCenterX);
@@ -324,7 +329,7 @@ void VisionSubsystem::markTarget(Image *image) {
 	}
 }
 
-double VisionSubsystem::getCorrectedFrameCenter() {
+double VisionSubsystem::getCorrectedFrameCenter(double distInches) {
 	if (Camera::GetNumberOfCameras() < 1) return 0;
 	int width = Camera::GetCamera(0)->GetWidth();
 
@@ -334,7 +339,6 @@ double VisionSubsystem::getCorrectedFrameCenter() {
 
 	// no target, no correction
 	if (m_numParticles>0) {
-		double distInches = getDistanceToTarget() * 12;
 	/*
 		Charles' version ...
 		double offsetAngle = atan2(camera_offset, distInches);
@@ -356,11 +360,11 @@ double VisionSubsystem::getCorrectedFrameCenter() {
 	return fCenter;
 }
 
-double VisionSubsystem::getCenterOfMassX() {
+double VisionSubsystem::getTargetCenterX() {
 	return m_frameCenterX;
 }
 
-double VisionSubsystem::getCenterOfMassY() {
+double VisionSubsystem::getTargetCenterY() {
 	return m_frameCenterY;
 }
 
@@ -374,12 +378,17 @@ double VisionSubsystem::getBoundingBoxHeight() {
 
 double VisionSubsystem::getDistanceToTarget() {
 	// an exponential regression fits our data with r2=99.9%
-	// TODO: recalculate with new data
-	double centerOfMassY = getCenterOfMassY();
-	return 2.333 * pow(1.0052, centerOfMassY);
+//	double centerOfMassY = getTargetCenterY();
+//	return 2.333 * pow(1.0052, centerOfMassY);
+
+	// use NewVision calculations
+	return m_distance;
 }
 
 double VisionSubsystem::getFlapsFractionForDistance(double distance) {
+	// there's lots of complicated physics involved during the shot
+	// no regression fits test data well, so this does linear interpolation
+	// between lookup table values
 	distance = fmax(fmin(distance, 9), 4);
 	double low = angles[(int) floor(distance)];
 	double high = angles[(int) ceil(distance)];
@@ -412,11 +421,8 @@ void VisionSubsystem::sendValuesToSmartDashboard() {
 	SmartDashboard::PutNumber("TargetsDetected", m_numParticles);
 	SmartDashboard::PutNumber("TargetDistance", getDistanceToTarget());
 
-	double distance;
-	double angle;
-	getDistanceAndAngle(m_frameCenterX, m_frameCenterY, &distance, &angle);
-	SmartDashboard::PutNumber("NewVision Target Distance", distance);
-	SmartDashboard::PutNumber("NewVision Target Angle", angle);
+	SmartDashboard::PutNumber("NewVision Target Distance", m_distance);
+	SmartDashboard::PutNumber("NewVision Target Angle", m_angle);
 }
 
 void VisionSubsystem::SetPIDSourceType(PIDSourceType pidSource) {
@@ -436,21 +442,20 @@ double VisionSubsystem::PIDGet() {
 // returns the TargetAngle RELATIVE to the current robot angle
 double VisionSubsystem::TargetAngle() {
 	if (m_numParticles==0) return 0.0;
-	double centerToFraction = getCorrectedFrameCenter();
-	double frameCenterFraction = m_frameCenterX / m_frameWidth;
+	double centerToFraction = getCorrectedFrameCenter(m_distance);
 	double angle2 = atan(centerToFraction * tan_half_horizontal_field_of_view / 0.5) * 180 / M_PI;
-	double angle1 = atan(frameCenterFraction * tan_half_horizontal_field_of_view / 0.5) * 180 / M_PI;
+	double angle1 = m_angle;
 	double angle = angle1 - angle2;
-	printf("---> targetX = %5.2f, fraction1 = %5.2f fraction2 = %5.2f, angle1 = %5.2f angle2 = %5.2f\n", m_frameCenterX, centerToFraction, frameCenterFraction, angle1, angle2);
+	printf("---> targetX = %5.2f, fraction1 = %5.2f, angle1 = %5.2f angle2 = %5.2f\n", m_frameCenterX, centerToFraction, angle1, angle2);
 	printf("---> Angle to target relative %5.2f\n", angle);
 	SmartDashboard::PutNumber("AngleToTarget", angle);
 	return angle;
 }
 
-void VisionSubsystem::getDistanceAndAngle(double xpos, double ypos, double* distance, double* angle){
+void VisionSubsystem::calculateDistanceAndAngle(double xpos, double ypos, double* distance, double* angle){
 	FieldInfo::VisionDataPoint closestPoint;
 	double closestPointMeasure = DBL_MAX;
-	for(int i = 0; i < sizeof(Robot::instance->fieldInfo.visionData) / sizeof(FieldInfo::VisionDataPoint); i++){
+	for(size_t i = 0; i < sizeof(Robot::instance->fieldInfo.visionData) / sizeof(FieldInfo::VisionDataPoint); i++){
 		FieldInfo::VisionDataPoint point = Robot::instance->fieldInfo.visionData[i];
 		double measure = (point.xpos - xpos) * (point.xpos - xpos) + (point.ypos - ypos) * (point.ypos - ypos);
 		if(measure < closestPointMeasure){
@@ -470,7 +475,7 @@ void VisionSubsystem::getDistanceAndAngle(double xpos, double ypos, double* dist
 	double nextAngle = (xpos > closestPoint.xpos) ? closestPoint.angle + 10 : closestPoint.angle - 10;
 	FieldInfo::VisionDataPoint pointNextAngle;
 	bool angleFound = false;
-	for(int i = 0; i < sizeof(Robot::instance->fieldInfo.visionData) / sizeof(FieldInfo::VisionDataPoint); i++){
+	for(size_t i = 0; i < sizeof(Robot::instance->fieldInfo.visionData) / sizeof(FieldInfo::VisionDataPoint); i++){
 		FieldInfo::VisionDataPoint point = Robot::instance->fieldInfo.visionData[i];
 		if(point.distance == closestPoint.distance && point.angle == nextAngle){
 			pointNextAngle = point;
@@ -483,7 +488,7 @@ void VisionSubsystem::getDistanceAndAngle(double xpos, double ypos, double* dist
 	double nextDistance = (ypos > closestPoint.ypos) ? closestPoint.distance + 12 : closestPoint.distance - 12;
 	FieldInfo::VisionDataPoint pointNextDistance;
 	bool distanceFound = false;
-	for(int i = 0; i < sizeof(Robot::instance->fieldInfo.visionData) / sizeof(FieldInfo::VisionDataPoint); i++){
+	for(size_t i = 0; i < sizeof(Robot::instance->fieldInfo.visionData) / sizeof(FieldInfo::VisionDataPoint); i++){
 		FieldInfo::VisionDataPoint point = Robot::instance->fieldInfo.visionData[i];
 		if(point.distance == nextDistance && point.angle == closestPoint.angle){
 			pointNextDistance = point;
@@ -502,4 +507,20 @@ void VisionSubsystem::getDistanceAndAngle(double xpos, double ypos, double* dist
 	} else {
 		*distance = closestPoint.distance;
 	}
+}
+
+bool VisionSubsystem::isVisionCalculationDirty(){
+	// checks for validity of vision calculation by comparing current robot position and orientation
+	// to what it was during the calculation
+	DriveSubsystem::Position pos = CommandBase::driveSubsystem->GetPosition();
+	return fabs(pos.Angle - m_robotPos.Angle) > 1.5
+			|| fabs(pos.X - m_robotPos.X) > 2 || fabs(pos.Y - m_robotPos.Y) > 2;
+}
+
+bool VisionSubsystem::isVisionBusy(){
+	// for AcquireTarget with waitForVision=true
+	// on the first tick, requested = true, busy = false
+	// once updateVision runs (in 1 or 2 more ticks), requested = false, busy = true
+	// once thread actually finishes processing, requested = false, busy = false
+	return m_visionRequested || m_visionBusy;
 }

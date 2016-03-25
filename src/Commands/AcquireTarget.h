@@ -6,8 +6,14 @@
 
 class AcquireTarget: public CommandBase
 {
+protected:
+	bool m_waitForVision;
+	bool m_forceUpdate;
+	// calls visionSubsystem->isVisionCalculationDirty()
+	// if that returns false, then it skips getting a frame
+	bool m_isRunningVision;
 public:
-	AcquireTarget();
+	AcquireTarget(bool waitForVision = false, bool forceUpdate = false);
 	void Initialize();
 	void Execute();
 	bool IsFinished();

@@ -1,39 +1,42 @@
 #include "AcquireTarget.h"
 
-AcquireTarget::AcquireTarget() : CommandBase("AcquireTarget")
-{
-	// Use Requires() here to declare subsystem dependencies
-	// eg. Requires(chassis);
+AcquireTarget::AcquireTarget(bool waitForVision, bool forceUpdate) :
+				CommandBase("AcquireTarget") {
+	m_waitForVision = waitForVision;
+	m_forceUpdate = forceUpdate;
+	m_isRunningVision = true;
 }
 
-// Called just before this Command runs the first time
-void AcquireTarget::Initialize()
-{
-	printf("Acquire Target!!!!!\n");
-	visionSubsystem->runVision();
+void AcquireTarget::Initialize() {
+	printf("Acquire Target\n");
+	// if the robot has moved and the calculation is invalid, get another frame
+	// otherwise skip it
+	m_isRunningVision = m_forceUpdate || visionSubsystem->isVisionCalculationDirty();
+	if(m_isRunningVision){
+		visionSubsystem->runVision();
+	} else {
+		printf("AcquireTarget: skipping vision frame because position hasn't changed\n");
+	}
 }
 
-// Called repeatedly when this Command is scheduled to run
-void AcquireTarget::Execute()
-{
-
-}
-
-// Make this return true when this Command no longer needs to run execute()
-bool AcquireTarget::IsFinished()
-{
-	return true;
-}
-
-// Called once after isFinished returns true
-void AcquireTarget::End()
-{
+void AcquireTarget::Execute() {
 
 }
 
-// Called when another command which requires one or more of the same
-// subsystems is scheduled to run
-void AcquireTarget::Interrupted()
-{
+bool AcquireTarget::IsFinished() {
+	if(!m_isRunningVision){
+		return true; // the calculation is still valid, we didn't bother to get another frame
+	} else if(m_waitForVision){
+		return !visionSubsystem->isVisionBusy(); // wait until the thread finishes if this command is set to wait
+	} else {
+		return true; // otherwise exit immediately; don't wait for completion
+	}
+}
+
+void AcquireTarget::End() {
+
+}
+
+void AcquireTarget::Interrupted() {
 
 }

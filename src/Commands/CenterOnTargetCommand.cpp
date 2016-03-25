@@ -62,7 +62,11 @@ void CenterOnTargetCommand::Execute() {
 		return;
 	}
 
-	centerTo = visionSubsystem->getCorrectedFrameCenter();
+	// continuously run vision for this command, since it's closed loop
+	// see RotateToTarget for centering without continuous vision
+	visionSubsystem->runVision();
+
+	centerTo = visionSubsystem->getCorrectedFrameCenter(visionSubsystem->getDistanceToTarget());
 
 	double error = centerTo - visionSubsystem->PIDGet();
 	double sign = error < 0 ? -1 : 1;

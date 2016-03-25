@@ -55,14 +55,23 @@ private:
 
 	double m_frameCenterX;
 	double m_frameCenterY;
+	/**
+	 * Distance and angle, calculated from feret midpoint using the lookup table
+	 * Inches / Degrees
+	 */
+	double m_distance;
+	double m_angle;
+
 	double m_frameWidth;
 	int m_numParticles;
+
 	std::thread m_processingThread;
 	bool m_visionBusy;
 	bool m_visionRequested;
 	pthread_cond_t m_threadCond;
 	pthread_mutex_t m_threadMutex;
 	int m_lastVisionTick;
+
 	DriveSubsystem::Position m_robotPos;
 
 	// Take all the particple measurements in one call
@@ -101,11 +110,13 @@ public:
 	static constexpr double tan_half_horizontal_field_of_view = 0.8162;
 
 	void runVision();
-	double getCorrectedFrameCenter();
+	double getCorrectedFrameCenter(double distInches);
 	bool isTargetVisible();
+	bool isVisionCalculationDirty();
+	bool isVisionBusy();
 
-	double getCenterOfMassX();
-	double getCenterOfMassY();
+	double getTargetCenterX();
+	double getTargetCenterY();
 	double getBoundingBoxWidth();
 	double getBoundingBoxHeight();
 
@@ -116,7 +127,7 @@ public:
 	 */
 	double getDistanceToTarget();
 
-	void getDistanceAndAngle(double xpos, double ypos, double* distance, double* angle);
+	void calculateDistanceAndAngle(double xpos, double ypos, double* distance, double* angle);
 
 	/**
 	 * Bad implementation that uses lookup table values from the test data
