@@ -115,6 +115,9 @@ public:
 	 * @return Distance, in feet
 	 */
 	double getDistanceToTarget();
+
+	void getDistanceAndAngle(double xpos, double ypos, double* distance, double* angle);
+
 	/**
 	 * Bad implementation that uses lookup table values from the test data
 	 */

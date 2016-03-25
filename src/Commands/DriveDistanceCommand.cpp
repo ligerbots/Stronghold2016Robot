@@ -29,9 +29,11 @@ void DriveDistanceCommand::Initialize() {
 
 	// ignore top gear shift for distances less than 3 ft
 	if (m_gear==HIGH) {
-		if (fabs(m_distance) > 2.0) driveSubsystem->shiftUp();
-		else {
-			printf("m_distance: %f\n", fabs(m_distance));
+		printf("m_distance: %f, >2: %d\n", fabs(m_distance), fabs(m_distance) > 2.0);
+		if (fabs(m_distance) > 2.0){
+			printf("DriveDistance: going to high gear\n");
+			driveSubsystem->shiftUp();
+		} else {
 			// force low gear and normal speed
 			m_gear = LOW;
 			m_speed = NORMAL_SPEED;

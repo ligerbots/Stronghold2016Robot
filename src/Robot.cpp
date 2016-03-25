@@ -211,6 +211,9 @@ void Robot::TeleopInit() {
 	m_startTicks = ticks;
 	m_startTime = startTime;
 
+	// uncomment only for calibrating vision
+//	CommandBase::navXSubsystem->zeroYaw(0);
+
 	if (mp_autonomousCommand != NULL) {
 		mp_autonomousCommand->Cancel();
 	}

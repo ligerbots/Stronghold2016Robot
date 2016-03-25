@@ -90,7 +90,7 @@ void VisionSubsystem::updateVision(int ticks) {
 			LCameraServer::GetInstance()->SetImage(mp_processingFrame);
 		else {
 			DriveSubsystem::Position pos = CommandBase::driveSubsystem->GetPosition();
-			if (fabs(pos.Angle - m_robotPos.Angle < 1.5)) {
+			if (fabs(pos.Angle - m_robotPos.Angle) < 1.5) {
 				// If the robot hasn't shifted more than 1.5 degrees off the orientation
 				// it had when we last took a vision position, then display the target markup
 				markTarget(image);
@@ -411,6 +411,12 @@ void VisionSubsystem::sendValuesToSmartDashboard() {
 	SmartDashboard::PutNumber("XPos", m_frameCenterX);
 	SmartDashboard::PutNumber("TargetsDetected", m_numParticles);
 	SmartDashboard::PutNumber("TargetDistance", getDistanceToTarget());
+
+	double distance;
+	double angle;
+	getDistanceAndAngle(m_frameCenterX, m_frameCenterY, &distance, &angle);
+	SmartDashboard::PutNumber("NewVision Target Distance", distance);
+	SmartDashboard::PutNumber("NewVision Target Angle", angle);
 }
 
 void VisionSubsystem::SetPIDSourceType(PIDSourceType pidSource) {
@@ -439,4 +445,61 @@ double VisionSubsystem::TargetAngle() {
 	printf("---> Angle to target relative %5.2f\n", angle);
 	SmartDashboard::PutNumber("AngleToTarget", angle);
 	return angle;
+}
+
+void VisionSubsystem::getDistanceAndAngle(double xpos, double ypos, double* distance, double* angle){
+	FieldInfo::VisionDataPoint closestPoint;
+	double closestPointMeasure = DBL_MAX;
+	for(int i = 0; i < sizeof(Robot::instance->fieldInfo.visionData) / sizeof(FieldInfo::VisionDataPoint); i++){
+		FieldInfo::VisionDataPoint point = Robot::instance->fieldInfo.visionData[i];
+		double measure = (point.xpos - xpos) * (point.xpos - xpos) + (point.ypos - ypos) * (point.ypos - ypos);
+		if(measure < closestPointMeasure){
+			closestPoint = point;
+			closestPointMeasure = measure;
+		}
+	}
+	if(closestPointMeasure == DBL_MAX){
+		printf("Vision: Can't fit distance/angle data\n");
+		// should never happen
+		*distance = 0;
+		*angle = 0;
+		return;
+	}
+
+	// find point with next angle to interpolate with
+	double nextAngle = (xpos > closestPoint.xpos) ? closestPoint.angle + 10 : closestPoint.angle - 10;
+	FieldInfo::VisionDataPoint pointNextAngle;
+	bool angleFound = false;
+	for(int i = 0; i < sizeof(Robot::instance->fieldInfo.visionData) / sizeof(FieldInfo::VisionDataPoint); i++){
+		FieldInfo::VisionDataPoint point = Robot::instance->fieldInfo.visionData[i];
+		if(point.distance == closestPoint.distance && point.angle == nextAngle){
+			pointNextAngle = point;
+			angleFound = true;
+			break;
+		}
+	}
+
+	// find point with next distance to interpolate with
+	double nextDistance = (ypos > closestPoint.ypos) ? closestPoint.distance + 12 : closestPoint.distance - 12;
+	FieldInfo::VisionDataPoint pointNextDistance;
+	bool distanceFound = false;
+	for(int i = 0; i < sizeof(Robot::instance->fieldInfo.visionData) / sizeof(FieldInfo::VisionDataPoint); i++){
+		FieldInfo::VisionDataPoint point = Robot::instance->fieldInfo.visionData[i];
+		if(point.distance == nextDistance && point.angle == closestPoint.angle){
+			pointNextDistance = point;
+			distanceFound = true;
+			break;
+		}
+	}
+
+	if(angleFound){
+		*angle = closestPoint.angle + (xpos - closestPoint.xpos) * (pointNextAngle.angle - closestPoint.angle) / (pointNextAngle.xpos - closestPoint.xpos);
+	} else {
+		*angle = closestPoint.angle;
+	}
+	if(distanceFound){
+		*distance = closestPoint.distance + (ypos - closestPoint.ypos) * (pointNextDistance.distance - closestPoint.distance) / (pointNextDistance.ypos - closestPoint.ypos);
+	} else {
+		*distance = closestPoint.distance;
+	}
 }
