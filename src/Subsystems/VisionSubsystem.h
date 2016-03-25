@@ -49,6 +49,20 @@ private:
 		MAXVAL
 	};
 
+	// Max's regression coefficients
+	static constexpr double regcoef_a1 = -2.31E-01;
+	static constexpr double regcoef_a2 = -1.43E-06;
+	static constexpr double regcoef_a3 = -1.24E-01;
+	static constexpr double regcoef_a4 = -9.89E-06;
+	static constexpr double regcoef_a5 =  4.15E-04;
+	static constexpr double regcoef_a6 =  6.91E+01;
+	static constexpr double regcoef_d1 = -2.09E-01;
+	static constexpr double regcoef_d2 =  3.46E-04;
+	static constexpr double regcoef_d3 =  3.58E-02;
+	static constexpr double regcoef_d4 =  9.40E-04;
+	static constexpr double regcoef_d5 =  0.00E+00;
+	static constexpr double regcoef_d6 =  6.51E+01;
+
 	std::mutex m_frameMutex;
 	Image* mp_currentFrame;
 	Image* mp_processingFrame;
@@ -128,6 +142,7 @@ public:
 	double getDistanceToTarget();
 
 	void calculateDistanceAndAngle(double xpos, double ypos, double* distance, double* angle);
+	void calculateDistanceAndAngle_FromRegression(double xpos, double ypos, double* distance, double* angle);
 
 	/**
 	 * Bad implementation that uses lookup table values from the test data

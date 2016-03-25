@@ -423,6 +423,12 @@ void VisionSubsystem::sendValuesToSmartDashboard() {
 
 	SmartDashboard::PutNumber("NewVision Target Distance", m_distance);
 	SmartDashboard::PutNumber("NewVision Target Angle", m_angle);
+
+	double angle_regBased;
+	double distance_regBased;
+	calculateDistanceAndAngle_FromRegression(m_frameCenterX, m_frameCenterY, &distance_regBased, &angle_regBased);
+	SmartDashboard::PutNumber("Max's NewVision Target Distance", angle_regBased);
+	SmartDashboard::PutNumber("Max's NewVision Target Angle", distance_regBased);
 }
 
 void VisionSubsystem::SetPIDSourceType(PIDSourceType pidSource) {
@@ -507,6 +513,23 @@ void VisionSubsystem::calculateDistanceAndAngle(double xpos, double ypos, double
 	} else {
 		*distance = closestPoint.distance;
 	}
+}
+
+void VisionSubsystem::calculateDistanceAndAngle_FromRegression(double xpos, double ypos, double* distance, double* angle){
+	*distance =
+			regcoef_d1 * xpos +
+			regcoef_d2 * xpos * xpos +
+			regcoef_d3 * ypos +
+			regcoef_d4 * ypos * ypos +
+			regcoef_d5 * xpos * ypos +
+			regcoef_d6;
+	*angle =
+			regcoef_a1 * xpos +
+			regcoef_a2 * xpos * xpos +
+			regcoef_a3 * ypos +
+			regcoef_a4 * ypos * ypos +
+			regcoef_a5 * xpos * ypos +
+			regcoef_a6;
 }
 
 bool VisionSubsystem::isVisionCalculationDirty(){
