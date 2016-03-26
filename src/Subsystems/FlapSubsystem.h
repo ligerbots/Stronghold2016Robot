@@ -13,6 +13,8 @@ private:
 	Parameter<double> rightLowLimit;
 	Parameter<double> rightHighLimit;
 
+	int m_robotTickAtFlapsDown;
+
 	double currentLeftPosition;
 	double currentRightPosition;
 public:
@@ -31,6 +33,8 @@ public:
 	 */
 	void setFlapsFraction(double fractionBoth);
 	void setFlapsFraction(double fractionLeft, double fractionRight);
+
+	bool isSafeToIntake();
 
 	double getLeftFlapFraction();
 	double getRightFlapFraction();

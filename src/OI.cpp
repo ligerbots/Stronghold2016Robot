@@ -1,14 +1,17 @@
 #include <Stronghold2016Robot.h>
 
 OI::OI() :
-		controllerButtons(), buttonsPressed(), m_secondControllerPresent(false) {
+		controllerButtons(), buttonsPressed(), m_secondControllerButtonCount(0) {
 	pXboxController = new Joystick(0);
 	pFarmController = new Joystick(1);
 }
 
 void OI::registerCommands() {
 	// XBox A command
-	registerButton(pXboxController, 1, PRESSED, new ToggleCommand(new RollBallToIntakePositionCommand(RollBallToIntakePositionCommand::PICKUP)));
+	std::vector<Command*> rollBallRestartCommands;
+	rollBallRestartCommands.push_back(CommandBase::intakeRollerCommand.get());
+	rollBallRestartCommands.push_back(CommandBase::flapCommand.get());
+	registerButton(pXboxController, 1, PRESSED, new ToggleCommand(new RollBallPickupThenShooter(), rollBallRestartCommands));
 	// XBox B command
 	registerButton(pXboxController, 2, PRESSED, new AutonomousShootSequence());
 	// XBox X command
@@ -35,9 +38,10 @@ void OI::registerCommands() {
 void OI::registerSecondControllerButtons() {
 	// avoid excessive errors if this joystick isn't connected
 	// Commented out -- the second controller is now essential. We don't want to just silently fail if it's not there.
-	m_secondControllerPresent = true;	// pFarmController->GetButtonCount() > 0;
+	m_secondControllerButtonCount = pFarmController->GetButtonCount();
+	printf("Controller 2 has %d buttons.\n", m_secondControllerButtonCount);
 
-	if (m_secondControllerPresent) {
+	if (true) {
 		// we register the buttons even if the controller wasn't present on startup
 		// because it might be connected later
 
@@ -57,11 +61,15 @@ void OI::registerSecondControllerButtons() {
 
 		// section 3 - auto commands
 		registerButton(pFarmController, 11, PRESSED, new PrepareForCrossingSequence());
-		registerButton(pFarmController, 13, PRESSED, new CenterOnTargetCommand());
+		registerButton(pFarmController, 13, PRESSED, new AcquireTarget(true, true));
+		registerButton(pFarmController, 16, PRESSED, new RotateToTarget());
+
+		registerButton(pFarmController, 15, PRESSED, new CenterOnTargetCommand());
+//		registerButton(pFarmController, 16, PRESSED, new RotateIMUCommand(0));
 
 		// test commands
-		registerButton(pFarmController, 15, PRESSED, new DriveDistanceCommand(9 * 12));
-		registerButton(pFarmController, 16, PRESSED, new RotateIMUCommand(0));
+//		registerButton(pFarmController, 15, PRESSED, new DriveDistanceCommand(9 * 12, FieldInfo::FAST, DriveDistanceCommand::HIGH));
+
 
 		registerButton(pFarmController, 12, PRESSED, new AutonomousDriveSequence(
 				FieldInfo::POS_THREE,
@@ -69,19 +77,23 @@ void OI::registerSecondControllerButtons() {
 				FieldInfo::TARGET_CENTER));
 		registerButton(pFarmController, 14, PRESSED, new AutonomousShootSequence());
 
-		// section 4 - intake & wedge up/down
-		registerButton(pFarmController, 17, PRESSED, new IntakeToggleCommand(true));
-		registerButton(pFarmController, 18, PRESSED, new IntakeToggleCommand(false));
-		registerButton(pFarmController, 19, PRESSED, new WedgeToggleCommand(true));
-		registerButton(pFarmController, 20, PRESSED, new WedgeToggleCommand(false));
+		// if the farm controller isn't available, we might be using a Logitech Thurstmaster or something
+		// that likely gives out around 16 buttons
+		if (m_secondControllerButtonCount > 16) {
+			// section 4 - intake & wedge up/down
+			registerButton(pFarmController, 17, PRESSED, new IntakeToggleCommand(true));
+			registerButton(pFarmController, 18, PRESSED, new IntakeToggleCommand(false));
+			registerButton(pFarmController, 19, PRESSED, new WedgeToggleCommand(true));
+			registerButton(pFarmController, 20, PRESSED, new WedgeToggleCommand(false));
 
-		// the big button
-//		registerButton(pFarmController, 21, PRESSED, new AutonomousShootSequence());
+			// the big button
+	//		registerButton(pFarmController, 21, PRESSED, new AutonomousShootSequence());
 
-		// section 5 - cameras
-		registerButton(pFarmController, 22, PRESSED, new ToggleCameraFeedCommand(0));
-		registerButton(pFarmController, 23, PRESSED, new ToggleCameraFeedCommand(1));
-//		registerButton(pFarmController, 24, PRESSED, new ToggleCameraFeedCommand(2));
+			// section 5 - cameras
+			registerButton(pFarmController, 22, PRESSED, new ToggleCameraFeedCommand(0));
+			registerButton(pFarmController, 23, PRESSED, new ToggleCameraFeedCommand(1));
+	//		registerButton(pFarmController, 24, PRESSED, new ToggleCameraFeedCommand(2));
+		}
 	}
 }
 
@@ -155,4 +167,9 @@ void OI::registerButton(Joystick* pJoystick, int buttonNumber, ButtonEvent when,
 		button->WhenReleased(pCommand);
 		break;
 	}
+}
+
+bool OI::get2ndControllerButton(int num) {
+	if (num <= m_secondControllerButtonCount) return pFarmController->GetRawButton(num);
+	return false;
 }

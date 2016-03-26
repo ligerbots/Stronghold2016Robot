@@ -3,6 +3,8 @@
 #include "Commands/Subsystem.h"
 #include "WPILib.h"
 #include <Utils/Parameter.h>
+#include <pthread.h>
+#include "DriveSubsystem.h"
 
 // We believe the "float" color in the imaqDraw calls is BGR (Blue Green Red)
 // with ranges of 0.0 to just under 256.0 for each color
@@ -23,15 +25,7 @@ private:
 	Parameter<bool> paintTarget;
 	Parameter<bool> enableVision;
 	Parameter<double> color;
-//	Parameter<double> boundingBoxWidth;
-//	Parameter<double> boundingBoxHeight;
-//	Parameter<double> convexHullSize;
-//	Parameter<double> convexHullPerArea;
-//	Parameter<double> feretDiameter;
-//	Parameter<double> feretStartX;
-//	Parameter<double> feretStartY;
-//	Parameter<double> feretEndX;
-//	Parameter<double> feretEndY;
+
 	// Define the indexes to our MeasuremeParticleReport
 	enum Measures {
 		COMX,	// IMAQ_MT_CENTER_OF_MASS_X
@@ -55,15 +49,47 @@ private:
 		MAXVAL
 	};
 
+	// Max's regression coefficients
+	static constexpr double regcoef_a1 = -2.448E-01;
+	static constexpr double regcoef_a2 =  1.979E-05;
+	static constexpr double regcoef_a3 = -1.217E-01;
+	static constexpr double regcoef_a4 = -3.020E-05;
+	static constexpr double regcoef_a5 =  4.378E-04;
+	static constexpr double regcoef_a6 =  7.033E+01;
+	static constexpr double regcoef_d1 = -2.09E-01;
+	static constexpr double regcoef_d2 =  3.46E-04;
+	static constexpr double regcoef_d3 =  3.58E-02;
+	static constexpr double regcoef_d4 =  9.40E-04;
+	static constexpr double regcoef_d5 =  0.00E+00;
+	static constexpr double regcoef_d6 =  6.51E+01;
+
 	std::mutex m_frameMutex;
 	Image* mp_currentFrame;
 	Image* mp_processingFrame;
 
 	double m_frameCenterX;
 	double m_frameCenterY;
+	/**
+	 * Distance and angle, calculated from feret midpoint using the lookup table
+	 * Inches / Degrees
+	 */
+	double m_distance;
+	double m_angle;
+
+	double m_frameWidth;
 	int m_numParticles;
+
 	std::thread m_processingThread;
-	// Take about 55 measures on each particle in one call
+	bool m_visionBusy;
+	bool m_visionRequested;
+	pthread_cond_t m_threadCond;
+	pthread_mutex_t m_threadMutex;
+	int m_lastVisionTick;
+
+	DriveSubsystem::Position m_robotPos;
+	bool m_firstFrame;
+
+	// Take all the particple measurements in one call
 	// Q: Does taking extra measurements slow things down?
 	MeasurementType mT[MAXVAL];
 
@@ -75,7 +101,8 @@ private:
 
 
 	void visionProcessingThread();
-	void measureAndMark(Image *mark, Image *image);
+	void measureTarget(Image *image);
+	void markTarget(Image *image);
 
 public:
 	// Subsystem
@@ -95,13 +122,16 @@ public:
 	static constexpr double distance_b = 1.0052;
 	static constexpr double camera_offset = 3.25; // in
 	static constexpr double horizontal_field_of_view = 78.442;
+	static constexpr double tan_half_horizontal_field_of_view = 0.8162;
 
-	double getFrameCenter();
-	double getSetpoint();
+	void runVision();
+	double getCorrectedFrameCenter(double distInches);
 	bool isTargetVisible();
+	bool isVisionCalculationDirty();
+	bool isVisionBusy();
 
-	double getCenterOfMassX();
-	double getCenterOfMassY();
+	double getTargetCenterX();
+	double getTargetCenterY();
 	double getBoundingBoxWidth();
 	double getBoundingBoxHeight();
 
@@ -111,6 +141,10 @@ public:
 	 * @return Distance, in feet
 	 */
 	double getDistanceToTarget();
+
+	void calculateDistanceAndAngle(double xpos, double ypos, double* distance, double* angle);
+	void calculateDistanceAndAngle_FromRegression(double xpos, double ypos, double* distance, double* angle);
+
 	/**
 	 * Bad implementation that uses lookup table values from the test data
 	 */
@@ -122,4 +156,5 @@ public:
 	void SetPIDSourceType(PIDSourceType pidSource);
 	PIDSourceType GetPIDSourceType() const;
 	double PIDGet();
+	double TargetAngle();
 };

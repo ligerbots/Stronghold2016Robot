@@ -43,11 +43,18 @@ void Robot::RobotInit() {
 
 	fieldInfo.initSelectors();
 
+	// set the robot initial position (perhaps)
+	CommandBase::navXSubsystem->zeroYaw(fieldInfo.GetInitialOrientation());
+
 	printf("Done\n");
 }
 
 void Robot::AlwaysPeriodic() {
 	ticks++;
+
+//	if(ticks % 50 == 0){
+//		printf("Main thread running\n");
+//	}
 
 	// Check to see if the robot is about to tip
 	ROBOT_IS_ABOUT_TO_TIP = CommandBase::navXSubsystem->isRobotAboutToTip(RobotMap::MAX_PITCH_ANGLE);
@@ -66,19 +73,24 @@ void Robot::AlwaysPeriodic() {
 	CommandBase::wedgeSubsystem->sendValuesToSmartDashboard();
 	CommandBase::intakeSubsystem->sendValuesToSmartDashboard();
 
-	if(mp_operatorInterface->pFarmController->GetRawButton(28)){
+	if (mp_operatorInterface->get2ndControllerButton(28)) {
 		printf("Canceling centering/auto\n");
 		if(mp_autonomousCommand != NULL){
 			mp_autonomousCommand->Cancel();
 		}
 		CommandBase::centerOnTargetCommand->Cancel();
+		if(DriverStation::GetInstance().IsOperatorControl()){
+			CommandBase::driveJoystickCommand->Start();
+			CommandBase::flapCommand->Start();
+			CommandBase::intakeRollerCommand->Start();
+		}
 	}
 
-	if(mp_operatorInterface->pFarmController->GetRawButton(21)){
+	if (mp_operatorInterface->get2ndControllerButton(21)) {
 		CommandBase::visionSubsystem->setVisionEnabled(true);
 	}
 
-	if(mp_operatorInterface->pFarmController->GetRawButton(24)){
+	if (mp_operatorInterface->get2ndControllerButton(24)) {
 		CommandBase::visionSubsystem->setVisionEnabled(false);
 	}
 
@@ -141,6 +153,13 @@ void Robot::DisabledInit() {
 
 void Robot::DisabledPeriodic() {
 	AlwaysPeriodic();
+	// the commands don't seem to run in disabled
+	if(mp_operatorInterface->pFarmController->GetRawButton(22)){
+		CommandBase::visionSubsystem->setCameraFeed(0);
+	}
+	if(mp_operatorInterface->pFarmController->GetRawButton(23)){
+		CommandBase::visionSubsystem->setCameraFeed(1);
+	}
 
 	if(ticks % 50 == 0){
 		printf("Selected auto parameters:\n");
@@ -180,6 +199,9 @@ void Robot::AutonomousInit() {
 	CommandBase::navXSubsystem->zeroYaw(fieldInfo.GetInitialOrientation());
 	CommandBase::navXSubsystem->ResetDisplacement();
 
+	CommandBase::driveSubsystem->SetInitialPosition(FieldInfo::startingLocations[pos].x,
+													FieldInfo::startingLocations[pos].y);
+
 	CommandBase::driveJoystickCommand->Cancel();
 	CommandBase::intakeRollerCommand->Cancel();
 	CommandBase::flapCommand->Cancel();
@@ -204,13 +226,15 @@ void Robot::TeleopInit() {
 	m_startTicks = ticks;
 	m_startTime = startTime;
 
+	// uncomment only for calibrating vision
+//	CommandBase::navXSubsystem->zeroYaw(0);
+
 	if (mp_autonomousCommand != NULL) {
 		mp_autonomousCommand->Cancel();
 	}
 	CommandBase::driveJoystickCommand->Start();
 	CommandBase::intakeRollerCommand->Start();
 	CommandBase::flapCommand->Start();
-	CommandBase::navXSubsystem->zeroYaw(Robot::instance->fieldInfo.GetInitialOrientation());
 }
 
 void Robot::TeleopPeriodic() {

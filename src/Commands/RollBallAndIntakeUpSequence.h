@@ -4,10 +4,10 @@
 #include "Commands/CommandGroup.h"
 #include "WPILib.h"
 
-class CenterAndRollBallSequence: public CommandGroup
+class RollBallAndIntakeUpSequence: public CommandGroup
 {
 public:
-	CenterAndRollBallSequence();
+	RollBallAndIntakeUpSequence();
 	void cleanup();
 	void End();
 	void Interrupted();

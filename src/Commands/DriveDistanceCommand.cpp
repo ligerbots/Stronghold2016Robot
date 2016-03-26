@@ -29,15 +29,19 @@ void DriveDistanceCommand::Initialize() {
 
 	// ignore top gear shift for distances less than 3 ft
 	if (m_gear==HIGH) {
-		if (fabs(m_distance) > 2.0) driveSubsystem->shiftUp();
-		else {
+		printf("m_distance: %f, >2: %d\n", fabs(m_distance), fabs(m_distance) > 2.0);
+		if (fabs(m_distance) > 2.0){
+			printf("DriveDistance: going to high gear\n");
+			driveSubsystem->shiftUp();
+		} else {
 			// force low gear and normal speed
 			m_gear = LOW;
 			m_speed = NORMAL_SPEED;
 			driveSubsystem->shiftDown();
 		}
+	} else{
+		driveSubsystem->shiftDown();
 	}
-	else driveSubsystem->shiftDown();
 }
 
 void DriveDistanceCommand::Execute() {
@@ -57,8 +61,9 @@ void DriveDistanceCommand::Execute() {
 		// if m_distance is negative, m_startRightPosition is negative, right is negative and decreasing
 		//  negative example: -400 - (-600 - -300), so -400 - -300 = 100
 		//  positive example: 400 - (600 - 300) = 400 - 300 = 100
-		remaining = m_distance - (right - m_startPositionRight);
-		if (remaining*TICKS_PER_FOOT < 2.0) {
+		remaining = m_distance - (right - m_startPositionRight) * TICKS_PER_FOOT;
+		if (fabs(remaining) < 2.0) {
+			printf("DriveDistance: Shifting down for last 2 feet\n");
 			m_gear = LOW;
 			m_speed = NORMAL_SPEED;
 			driveSubsystem->shiftDown();
@@ -90,7 +95,4 @@ void DriveDistanceCommand::End() {
 
 void DriveDistanceCommand::Interrupted() {
 	driveSubsystem->zeroMotors();
-	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL){
-		CommandBase::driveJoystickCommand->Start();
-	}
 }

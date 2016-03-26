@@ -19,6 +19,7 @@ public:
 	bool IsFinished();
 	void End();
 	void Interrupted();
+	OI *oi;
 
 
 };

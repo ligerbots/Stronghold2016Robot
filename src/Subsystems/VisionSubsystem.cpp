@@ -14,13 +14,20 @@ VisionSubsystem::VisionSubsystem() :
 		mp_processingFrame(NULL),
 		m_frameCenterX(0),
 		m_frameCenterY(0),
+		m_distance(0),
+		m_angle(0),
+		m_frameWidth(640.0), 		// guess
 		m_numParticles(0),
 		m_processingThread(&VisionSubsystem::visionProcessingThread,this),
+		m_visionBusy(false),
+		m_visionRequested(true), // run one vision frame on startup
+		m_lastVisionTick(0),
 		m_activeCamera(0),
 		m_pM(NULL)
 {
 	ledRingSpike.reset(new Relay(RobotMap::RELAY_LED_RING_SPIKE));
 	enableVision = true;	// default on
+	m_firstFrame = true;
 
 	mT[COMX] = IMAQ_MT_CENTER_OF_MASS_X;
 	mT[COMY] = IMAQ_MT_CENTER_OF_MASS_Y;
@@ -40,6 +47,7 @@ VisionSubsystem::VisionSubsystem() :
 	mT[MFDEX] = IMAQ_MT_MAX_FERET_DIAMETER_END_X;
 	mT[MFDEY] = IMAQ_MT_MAX_FERET_DIAMETER_END_Y;
 	mT[ORIENT] = IMAQ_MT_ORIENTATION;
+	m_robotPos = {0, 0, 0};
 }
 
 void VisionSubsystem::InitDefaultCommand() {
@@ -79,15 +87,50 @@ void VisionSubsystem::updateVision(int ticks) {
 	Image *image = Camera::GetCamera(m_activeCamera)->GetStoredFrame();
 	// if we're not running Vision, just display the frame from the current camera, or
 	// if the alternate camera is current, display its frame, even if we're doing vision on camera 0
-	if (/*!enableVision.get() ||*/ m_activeCamera != 0) LCameraServer::GetInstance()->SetImage(image);
+	if (m_activeCamera != 0) {
+		LCameraServer::GetInstance()->SetImage(image);
+	} else {
+		if (mp_processingFrame != NULL && showVision.get()) {
+			LCameraServer::GetInstance()->SetImage(mp_processingFrame);
+		} else {
+			if (!isVisionCalculationDirty()) {
+				// If the robot hasn't shifted more than 1.5 degrees off the orientation
+				// it had when we last took a vision position, or more than 1 inch in position,
+				// then display the target markup
+				markTarget(image);
+			}
+			LCameraServer::GetInstance()->SetImage(image);
+		}
+	}
 
-	if (enableVision.get()) {
-		std::lock_guard<std::mutex> lock(m_frameMutex);
+	if (m_visionRequested) {
 		// If we just asked camera zero to get a frame, don't do it again here
 		if (m_activeCamera != 0) Camera::GetCamera(0)->GetFrame();
 		mp_currentFrame = Camera::GetCamera(0)->GetStoredFrame();
+		int width, height;
+		imaqGetImageSize(mp_currentFrame, &width, &height);
+		m_frameWidth = (double) width;
 		// We don't do a SetImage here -- that's done in the Vision Processing thread
+
+		// If it's been more than eight vision ticks since we last processed a frame, do one now
+		if ((Robot::ticks > m_lastVisionTick + 8) && !m_visionBusy) {
+			if (mp_processingFrame == NULL) {
+				// First time: create our processing frame
+				printf("VisionSubsystem: Creating second Image*\n");
+				mp_processingFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
+			}
+			// duplicate the current frame for image processing
+			imaqDuplicate(mp_processingFrame, mp_currentFrame);
+			m_visionBusy = true;
+			pthread_cond_signal(&m_threadCond);
+			// if a vision request came in while we were still processing, cancel it
+			m_visionRequested = false;
+		}
 	}
+}
+
+void VisionSubsystem::runVision() {
+	m_visionRequested = true;
 }
 
 void VisionSubsystem::toggleCameraFeed() {
@@ -120,41 +163,32 @@ void VisionSubsystem::visionProcessingThread() {
 	pthread_getcpuclockid(pthread_self(), &cid);
 
 	while (true) {
+		// wait here forever until we get a signal
+		pthread_cond_wait(&m_threadCond, &m_threadMutex);
+		m_visionBusy = true;
 		loopCounter++;
 		int startTicks = Robot::ticks;
 		double startTime = Robot::GetRTC();
 		timespec startCPUTime, endCPUTime;
 		clock_gettime(cid, &startCPUTime);
 
-		if (enableVision.get()) {
+		// for now in the new scheme we don't allow Vision disable
+		if (true && enableVision.get()) {
 			if (mp_currentFrame == NULL) {
 				// wait for first frame
 				usleep(34000); 	// 34 ms - about a tick and half
 				continue;
 			}
 
-			if (mp_processingFrame == NULL) {
-				// First time: create our processing frame
-				printf("VisionSubsystem: Creating second Image*\n");
-				mp_processingFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
-			}
-
-			{
-				std::lock_guard<std::mutex> lock(m_frameMutex);
-				imaqDuplicate(mp_processingFrame, mp_currentFrame);
-			}
 			int err = IVA_ProcessImage(mp_processingFrame); // run vision script
 			SmartDashboard::PutNumber("Vision/imaq_err", err);
 
 			// compute the distance, angle, etc. and mark target on currentFrame
-			measureAndMark(mp_currentFrame, mp_processingFrame);
-
-			// Display the marked frame, or the processing frame
-			if (m_activeCamera == 0)
-				LCameraServer::GetInstance()->SetImage(showVision.get() ? mp_processingFrame : mp_currentFrame);
+			measureTarget(mp_processingFrame);
+			m_robotPos = CommandBase::driveSubsystem->GetPosition();
 
 			// print out CPU statistics periodically, but not so often as to spam the console
-			if (loopCounter%15 == 0) {
+			if (loopCounter%40 == 0) {
 				double elapsedTime = Robot::GetRTC() - startTime;
 				int elapsedTicks = Robot::ticks - startTicks;
 				clock_gettime(cid, &endCPUTime);
@@ -164,6 +198,8 @@ void VisionSubsystem::visionProcessingThread() {
 				printf("Vision frame done in %f seconds, %f CPU seconds, %d ticks\n",
 						elapsedTime, elapsedCPUTime, elapsedTicks);
 			}
+			printf("Vision: Finished a vision frame\n");
+			m_firstFrame = false;
 		}
 		else {
 			// if we didn't process any images, display something
@@ -171,7 +207,11 @@ void VisionSubsystem::visionProcessingThread() {
 			//LCameraServer::GetInstance()->SetImage(mp_currentFrame);
 			m_numParticles = 0;
 		}
-		usleep(33000);
+		m_visionBusy = false;
+		m_visionRequested = false;
+		m_lastVisionTick = Robot::ticks;
+		// with pthread_cond_wait, we don't need Mutex anymore
+		//usleep(33000);
 	}
 }
 
@@ -182,7 +222,7 @@ bool VisionSubsystem::isTargetVisible(){
 // Measure particles and mark target
 // image is the image to process
 // mark is the image we mark the target on
-void VisionSubsystem::measureAndMark(Image *mark, Image *image)
+void VisionSubsystem::measureTarget(Image *image)
 {
 	//  use largest particle only, and check (convex hull area)/(particle area)
 	// to make sure it's about 2.2
@@ -241,93 +281,95 @@ void VisionSubsystem::measureAndMark(Image *mark, Image *image)
 
 			m_frameCenterX = (feretStartX + feretEndX) / 2;
 			m_frameCenterY = (feretStartY + feretEndY) / 2;
+			calculateDistanceAndAngle(m_frameCenterX, m_frameCenterY, &m_distance, &m_angle);
+		}
+	}
+}
 
-			if (paintTarget.get()) {
-				std::lock_guard<std::mutex> lock(m_frameMutex);
-				// Send the image to the dashboard with a target indicator
-				int width, height;
-				imaqGetImageSize(mark, &width, &height);
-				double setpoint = getSetpoint();
-				if (m_numParticles != 0) {
-					// If the target is centered in our field of view, paint it green; else red
-					double Xerror = fabs(setpoint * width - m_frameCenterX);
-//					printf("%f\n", Xerror);
-					// Centered means no more than 1.5% off to either side
-					double color = Xerror < (width * 0.015) ? GREEN : RED;
-					// draw a 6-pixel circle in red
-					imaqDrawShapeOnImage(mark, mark,
-							{ (int) m_frameCenterY - 3, (int) m_frameCenterX - 3, 6, 6}, IMAQ_PAINT_VALUE, IMAQ_SHAPE_OVAL, color);
-					if (false) {
-						// this code attempts to draw an X, but ...
-						imaqDrawLineOnImage(mark, mark, DrawMode::IMAQ_DRAW_VALUE,
-								{ (int) m_frameCenterX - 5, (int) m_frameCenterY },
-								{ (int) m_frameCenterX + 5, (int) m_frameCenterY },
-								CYAN);
-						imaqDrawLineOnImage(mark, mark, DrawMode::IMAQ_DRAW_VALUE,
-								{ (int) m_frameCenterX, (int) m_frameCenterY - 5 },
-								{ (int) m_frameCenterX, (int) m_frameCenterY + 5 },
-								CYAN);
-					}
-					// Draw the whole feret diagonal
-					imaqDrawLineOnImage(mark, mark, DrawMode::IMAQ_DRAW_VALUE,
-							{(int) feretStartX, (int) feretStartY},
-							{(int) feretEndX,   (int) feretEndY },
-							YELLOW);
-				}
+void VisionSubsystem::markTarget(Image *image) {
+	if (paintTarget.get() && image!=NULL && m_pM!=NULL) {
+		double feretStartX = m_pM[MFDSX];
+		double feretStartY = m_pM[MFDSY];
+		double feretEndX = m_pM[MFDEX];
+		double feretEndY = m_pM[MFDEY];
+		// Mutex below is commented out because we're now painting the target on the main thread
+		// std::lock_guard<std::mutex> lock(m_frameMutex);
+		// Send the image to the dashboard with a target indicator
+		int width, height;
+		imaqGetImageSize(image, &width, &height);
+		double setpoint = getCorrectedFrameCenter(m_distance);
+		if (m_numParticles != 0) {
+			// If the target is centered in our field of view, paint it green; else red
+			double Xerror = fabs(setpoint * width - m_frameCenterX);
+//			printf("%f\n", Xerror);
+			// Centered means no more than 1.5% off to either side
+			double color = Xerror < 3.2 ? GREEN : RED;
 
-				imaqDrawLineOnImage(mark, mark, DrawMode::IMAQ_DRAW_VALUE,
-						{ (int) (setpoint * width), 0 },
-						{ (int) (setpoint * width), height },
-						YELLOW);
+			if(false){
+				// this code attempts to draw an circle, but ...
+				// draw a 6-pixel circle in red
+				imaqDrawShapeOnImage(image, image,
+						{ (int) m_frameCenterY - 3, (int) m_frameCenterX - 3, 6, 6}, IMAQ_PAINT_VALUE, IMAQ_SHAPE_OVAL, color);
 			}
+
+				imaqDrawLineOnImage(image, image, DrawMode::IMAQ_DRAW_VALUE,
+						{ (int) m_frameCenterX - 5, (int) m_frameCenterY },
+						{ (int) m_frameCenterX + 5, (int) m_frameCenterY },
+						CYAN);
+				imaqDrawLineOnImage(image, image, DrawMode::IMAQ_DRAW_VALUE,
+						{ (int) m_frameCenterX, (int) m_frameCenterY - 5 },
+						{ (int) m_frameCenterX, (int) m_frameCenterY + 5 },
+						CYAN);
+			// Draw the whole feret diagonal
+			imaqDrawLineOnImage(image, image, DrawMode::IMAQ_DRAW_VALUE,
+					{(int) feretStartX, (int) feretStartY},
+					{(int) feretEndX,   (int) feretEndY },
+					YELLOW);
 		}
+
+		imaqDrawLineOnImage(image, image, DrawMode::IMAQ_DRAW_VALUE,
+				{ (int) (setpoint * width), 0 },
+				{ (int) (setpoint * width), height },
+				YELLOW);
 	}
 }
 
-double VisionSubsystem::getFrameCenter() {
-	if (Camera::GetNumberOfCameras() < 1)
-		return 0;
-	else {
-		int width = Camera::GetCamera(0)->GetWidth();
-		if (width == 0)
-			return 0; // no frame captured yet
-		else {
-			return width / 2.0;
-		}
-	}
-}
-
-double VisionSubsystem::getSetpoint(){
-	if (Camera::GetNumberOfCameras() < 1)return 0;
+double VisionSubsystem::getCorrectedFrameCenter(double distInches) {
+	if (Camera::GetNumberOfCameras() < 1) return 0;
 	int width = Camera::GetCamera(0)->GetWidth();
 
 	if (width == 0) return 0; // no frame captured yet
+	int center = width/2;
+	double fCenter = (double) center;
 
-	double distInches = getDistanceToTarget() * 12;
-/*
-	Charles' version ...
-	double offsetAngle = atan2(camera_offset, distInches);
-	double ratio = offsetAngle/horizontal_field_of_view;
-	// ratio gives us the fraction of the field of view to adjust by.
-	// now turn it into pixels
-	double dxPixels = ratio * width;
-	return (getFrameCenter() - dxPixels);
-*/
-	// fov_diag = 90deg http://www.logitech.com/assets/47868/logitech-webcam-c930e-data-sheet.pdf
-	// fov_horiz = 2 * atan2(16/2, sqrt(16*16+9*9)/2)
-	// tan(fov_horiz/2) = .8716
+	// no target, no correction
+	if (m_numParticles>0) {
+	/*
+		Charles' version ...
+		double offsetAngle = atan2(camera_offset, distInches);
+		double ratio = offsetAngle/horizontal_field_of_view;
+		// ratio gives us the fraction of the field of view to adjust by.
+		// now turn it into pixels
+		double dxPixels = ratio * width;
+		return (fCenter - dxPixels);
+	*/
+		// fov_diag = 90deg http://www.logitech.com/assets/47868/logitech-webcam-c930e-data-sheet.pdf
+		// fov_horiz = 2 * atan2(16/2, sqrt(16*16+9*9)/2)
+		// tan(fov_horiz/2) = .8716
 
-	// charles's fov calculation - 78.442
-	double f = (getFrameCenter() / 0.8162);
-	double dxPixels = camera_offset * f / distInches;
-	return (getFrameCenter() - dxPixels) / width;
+		// charles's fov calculation - 78.442, tan(78.442/2) = 0.8162
+		double f = (fCenter / tan_half_horizontal_field_of_view);
+		double dxPixels = camera_offset * f / distInches;
+		fCenter = (fCenter - dxPixels) / width;
+	}
+	return fCenter;
 }
 
-double VisionSubsystem::getCenterOfMassX() {
+double VisionSubsystem::getTargetCenterX() {
 	return m_frameCenterX;
 }
 
-double VisionSubsystem::getCenterOfMassY() {
+double VisionSubsystem::getTargetCenterY() {
 	return m_frameCenterY;
 }
 
@@ -341,12 +383,20 @@ double VisionSubsystem::getBoundingBoxHeight() {
 
 double VisionSubsystem::getDistanceToTarget() {
 	// an exponential regression fits our data with r2=99.9%
-	// TODO: recalculate with new data
-	double centerOfMassY = getCenterOfMassY();
-	return 2.333 * pow(1.0052, centerOfMassY);
+//	double centerOfMassY = getTargetCenterY();
+//	return 2.333 * pow(1.0052, centerOfMassY);
+
+	// use NewVision calculations
+	return m_distance;
 }
 
 double VisionSubsystem::getFlapsFractionForDistance(double distance) {
+	distance = distance / 12; // distances from the lookup table and regression are now in inches, so convert to feet
+	// which is what the flaps lookup table needs
+
+	// there's lots of complicated physics involved during the shot
+	// no regression fits test data well, so this does linear interpolation
+	// between lookup table values
 	distance = fmax(fmin(distance, 9), 4);
 	double low = angles[(int) floor(distance)];
 	double high = angles[(int) ceil(distance)];
@@ -378,6 +428,15 @@ void VisionSubsystem::sendValuesToSmartDashboard() {
 	SmartDashboard::PutNumber("XPos", m_frameCenterX);
 	SmartDashboard::PutNumber("TargetsDetected", m_numParticles);
 	SmartDashboard::PutNumber("TargetDistance", getDistanceToTarget());
+
+	SmartDashboard::PutNumber("NewVision Target Distance", m_distance);
+	SmartDashboard::PutNumber("NewVision Target Angle", m_angle);
+
+	double angle_regBased;
+	double distance_regBased;
+	calculateDistanceAndAngle_FromRegression(m_frameCenterX, m_frameCenterY, &distance_regBased, &angle_regBased);
+	SmartDashboard::PutNumber("Max's NewVision Target Distance", distance_regBased);
+	SmartDashboard::PutNumber("Max's NewVision Target Angle", angle_regBased);
 }
 
 void VisionSubsystem::SetPIDSourceType(PIDSourceType pidSource) {
@@ -388,7 +447,118 @@ PIDSourceType VisionSubsystem::GetPIDSourceType() const {
 	return PIDSourceType::kDisplacement;
 }
 
+// m_frameCenterX is where Vision put the target
+//
 double VisionSubsystem::PIDGet() {
-	return m_frameCenterX / (getFrameCenter() * 2);
+	return m_frameCenterX / m_frameWidth;
 }
 
+// returns the TargetAngle RELATIVE to the current robot angle
+double VisionSubsystem::TargetAngle() {
+	if (m_numParticles==0) return 0.0;
+//	double centerToFraction = getCorrectedFrameCenter(m_distance);
+//	double angle2 = atan(centerToFraction * tan_half_horizontal_field_of_view / 0.5) * 180 / M_PI;
+	double angle1 = m_angle;
+//	double angle = angle1 - angle2;
+//	printf("---> targetX = %5.2f, fraction1 = %5.2f, angle1 = %5.2f angle2 = %5.2f\n", m_frameCenterX, centerToFraction, angle1, angle2);
+//	printf("---> Angle to target relative %5.2f\n", angle);
+	SmartDashboard::PutNumber("AngleToTarget", angle1);
+	return angle1;
+}
+
+void VisionSubsystem::calculateDistanceAndAngle(double xpos, double ypos, double* distance, double* angle){
+	calculateDistanceAndAngle_FromRegression(xpos, ypos, distance, angle);
+
+	return; // don't use lookup table anymore
+
+	FieldInfo::VisionDataPoint closestPoint;
+	double closestPointMeasure = DBL_MAX;
+	for(size_t i = 0; i < sizeof(Robot::instance->fieldInfo.visionData) / sizeof(FieldInfo::VisionDataPoint); i++){
+		FieldInfo::VisionDataPoint point = Robot::instance->fieldInfo.visionData[i];
+		double measure = (point.xpos - xpos) * (point.xpos - xpos) + (point.ypos - ypos) * (point.ypos - ypos);
+		if(measure < closestPointMeasure){
+			closestPoint = point;
+			closestPointMeasure = measure;
+		}
+	}
+	if(closestPointMeasure == DBL_MAX){
+		printf("Vision: Can't fit distance/angle data\n");
+		// should never happen
+		*distance = 0;
+		*angle = 0;
+		return;
+	}
+
+	// find point with next angle to interpolate with
+	double nextAngle = (xpos > closestPoint.xpos) ? closestPoint.angle + 10 : closestPoint.angle - 10;
+	FieldInfo::VisionDataPoint pointNextAngle;
+	bool angleFound = false;
+	for(size_t i = 0; i < sizeof(Robot::instance->fieldInfo.visionData) / sizeof(FieldInfo::VisionDataPoint); i++){
+		FieldInfo::VisionDataPoint point = Robot::instance->fieldInfo.visionData[i];
+		if(point.distance == closestPoint.distance && point.angle == nextAngle){
+			pointNextAngle = point;
+			angleFound = true;
+			break;
+		}
+	}
+
+	// find point with next distance to interpolate with
+	double nextDistance = (ypos > closestPoint.ypos) ? closestPoint.distance + 12 : closestPoint.distance - 12;
+	FieldInfo::VisionDataPoint pointNextDistance;
+	bool distanceFound = false;
+	for(size_t i = 0; i < sizeof(Robot::instance->fieldInfo.visionData) / sizeof(FieldInfo::VisionDataPoint); i++){
+		FieldInfo::VisionDataPoint point = Robot::instance->fieldInfo.visionData[i];
+		if(point.distance == nextDistance && point.angle == closestPoint.angle){
+			pointNextDistance = point;
+			distanceFound = true;
+			break;
+		}
+	}
+
+	if(angleFound){
+		*angle = closestPoint.angle + (xpos - closestPoint.xpos) * (pointNextAngle.angle - closestPoint.angle) / (pointNextAngle.xpos - closestPoint.xpos);
+	} else {
+		*angle = closestPoint.angle;
+	}
+	if(distanceFound){
+		*distance = closestPoint.distance + (ypos - closestPoint.ypos) * (pointNextDistance.distance - closestPoint.distance) / (pointNextDistance.ypos - closestPoint.ypos);
+	} else {
+		*distance = closestPoint.distance;
+	}
+}
+
+void VisionSubsystem::calculateDistanceAndAngle_FromRegression(double xpos, double ypos, double* distance, double* angle){
+	*distance =
+			regcoef_d1 * xpos +
+			regcoef_d2 * xpos * xpos +
+			regcoef_d3 * ypos +
+			regcoef_d4 * ypos * ypos +
+			regcoef_d5 * xpos * ypos +
+			regcoef_d6;
+	*angle =
+			regcoef_a1 * xpos +
+			regcoef_a2 * xpos * xpos +
+			regcoef_a3 * ypos +
+			regcoef_a4 * ypos * ypos +
+			regcoef_a5 * xpos * ypos +
+			regcoef_a6;
+}
+
+bool VisionSubsystem::isVisionCalculationDirty(){
+	if(m_firstFrame || m_numParticles == 0){
+		return true;
+	}
+	// checks for validity of vision calculation by comparing current robot position and orientation
+	// to what it was during the calculation
+	DriveSubsystem::Position pos = CommandBase::driveSubsystem->GetPosition();
+	return fabs(pos.Angle - m_robotPos.Angle) > 0.5
+			|| fabs(pos.X - m_robotPos.X) > 1 || fabs(pos.Y - m_robotPos.Y) > 1;
+}
+
+bool VisionSubsystem::isVisionBusy(){
+	// for AcquireTarget with waitForVision=true
+	// on the first tick, requested = true, busy = false
+	// once updateVision runs (in 1 or 2 more ticks), requested = false, busy = true
+	// once thread actually finishes processing, requested = false, busy = false
+	return m_visionRequested || m_visionBusy;
+}

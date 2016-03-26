@@ -32,7 +32,6 @@ void PrepareForCrossingSequence::Initialize(){
 
 void PrepareForCrossingSequence::Interrupted(){
 	CommandGroup::Interrupted();
-	Cleanup();
 }
 
 void PrepareForCrossingSequence::End(){

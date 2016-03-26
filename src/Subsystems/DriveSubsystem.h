@@ -2,26 +2,9 @@
 
 #include "Commands/Subsystem.h"
 #include "WPILib.h"
+#include "Robot.h"
 
 class DriveSubsystem: public Subsystem {
-private:
-	std::unique_ptr<CANTalon> mp_left1;
-	std::unique_ptr<CANTalon> mp_left2;
-	std::unique_ptr<CANTalon> mp_left3;
-	std::unique_ptr<CANTalon> mp_right1;
-	std::unique_ptr<CANTalon> mp_right2;
-	std::unique_ptr<CANTalon> mp_right3;
-
-	std::unique_ptr<RobotDrive> mp_robotDrive;
-
-	std::unique_ptr<DoubleSolenoid> mp_shifterSolenoid;
-
-	CANTalon *talonPtrs[7];
-	bool talonsPresent[7];
-
-	CANTalon *mp_leftEncoder;
-	CANTalon *mp_rightEncoder;
-
 protected:
 	class DriveTurnPIDOutput: public PIDOutput {
 	protected:
@@ -43,10 +26,76 @@ protected:
 
 			pidOutput = -pidOutput;
 
-			printf("TurnPIDOutput %f\n", pidOutput);
+			if (Robot::ticks%5==0) printf("TurnPIDOutput %f\n", pidOutput);
 			mr_parent.drive(0, pidOutput); // turn
 		}
 	};
+
+public:
+
+	// structure used for tracking robot position
+	struct Position {
+		double X, Y;
+		double Angle;
+	};
+	Position m_pos;
+	double m_originalDistance;	// original encoder value in inches
+
+	// m_prevDistance is adjusted by original distance, so it starts
+	// at zero and records the distance the robot traveled since
+	// the last tick
+	double m_prevDistance;
+
+	// empirically measured by driving 5 feet
+	static constexpr double TICKS_PER_INCH = 640;
+
+	DriveSubsystem();
+	virtual ~DriveSubsystem();
+	void InitDefaultCommand();
+	/**
+	 * Drive with the specified x and y inputs
+	 * @param y Linear, [0, 1]
+	 * @param x Rotation, [0, 1]
+	 */
+	void drive(double y, double x);
+	void driveDirect(double left, double right);
+	/**
+	 * Zeroes the motors. Use at the end of autonomous commands that use DriveSubsystem
+	 */
+	void zeroMotors();
+	void shiftUp();
+	void shiftDown();
+	bool isShiftedUp();
+	double getLeftEncoderPosition();
+	double getRightEncoderPosition();
+	void updatePosition();
+	void SetInitialPosition(double x, double y);
+	Position GetPosition();
+
+	/**
+	 * PIDOutput instance to use for turning (not really)
+	 */
+	std::shared_ptr<DriveTurnPIDOutput> turnPIDOutput;
+
+	void sendValuesToSmartDashboard();
+
+private:
+	std::unique_ptr<CANTalon> mp_left1;
+	std::unique_ptr<CANTalon> mp_left2;
+	std::unique_ptr<CANTalon> mp_left3;
+	std::unique_ptr<CANTalon> mp_right1;
+	std::unique_ptr<CANTalon> mp_right2;
+	std::unique_ptr<CANTalon> mp_right3;
+
+	std::unique_ptr<RobotDrive> mp_robotDrive;
+
+	std::unique_ptr<DoubleSolenoid> mp_shifterSolenoid;
+
+	CANTalon *talonPtrs[7];
+	bool talonsPresent[7];
+
+	CANTalon *mp_leftEncoder;
+	CANTalon *mp_rightEncoder;
 
 	/**
 	 * Initialize a talon as a master
@@ -67,32 +116,5 @@ protected:
 	bool IsTalonPresent(CANTalon& r_talon);bool IsEncoderPresent(
 			CANTalon& r_talon);
 
-public:
-	DriveSubsystem();
-	virtual ~DriveSubsystem();
-	void InitDefaultCommand();
-	/**
-	 * Drive with the specified x and y inputs
-	 * @param y Linear, [0, 1]
-	 * @param x Rotation, [0, 1]
-	 */
-	void drive(double y, double x);
-	void driveDirect(double left, double right);
-	/**
-	 * Zeroes the motors. Use at the end of autonomous commands that use DriveSubsystem
-	 */
-	void zeroMotors();
-	void shiftUp();
-	void shiftDown();
-	bool isShiftedUp();
-	double getLeftEncoderPosition();
-	double getRightEncoderPosition();
-
-	/**
-	 * PIDOutput instance to use for turning
-	 */
-	std::shared_ptr<DriveTurnPIDOutput> turnPIDOutput;
-
-	void sendValuesToSmartDashboard();
 
 };

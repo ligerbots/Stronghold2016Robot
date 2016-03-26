@@ -89,7 +89,6 @@ void AutonomousDriveSequence::End(){
 
 void AutonomousDriveSequence::Interrupted(){
 	CommandGroup::Interrupted();
-	cleanup();
 }
 
 void AutonomousDriveSequence::cleanup(){

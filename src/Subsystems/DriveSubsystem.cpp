@@ -1,7 +1,9 @@
 #include <Stronghold2016Robot.h>
 
 DriveSubsystem::DriveSubsystem() :
-		Subsystem("DriveSubsystem"){
+		Subsystem("DriveSubsystem"),
+		m_pos({ 0.0, 0.0, 0.0 })
+{
 	printf("DriveSubsystem: initialize\n");
 	turnPIDOutput.reset(new DriveTurnPIDOutput(*this));
 	// create all the CANTalon objects we need
@@ -141,6 +143,10 @@ DriveSubsystem::DriveSubsystem() :
 	mp_leftEncoder = talonPtrs[RobotMap::CT_DRIVE_LEFT1];
 	mp_rightEncoder = talonPtrs[RobotMap::CT_DRIVE_RIGHT1];
 
+	// need to get initial encoder reading to make delta meangingful
+	m_originalDistance = getRightEncoderPosition() / TICKS_PER_INCH;
+	m_prevDistance = 0.0;
+
 	// the object that actually handles setting talons from Arcade Drive input
 	mp_robotDrive.reset(
 			new RobotDrive(talonPtrs[masterLeft], talonPtrs[masterRight]));
@@ -191,9 +197,35 @@ void DriveSubsystem::drive(double y, double x) {
 		// Don't let the robot go forward anymore
 		y = 0.0;
 	}
-	SmartDashboard::PutNumber("x", x);
-	SmartDashboard::PutNumber("y", y);
+
+	if (Robot::ticks%5==0) {
+	   SmartDashboard::PutNumber("x", x);
+	   SmartDashboard::PutNumber("y", y);
+	}
 	mp_robotDrive->ArcadeDrive(y, x);
+	updatePosition();
+}
+
+void DriveSubsystem::updatePosition() {
+	double distance = (getRightEncoderPosition() / TICKS_PER_INCH) -
+			(m_originalDistance + m_prevDistance);
+	m_prevDistance += distance;
+	m_pos.Angle = CommandBase::navXSubsystem->GetYaw();
+	double xMoved = cos(m_pos.Angle) * distance;
+	double yMoved = sqrt(distance*distance - xMoved*xMoved);
+	m_pos.X += xMoved;
+	m_pos.Y += yMoved;
+	if (Robot::ticks%300==0)
+		printf("POSITION: X=%5.2f Y=%5.2f Angle=%5.2f\n", m_pos.X, m_pos.Y, m_pos.Angle);
+}
+
+void DriveSubsystem::SetInitialPosition(double x, double y) {
+	m_pos.X = x;
+	m_pos.Y = y;
+}
+
+DriveSubsystem::Position DriveSubsystem::GetPosition() {
+	return m_pos;
 }
 
 void DriveSubsystem::driveDirect(double left, double right){
@@ -203,6 +235,7 @@ void DriveSubsystem::driveDirect(double left, double right){
 		if (right > 0.0) right = 0.0;
 	}
 	mp_robotDrive->SetLeftRightMotorOutputs(left, right);
+	updatePosition();
 }
 
 double DriveSubsystem::getLeftEncoderPosition() {
@@ -258,6 +291,10 @@ void DriveSubsystem::sendValuesToSmartDashboard() {
 									* talonPtrs[i]->GetOutputVoltage() :
 							0.0);
 		}
+
+		SmartDashboard::PutNumber("X", m_pos.X);
+		SmartDashboard::PutNumber("Y", m_pos.Y);
+		SmartDashboard::PutNumber("Angle", m_pos.Angle);
 
 		SmartDashboard::PutNumber("Drive/LeftPosition",
 				getLeftEncoderPosition());

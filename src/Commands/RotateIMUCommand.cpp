@@ -14,10 +14,12 @@ void RotateIMUCommand::Initialize() {
 	driveSubsystem->shiftDown();
 
 	updateCurrentAngle();
-	if(isAbsolute)
+	if (isAbsolute) {
 		targetAngle = angle;
-	else
+	} else {
 		targetAngle = currentAngle + angle;
+	}
+	printf("Current angle %f, angle %f, targetAngle %f, absolute %d\n", currentAngle, angle, targetAngle, isAbsolute);
 	targetAngle = fmod(targetAngle + 360.0, 360.0);
 
 	// find the shortest direction to turn
@@ -47,10 +49,10 @@ void RotateIMUCommand::Execute() {
 
 	double error = fabs(currentAngle - targetAngle);
 	if(error > 180) error = 360 - error; // we always try to go the minimum number of degrees
-	if(error < 30){
-		speed = error * (1 - .6) / 30 + .6;
-	} else if(m_ticks < 20){
-		speed = .45 + (.55 * m_ticks / 20.0);
+	if(error < RAMP_DOWN_ZONE){
+		speed = error * (1 - MIN_SPEED) / RAMP_DOWN_ZONE + MIN_SPEED;
+	} else if(m_ticks < RAMP_UP_TICKS){
+		speed = MIN_SPEED + ((1 - MIN_SPEED) * m_ticks / RAMP_UP_TICKS);
 	}
 
 	driveSubsystem->drive(0, isClockwise ? speed : -speed);

@@ -37,11 +37,13 @@ void RollBallToIntakePositionCommand::Initialize() {
 		moveUp = true;
 	}
 
-	if(flapSubsystem->getRightFlapFraction() == 1.0 && flapSubsystem->getLeftFlapFraction() == 1.0){
+	if(flapSubsystem->isSafeToIntake()){
 		needsToWaitForFlaps = false;
+		printf("Skipping flaps wait\n");
 	} else {
 		flapSubsystem->setFlapsFraction(1); // all the way down
 		needsToWaitForFlaps = true;
+		printf("Waiting for flaps\n");
 	}
 	intakeSubsystem->setIntakeArmDown();
 
@@ -69,10 +71,10 @@ void RollBallToIntakePositionCommand::Execute() {
 	}
 
 	ticks++;
-	if(ticks < 20 && needsToWaitForFlaps)
+	if(needsToWaitForFlaps && !flapSubsystem->isSafeToIntake())
 		return; // wait for flaps
 
-	double rollSpeed = 0.3;
+	double rollSpeed = .5;
 	if(where == LOW_GOAL || where == PICKUP)
 		rollSpeed = 1; // max speed
 
@@ -98,7 +100,7 @@ void RollBallToIntakePositionCommand::Execute() {
 			waiting_ticks = 0;
 		} else if(shooter_switch_state == STATE_WAIT){
 			waiting_ticks++;
-			if(waiting_ticks > 15){
+			if(waiting_ticks > 5){
 				shooter_switch_state = STATE_BACK;
 				printf("RollBall: State = STATE_BACK\n");
 			}
@@ -116,7 +118,7 @@ bool RollBallToIntakePositionCommand::IsFinished() {
 				switchAlreadyPressed ||
 				(shooter_switch_state == STATE_BACK && sensorFlag);
 	} else if(where == CROSSING_POSITION){
-		return IsTimedOut() || (sensorFlag && ticks_since_crossing_position > 15);
+		return IsTimedOut() || (sensorFlag && ticks_since_crossing_position > 5);
 	} else
 		return IsTimedOut() || sensorFlag;
 }
@@ -133,8 +135,4 @@ void RollBallToIntakePositionCommand::End() {
 void RollBallToIntakePositionCommand::Interrupted() {
 	printf("RollBallToIntakePositionCommand: interrupted\n");
 	intakeSubsystem->rollStop();
-	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL){
-		CommandBase::intakeRollerCommand->Start();
-		CommandBase::flapCommand->Start();
-	}
 }
