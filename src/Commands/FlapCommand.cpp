@@ -34,6 +34,8 @@ void FlapCommand::Execute() {
 			fraction = VisionSubsystem::angles[flapButtons];
 		}
 
+		printf("Setting flaps to %f\n", fraction);
+
 		flapPositionLeft = fraction;
 		flapPositionRight = fraction;
 

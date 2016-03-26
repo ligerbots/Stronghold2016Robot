@@ -20,6 +20,8 @@ CenterOnTargetCommand::CenterOnTargetCommand() :
 //	}
 //	mp_softwarePID->SetAbsoluteTolerance(0.02);
 //	SmartDashboard::PutData("CenterOnTargetPID", mp_softwarePID);
+
+	m_ticksSinceCentered = 0;
 }
 
 void CenterOnTargetCommand::Initialize() {
@@ -28,6 +30,9 @@ void CenterOnTargetCommand::Initialize() {
 	visionSubsystem->setLedRingOn(true);
 	driveSubsystem->zeroMotors();
 	driveSubsystem->shiftDown(); // untested in high gear
+
+	SmartDashboard::PutNumber("AngleBeforeFineCenter", navXSubsystem->GetYaw());
+
 	SetTimeout(5);
 
 //	Preferences::GetInstance()->PutDouble("CenterOnTargetP",
@@ -85,7 +90,14 @@ bool CenterOnTargetCommand::IsFinished() {
 		return true;
 	}
 
-	return IsTimedOut() || fabs(centerTo - visionSubsystem->PIDGet()) < ACCEPTABLE_ERROR;
+	bool isCentered = fabs(centerTo - visionSubsystem->PIDGet()) < ACCEPTABLE_ERROR;
+	if(isCentered){
+		m_ticksSinceCentered++;
+	} else {
+		m_ticksSinceCentered = 0;
+	}
+
+	return IsTimedOut() || (isCentered && m_ticksSinceCentered > 15);
 }
 
 void CenterOnTargetCommand::End() {
@@ -93,6 +105,9 @@ void CenterOnTargetCommand::End() {
 //	printf("\tOn target: %d\n", mp_softwarePID->OnTarget());
 //	mp_softwarePID->Disable();
 	driveSubsystem->zeroMotors();
+
+	SmartDashboard::PutNumber("AngleAfterFineCenter", navXSubsystem->GetYaw());
+
 //	SmartDashboard::PutData("CenterOnTargetPID", mp_softwarePID);
 	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL)
 		CommandBase::driveJoystickCommand->Start();

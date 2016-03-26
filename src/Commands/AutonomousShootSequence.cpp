@@ -20,11 +20,12 @@ AutonomousShootSequence::AutonomousShootSequence()
 	// arm.
 
 	//TODO: switch back
-	AddSequential(new CenterAndRollBallSequence());
-	AddSequential(new IntakeToggleCommand(true));
+	AddParallel(new RollBallAndIntakeUpSequence());
+	AddSequential(new AcquireTarget(true));
+	AddSequential(new CenterOnTargetCommand());
+	AddSequential(new AcquireTarget(true));
 	AddSequential(new WaitForIntakeUpCommand());
 	AddSequential(new AutoSetFlapsCommand());
-	AddSequential(new DelayCommand(0.6));
 	AddSequential(new ShootCommand());
 }
 

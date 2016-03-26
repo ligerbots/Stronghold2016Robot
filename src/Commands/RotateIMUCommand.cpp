@@ -14,10 +14,12 @@ void RotateIMUCommand::Initialize() {
 	driveSubsystem->shiftDown();
 
 	updateCurrentAngle();
-	if (isAbsolute)
+	if (isAbsolute) {
 		targetAngle = angle;
-	else
+	} else {
 		targetAngle = currentAngle + angle;
+	}
+	printf("Current angle %f, angle %f, targetAngle %f, absolute %d\n", currentAngle, angle, targetAngle, isAbsolute);
 	targetAngle = fmod(targetAngle + 360.0, 360.0);
 
 	// find the shortest direction to turn

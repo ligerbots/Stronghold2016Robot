@@ -12,6 +12,7 @@ protected:
 	Parameter<double> fastSpeed;
 	Parameter<double> mediumSpeed;
 	Parameter<double> slowSpeed;
+	int m_ticksSinceCentered;
 public:
 	explicit CenterOnTargetCommand();
 	void Initialize();
@@ -19,5 +20,5 @@ public:
 	void End();
 	void Interrupted();
 
-	static constexpr double ACCEPTABLE_ERROR = 0.005;
+	static constexpr double ACCEPTABLE_ERROR = 0.00625;
 };

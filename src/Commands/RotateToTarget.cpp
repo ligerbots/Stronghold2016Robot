@@ -7,7 +7,7 @@ RotateToTarget::RotateToTarget() :
 
 void RotateToTarget::Initialize() {
 	// Get the target angle from Vision. Will be zero if we have no target.
-	angle = visionSubsystem->TargetAngle();
+	angle = -(visionSubsystem->TargetAngle());
 	printf("RotateToTarget: turn angle: %5.2f\n", angle);
 	// let parent command initialize with the angle set
 	RotateIMUCommand::Initialize();

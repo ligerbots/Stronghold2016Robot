@@ -17,6 +17,7 @@ void DriveJoystickCommand::Initialize() {
 void DriveJoystickCommand::Execute() {
 	Joystick* pXboxController =
 			Robot::instance->mp_operatorInterface->pXboxController;
+	Joystick* pFarmController = Robot::instance->mp_operatorInterface->pFarmController;
 
 	//double y = pXboxController->GetY();
 	// there was a 0.7 turnMax variable in the 2015 bot
@@ -28,8 +29,8 @@ void DriveJoystickCommand::Execute() {
 	//SmartDashboard::PutNumber("DriveJoystick_x", x);
 	//SmartDashboard::PutNumber("DriveJoystick_y", y);
 
-	driveSubsystem->drive(pXboxController->GetRawAxis(1),
-			pXboxController->GetRawAxis(4));
+	driveSubsystem->drive(pXboxController->GetRawAxis(1) + pFarmController->GetRawAxis(4),
+			pXboxController->GetRawAxis(4)+ pFarmController->GetRawAxis(5));
 }
 
 bool DriveJoystickCommand::IsFinished() {

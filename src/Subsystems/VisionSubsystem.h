@@ -50,12 +50,12 @@ private:
 	};
 
 	// Max's regression coefficients
-	static constexpr double regcoef_a1 = -2.31E-01;
-	static constexpr double regcoef_a2 = -1.43E-06;
-	static constexpr double regcoef_a3 = -1.24E-01;
-	static constexpr double regcoef_a4 = -9.89E-06;
-	static constexpr double regcoef_a5 =  4.15E-04;
-	static constexpr double regcoef_a6 =  6.91E+01;
+	static constexpr double regcoef_a1 = -2.448E-01;
+	static constexpr double regcoef_a2 =  1.979E-05;
+	static constexpr double regcoef_a3 = -1.217E-01;
+	static constexpr double regcoef_a4 = -3.020E-05;
+	static constexpr double regcoef_a5 =  4.378E-04;
+	static constexpr double regcoef_a6 =  7.033E+01;
 	static constexpr double regcoef_d1 = -2.09E-01;
 	static constexpr double regcoef_d2 =  3.46E-04;
 	static constexpr double regcoef_d3 =  3.58E-02;
@@ -87,6 +87,7 @@ private:
 	int m_lastVisionTick;
 
 	DriveSubsystem::Position m_robotPos;
+	bool m_firstFrame;
 
 	// Take all the particple measurements in one call
 	// Q: Does taking extra measurements slow things down?

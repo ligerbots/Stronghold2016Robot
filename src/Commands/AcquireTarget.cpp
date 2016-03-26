@@ -27,7 +27,9 @@ bool AcquireTarget::IsFinished() {
 	if(!m_isRunningVision){
 		return true; // the calculation is still valid, we didn't bother to get another frame
 	} else if(m_waitForVision){
-		return !visionSubsystem->isVisionBusy(); // wait until the thread finishes if this command is set to wait
+		bool visionBusy = visionSubsystem->isVisionBusy(); // wait until the thread finishes if this command is set to wait
+		printf("AcquireTarget: vision busy = %d\n", visionBusy);
+		return !visionBusy;
 	} else {
 		return true; // otherwise exit immediately; don't wait for completion
 	}

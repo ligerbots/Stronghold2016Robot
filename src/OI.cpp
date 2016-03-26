@@ -8,7 +8,7 @@ OI::OI() :
 
 void OI::registerCommands() {
 	// XBox A command
-	registerButton(pXboxController, 1, PRESSED, new ToggleCommand(new RollBallToIntakePositionCommand(RollBallToIntakePositionCommand::PICKUP)));
+	registerButton(pXboxController, 1, PRESSED, new ToggleCommand(new RollBallPickupThenShooter()));
 	// XBox B command
 	registerButton(pXboxController, 2, PRESSED, new AutonomousShootSequence());
 	// XBox X command
@@ -58,12 +58,14 @@ void OI::registerSecondControllerButtons() {
 
 		// section 3 - auto commands
 		registerButton(pFarmController, 11, PRESSED, new PrepareForCrossingSequence());
-		registerButton(pFarmController, 13, PRESSED, new AcquireTarget());
+		registerButton(pFarmController, 13, PRESSED, new AcquireTarget(true, true));
 		registerButton(pFarmController, 16, PRESSED, new RotateToTarget());
+
+		registerButton(pFarmController, 15, PRESSED, new CenterOnTargetCommand());
 //		registerButton(pFarmController, 16, PRESSED, new RotateIMUCommand(0));
 
 		// test commands
-		registerButton(pFarmController, 15, PRESSED, new DriveDistanceCommand(9 * 12, FieldInfo::FAST, DriveDistanceCommand::HIGH));
+//		registerButton(pFarmController, 15, PRESSED, new DriveDistanceCommand(9 * 12, FieldInfo::FAST, DriveDistanceCommand::HIGH));
 
 
 		registerButton(pFarmController, 12, PRESSED, new AutonomousDriveSequence(

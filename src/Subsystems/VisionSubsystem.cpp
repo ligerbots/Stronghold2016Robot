@@ -20,13 +20,14 @@ VisionSubsystem::VisionSubsystem() :
 		m_numParticles(0),
 		m_processingThread(&VisionSubsystem::visionProcessingThread,this),
 		m_visionBusy(false),
-		m_visionRequested(true),	// run one vision frame on startup
+		m_visionRequested(true), // run one vision frame on startup
 		m_lastVisionTick(0),
 		m_activeCamera(0),
 		m_pM(NULL)
 {
 	ledRingSpike.reset(new Relay(RobotMap::RELAY_LED_RING_SPIKE));
 	enableVision = true;	// default on
+	m_firstFrame = true;
 
 	mT[COMX] = IMAQ_MT_CENTER_OF_MASS_X;
 	mT[COMY] = IMAQ_MT_CENTER_OF_MASS_Y;
@@ -197,6 +198,8 @@ void VisionSubsystem::visionProcessingThread() {
 				printf("Vision frame done in %f seconds, %f CPU seconds, %d ticks\n",
 						elapsedTime, elapsedCPUTime, elapsedTicks);
 			}
+			printf("Vision: Finished a vision frame\n");
+			m_firstFrame = false;
 		}
 		else {
 			// if we didn't process any images, display something
@@ -298,14 +301,17 @@ void VisionSubsystem::markTarget(Image *image) {
 		if (m_numParticles != 0) {
 			// If the target is centered in our field of view, paint it green; else red
 			double Xerror = fabs(setpoint * width - m_frameCenterX);
-//					printf("%f\n", Xerror);
+//			printf("%f\n", Xerror);
 			// Centered means no more than 1.5% off to either side
-			double color = Xerror < (width * 0.015) ? GREEN : RED;
-			// draw a 6-pixel circle in red
-			imaqDrawShapeOnImage(image, image,
-					{ (int) m_frameCenterY - 3, (int) m_frameCenterX - 3, 6, 6}, IMAQ_PAINT_VALUE, IMAQ_SHAPE_OVAL, color);
-			if (false) {
-				// this code attempts to draw an X, but ...
+			double color = Xerror < 3.2 ? GREEN : RED;
+
+			if(false){
+				// this code attempts to draw an circle, but ...
+				// draw a 6-pixel circle in red
+				imaqDrawShapeOnImage(image, image,
+						{ (int) m_frameCenterY - 3, (int) m_frameCenterX - 3, 6, 6}, IMAQ_PAINT_VALUE, IMAQ_SHAPE_OVAL, color);
+			}
+
 				imaqDrawLineOnImage(image, image, DrawMode::IMAQ_DRAW_VALUE,
 						{ (int) m_frameCenterX - 5, (int) m_frameCenterY },
 						{ (int) m_frameCenterX + 5, (int) m_frameCenterY },
@@ -314,7 +320,6 @@ void VisionSubsystem::markTarget(Image *image) {
 						{ (int) m_frameCenterX, (int) m_frameCenterY - 5 },
 						{ (int) m_frameCenterX, (int) m_frameCenterY + 5 },
 						CYAN);
-			}
 			// Draw the whole feret diagonal
 			imaqDrawLineOnImage(image, image, DrawMode::IMAQ_DRAW_VALUE,
 					{(int) feretStartX, (int) feretStartY},
@@ -386,6 +391,9 @@ double VisionSubsystem::getDistanceToTarget() {
 }
 
 double VisionSubsystem::getFlapsFractionForDistance(double distance) {
+	distance = distance / 12; // distances from the lookup table and regression are now in inches, so convert to feet
+	// which is what the flaps lookup table needs
+
 	// there's lots of complicated physics involved during the shot
 	// no regression fits test data well, so this does linear interpolation
 	// between lookup table values
@@ -427,8 +435,8 @@ void VisionSubsystem::sendValuesToSmartDashboard() {
 	double angle_regBased;
 	double distance_regBased;
 	calculateDistanceAndAngle_FromRegression(m_frameCenterX, m_frameCenterY, &distance_regBased, &angle_regBased);
-	SmartDashboard::PutNumber("Max's NewVision Target Distance", angle_regBased);
-	SmartDashboard::PutNumber("Max's NewVision Target Angle", distance_regBased);
+	SmartDashboard::PutNumber("Max's NewVision Target Distance", distance_regBased);
+	SmartDashboard::PutNumber("Max's NewVision Target Angle", angle_regBased);
 }
 
 void VisionSubsystem::SetPIDSourceType(PIDSourceType pidSource) {
@@ -448,17 +456,21 @@ double VisionSubsystem::PIDGet() {
 // returns the TargetAngle RELATIVE to the current robot angle
 double VisionSubsystem::TargetAngle() {
 	if (m_numParticles==0) return 0.0;
-	double centerToFraction = getCorrectedFrameCenter(m_distance);
-	double angle2 = atan(centerToFraction * tan_half_horizontal_field_of_view / 0.5) * 180 / M_PI;
+//	double centerToFraction = getCorrectedFrameCenter(m_distance);
+//	double angle2 = atan(centerToFraction * tan_half_horizontal_field_of_view / 0.5) * 180 / M_PI;
 	double angle1 = m_angle;
-	double angle = angle1 - angle2;
-	printf("---> targetX = %5.2f, fraction1 = %5.2f, angle1 = %5.2f angle2 = %5.2f\n", m_frameCenterX, centerToFraction, angle1, angle2);
-	printf("---> Angle to target relative %5.2f\n", angle);
-	SmartDashboard::PutNumber("AngleToTarget", angle);
-	return angle;
+//	double angle = angle1 - angle2;
+//	printf("---> targetX = %5.2f, fraction1 = %5.2f, angle1 = %5.2f angle2 = %5.2f\n", m_frameCenterX, centerToFraction, angle1, angle2);
+//	printf("---> Angle to target relative %5.2f\n", angle);
+	SmartDashboard::PutNumber("AngleToTarget", angle1);
+	return angle1;
 }
 
 void VisionSubsystem::calculateDistanceAndAngle(double xpos, double ypos, double* distance, double* angle){
+	calculateDistanceAndAngle_FromRegression(xpos, ypos, distance, angle);
+
+	return; // don't use lookup table anymore
+
 	FieldInfo::VisionDataPoint closestPoint;
 	double closestPointMeasure = DBL_MAX;
 	for(size_t i = 0; i < sizeof(Robot::instance->fieldInfo.visionData) / sizeof(FieldInfo::VisionDataPoint); i++){
@@ -533,11 +545,14 @@ void VisionSubsystem::calculateDistanceAndAngle_FromRegression(double xpos, doub
 }
 
 bool VisionSubsystem::isVisionCalculationDirty(){
+	if(m_firstFrame || m_numParticles == 0){
+		return true;
+	}
 	// checks for validity of vision calculation by comparing current robot position and orientation
 	// to what it was during the calculation
 	DriveSubsystem::Position pos = CommandBase::driveSubsystem->GetPosition();
-	return fabs(pos.Angle - m_robotPos.Angle) > 1.5
-			|| fabs(pos.X - m_robotPos.X) > 2 || fabs(pos.Y - m_robotPos.Y) > 2;
+	return fabs(pos.Angle - m_robotPos.Angle) > 0.5
+			|| fabs(pos.X - m_robotPos.X) > 1 || fabs(pos.Y - m_robotPos.Y) > 1;
 }
 
 bool VisionSubsystem::isVisionBusy(){
