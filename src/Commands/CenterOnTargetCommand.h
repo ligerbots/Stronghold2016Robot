@@ -13,6 +13,7 @@ protected:
 	Parameter<double> mediumSpeed;
 	Parameter<double> slowSpeed;
 	int m_ticksSinceCentered;
+	bool m_isCentered;
 public:
 	explicit CenterOnTargetCommand();
 	void Initialize();

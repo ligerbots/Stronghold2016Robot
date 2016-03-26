@@ -39,8 +39,9 @@ void DriveDistanceCommand::Initialize() {
 			m_speed = NORMAL_SPEED;
 			driveSubsystem->shiftDown();
 		}
+	} else{
+		driveSubsystem->shiftDown();
 	}
-	else driveSubsystem->shiftDown();
 }
 
 void DriveDistanceCommand::Execute() {
@@ -60,8 +61,9 @@ void DriveDistanceCommand::Execute() {
 		// if m_distance is negative, m_startRightPosition is negative, right is negative and decreasing
 		//  negative example: -400 - (-600 - -300), so -400 - -300 = 100
 		//  positive example: 400 - (600 - 300) = 400 - 300 = 100
-		remaining = m_distance - (right - m_startPositionRight);
-		if (remaining*TICKS_PER_FOOT < 2.0) {
+		remaining = m_distance - (right - m_startPositionRight) * TICKS_PER_FOOT;
+		if (fabs(remaining) < 2.0) {
+			printf("DriveDistance: Shifting down for last 2 feet\n");
 			m_gear = LOW;
 			m_speed = NORMAL_SPEED;
 			driveSubsystem->shiftDown();

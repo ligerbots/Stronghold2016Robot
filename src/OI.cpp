@@ -8,7 +8,10 @@ OI::OI() :
 
 void OI::registerCommands() {
 	// XBox A command
-	registerButton(pXboxController, 1, PRESSED, new ToggleCommand(new RollBallPickupThenShooter()));
+	std::vector<Command*> rollBallRestartCommands;
+	rollBallRestartCommands.push_back(CommandBase::intakeRollerCommand.get());
+	rollBallRestartCommands.push_back(CommandBase::flapCommand.get());
+	registerButton(pXboxController, 1, PRESSED, new ToggleCommand(new RollBallPickupThenShooter(), rollBallRestartCommands));
 	// XBox B command
 	registerButton(pXboxController, 2, PRESSED, new AutonomousShootSequence());
 	// XBox X command

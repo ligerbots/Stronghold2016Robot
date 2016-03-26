@@ -1,14 +1,10 @@
 #include <Stronghold2016Robot.h>
 
 CenterOnTargetCommand::CenterOnTargetCommand() :
-		CommandBase("CenterOnTargetCommand"),
-		mp_softwarePID(NULL),
-		centerTo(0),
-		centerMediumZone("CenterMediumZone"),
-		centerSlowZone("CenterSlowZone"),
-		fastSpeed("CenterFastSpeed"),
-		mediumSpeed("CenterMediumSpeed"),
-		slowSpeed("CenterSlowSpeed") {
+		CommandBase("CenterOnTargetCommand"), mp_softwarePID(NULL), centerTo(0), centerMediumZone(
+				"CenterMediumZone"), centerSlowZone("CenterSlowZone"), fastSpeed(
+				"CenterFastSpeed"), mediumSpeed("CenterMediumSpeed"), slowSpeed(
+				"CenterSlowSpeed") {
 	Requires(visionSubsystem.get());
 	Requires(driveSubsystem.get());
 //	if (mp_softwarePID == NULL) {
@@ -22,6 +18,7 @@ CenterOnTargetCommand::CenterOnTargetCommand() :
 //	SmartDashboard::PutData("CenterOnTargetPID", mp_softwarePID);
 
 	m_ticksSinceCentered = 0;
+	m_isCentered = false;
 }
 
 void CenterOnTargetCommand::Initialize() {
@@ -62,7 +59,7 @@ void CenterOnTargetCommand::Execute() {
 //				mp_softwarePID->GetD());
 //	}
 
-	if(!visionSubsystem->isTargetVisible()){
+	if (!visionSubsystem->isTargetVisible()) {
 		driveSubsystem->zeroMotors();
 		return;
 	}
@@ -71,33 +68,39 @@ void CenterOnTargetCommand::Execute() {
 	// see RotateToTarget for centering without continuous vision
 	visionSubsystem->runVision();
 
-	centerTo = visionSubsystem->getCorrectedFrameCenter(visionSubsystem->getDistanceToTarget());
+	centerTo = visionSubsystem->getCorrectedFrameCenter(
+			visionSubsystem->getDistanceToTarget());
 
 	double error = centerTo - visionSubsystem->PIDGet();
 	double sign = error < 0 ? -1 : 1;
-	if (fabs(error) > centerMediumZone.get()) {
-		driveSubsystem->turnPIDOutput->PIDWrite(fastSpeed.get() * sign); // .7
-	} else if (fabs(error) > centerSlowZone.get()){
-		driveSubsystem->turnPIDOutput->PIDWrite(mediumSpeed.get() * sign); // .4
+	if (!m_isCentered) {
+		if (fabs(error) > centerMediumZone.get()) {
+			driveSubsystem->turnPIDOutput->PIDWrite(fastSpeed.get() * sign); // .7
+		} else if (fabs(error) > centerSlowZone.get()) {
+			driveSubsystem->turnPIDOutput->PIDWrite(mediumSpeed.get() * sign); // .4
+		} else {
+			driveSubsystem->turnPIDOutput->PIDWrite(slowSpeed.get() * sign); // .32
+		}
 	} else {
-		driveSubsystem->turnPIDOutput->PIDWrite(slowSpeed.get() * sign); // .32
+		driveSubsystem->zeroMotors();
 	}
 }
 
 bool CenterOnTargetCommand::IsFinished() {
-	if(Robot::instance->mp_operatorInterface->get2ndControllerButton(28)){
+	if (Robot::instance->mp_operatorInterface->get2ndControllerButton(28)) {
 		printf("Center: ending command\n");
 		return true;
 	}
 
-	bool isCentered = fabs(centerTo - visionSubsystem->PIDGet()) < ACCEPTABLE_ERROR;
-	if(isCentered){
+	m_isCentered = fabs(centerTo - visionSubsystem->PIDGet())
+			< ACCEPTABLE_ERROR;
+	if (m_isCentered) {
 		m_ticksSinceCentered++;
 	} else {
 		m_ticksSinceCentered = 0;
 	}
 
-	return IsTimedOut() || (isCentered && m_ticksSinceCentered > 15);
+	return IsTimedOut() || (m_isCentered && m_ticksSinceCentered > 15);
 }
 
 void CenterOnTargetCommand::End() {
@@ -109,7 +112,7 @@ void CenterOnTargetCommand::End() {
 	SmartDashboard::PutNumber("AngleAfterFineCenter", navXSubsystem->GetYaw());
 
 //	SmartDashboard::PutData("CenterOnTargetPID", mp_softwarePID);
-	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL)
+	if (DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL)
 		CommandBase::driveJoystickCommand->Start();
 }
 

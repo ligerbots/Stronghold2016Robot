@@ -6,8 +6,12 @@
 
 class RollBallPickupThenShooter: public CommandGroup
 {
+protected:
+	bool m_alreadyInShooter;
 public:
 	RollBallPickupThenShooter();
+	void Initialize();
+	bool IsFinished();
 	void End();
 };
 

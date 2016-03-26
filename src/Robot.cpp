@@ -79,6 +79,11 @@ void Robot::AlwaysPeriodic() {
 			mp_autonomousCommand->Cancel();
 		}
 		CommandBase::centerOnTargetCommand->Cancel();
+		if(DriverStation::GetInstance().IsOperatorControl()){
+			CommandBase::driveJoystickCommand->Start();
+			CommandBase::flapCommand->Start();
+			CommandBase::intakeRollerCommand->Start();
+		}
 	}
 
 	if (mp_operatorInterface->get2ndControllerButton(21)) {

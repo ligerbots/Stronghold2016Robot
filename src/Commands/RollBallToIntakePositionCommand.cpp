@@ -39,9 +39,11 @@ void RollBallToIntakePositionCommand::Initialize() {
 
 	if(flapSubsystem->isSafeToIntake()){
 		needsToWaitForFlaps = false;
+		printf("Skipping flaps wait\n");
 	} else {
 		flapSubsystem->setFlapsFraction(1); // all the way down
 		needsToWaitForFlaps = true;
+		printf("Waiting for flaps\n");
 	}
 	intakeSubsystem->setIntakeArmDown();
 

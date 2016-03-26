@@ -23,7 +23,7 @@ void FlapSubsystem::setFlapsFraction(double fractionLeft,
 	fractionLeft = fmax(fmin(fractionLeft, 1), 0);
 	fractionRight = fmax(fmin(fractionRight, 1), 0);
 
-	if(fractionLeft == 1.0 && fractionRight == 1.0){
+	if(fractionLeft == 1.0 && fractionRight == 1.0 && (currentLeftPosition != 1.0 || currentRightPosition != 1.0)){
 		m_robotTickAtFlapsDown = Robot::ticks;
 	}
 
@@ -41,8 +41,8 @@ void FlapSubsystem::setFlapsFraction(double fractionLeft,
 
 bool FlapSubsystem::isSafeToIntake(){
 	// did we set both flaps down more than 20 ticks ago?
-	printf("FlapSubsystem: left %f right %f ticksAtDown %d ticks %d\n", currentLeftPosition,currentRightPosition, m_robotTickAtFlapsDown, Robot::ticks);
-	return currentLeftPosition == 1 && currentRightPosition == 1 && (Robot::ticks - m_robotTickAtFlapsDown) > 20;
+//	printf("FlapSubsystem: left %f right %f ticksAtDown %d ticks %d\n", currentLeftPosition,currentRightPosition, m_robotTickAtFlapsDown, Robot::ticks);
+	return currentLeftPosition == 1.0 && currentRightPosition == 1.0 && (Robot::ticks - m_robotTickAtFlapsDown) > 20;
 }
 
 void FlapSubsystem::sendValuesToSmartDashboard() {
