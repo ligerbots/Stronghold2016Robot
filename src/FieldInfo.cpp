@@ -57,14 +57,14 @@ void FieldInfo::initSelectors(){
 	mp_position->AddObject("5", &I[POS_FIVE]);
 
 	mp_defense->AddDefault("Low Bar", &I[DEF_LOW_BAR]);
-	mp_defense->AddObject("Portcullis", &I[DEF_PORTCULLIS]);
-	mp_defense->AddObject("Cheval de Frise", &I[DEF_CHEVAL]);
-	mp_defense->AddObject("Moat", &I[DEF_MOAT]);
-	mp_defense->AddObject("Ramparts", &I[DEF_RAMPARTS]);
-	mp_defense->AddObject("Drawbridge", &I[DEF_DRAWBRIDGE]);
-	mp_defense->AddObject("Sally Port", &I[DEF_SALLY_PORT]);
-	mp_defense->AddObject("Rock Wall", &I[DEF_ROCK_WALL]);
-	mp_defense->AddObject("Rough Terrain", &I[DEF_ROUGH_TERRAIN]);
+	mp_defense->AddObject("A Portcullis", &I[DEF_PORTCULLIS]);
+	mp_defense->AddObject("A Cheval de Frise", &I[DEF_CHEVAL]);
+	mp_defense->AddObject("B Moat", &I[DEF_MOAT]);
+	mp_defense->AddObject("B Ramparts", &I[DEF_RAMPARTS]);
+	mp_defense->AddObject("C Drawbridge", &I[DEF_DRAWBRIDGE]);
+	mp_defense->AddObject("C Sally Port", &I[DEF_SALLY_PORT]);
+	mp_defense->AddObject("D Rock Wall", &I[DEF_ROCK_WALL]);
+	mp_defense->AddObject("D Rough Terrain", &I[DEF_ROUGH_TERRAIN]);
 	mp_defense->AddObject("NO AUTONOMOUS", &I[DEF_NO_AUTO]);
 
 	mp_target->AddDefault("Left", &I[TARGET_LEFT]);
