@@ -61,6 +61,7 @@ public:
 		POS_FIVE,
 		POS_MAX
 	};
+	static const std::string StartingPositionNames[];
 
 	struct StartingLocations {
 		double x, y;
@@ -81,6 +82,7 @@ public:
 		TARGET_RIGHT,
 		TARGET_MAX
 	};
+	static const std::string TargetNames[];
 
 	struct TargetLocations {
 		double x, y;
@@ -113,6 +115,7 @@ public:
 		DEF_NO_AUTO,
 		DEF_MAX
 	};
+	static const std::string DefenseNames[];
 
 	enum Speeds {
 		NOGO,
