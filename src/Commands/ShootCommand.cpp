@@ -17,6 +17,10 @@ void ShootCommand::Initialize() {
 			&& */!intakeSubsystem->isIntakeArmUp()) {
 		done = true;
 		printf("ShooterCommand: not safe to fire\n");
+	} else {
+		// turns on the shooting animation on the same tick as the actual shooter fire
+		// opponents should have no time to react
+		Robot::instance->SetLeds(Robot::SHOOT);
 	}
 	SetInterruptible(false);
 }

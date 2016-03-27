@@ -8,7 +8,8 @@ bool Robot::isRoadkill = false;
 bool Robot::ROBOT_IS_ABOUT_TO_TIP = false;
 timespec Robot::resolution;
 
-Robot::Robot() {
+Robot::Robot() :
+		ledsCommunication(I2C::kOnboard, 42) {
 	instance = this;
 
 	mp_autonomousCommand = NULL;
@@ -129,26 +130,36 @@ void Robot::DisabledInit() {
 		mp_autonomousCommand->Cancel();
 	}
 
-	// cbf -- commented this all out so we don't keep on getting SPI CRC errors
-	// spamming our logs
-	printf("Writing i2c\n");
-	I2C i2c(I2C::kOnboard, 10);
+	printf("LEDs: Turning off\n");
+	SetLeds(OFF);
+}
 
-	int numLeds = 23;
-//	int numStrips = 2;
-
-
-	char startByte = 0b11000000;
-	char r = 0, g = 0, b = 0;
-
-	uint8_t bytes[numLeds * 3 + 1];
-	bytes[0] = startByte;
-	for (int j = 1; j < numLeds * 3 + 1; j += 3) {
-		bytes[j] = r;
-		bytes[j + 1] = g;
-		bytes[j + 2] = b;
+void Robot::SetLeds(LedState state){
+	uint8_t bytes[10];
+	switch(state){
+	case OFF:
+		bytes[0] = 'O';
+		break;
+	case NORMAL:
+		if(DriverStation::GetInstance().IsAutonomous()){
+			bytes[0] = 'A';
+		} else if(DriverStation::GetInstance().GetAlliance() == DriverStation::kRed){
+			bytes[0] = 'R';
+		} else {
+			bytes[0] = 'B';
+		}
+		break;
+	case SHOOT:
+		bytes[0] = 'S';
+		break;
 	}
-	i2c.WriteBulk(bytes, numLeds * 3 + 1);
+	// write the same byte a few more times for good measure
+	// during the brief LED testing time we had at WPI, the I2C bus was
+	// dropping 50% of a transmission
+	for(int i = 1; i < 10; i++){
+		bytes[i] = bytes[0];
+	}
+	ledsCommunication.WriteBulk(bytes, 1);
 }
 
 void Robot::DisabledPeriodic() {
@@ -205,6 +216,7 @@ void Robot::AutonomousInit() {
 	CommandBase::driveJoystickCommand->Cancel();
 	CommandBase::intakeRollerCommand->Cancel();
 	CommandBase::flapCommand->Cancel();
+	SetLeds(NORMAL);
 }
 
 void Robot::AutonomousPeriodic() {
@@ -235,6 +247,7 @@ void Robot::TeleopInit() {
 	CommandBase::driveJoystickCommand->Start();
 	CommandBase::intakeRollerCommand->Start();
 	CommandBase::flapCommand->Start();
+	SetLeds(NORMAL);
 }
 
 void Robot::TeleopPeriodic() {

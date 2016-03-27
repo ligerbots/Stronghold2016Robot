@@ -15,6 +15,14 @@ public:
 	 */
 	static bool isRoadkill;
 
+	I2C ledsCommunication;
+	enum LedState {
+		OFF,
+		NORMAL,
+		SHOOT
+	};
+	void SetLeds(LedState state);
+
 	int m_startTicks;
 	timespec m_startSpec;
 	double m_startTime;
