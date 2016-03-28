@@ -286,8 +286,22 @@ void VisionSubsystem::measureTarget(Image *image)
 			double feretEndX = m_pM[MFDEX];
 			double feretEndY = m_pM[MFDEY];
 
-			m_frameCenterX = (feretStartX + feretEndX) / 2;
-			m_frameCenterY = (feretStartY + feretEndY) / 2;
+			// assign to temporary variables first so that we don't
+			// accidentally get unscaled center coordinates because
+			// of threading
+			// centerX and centerY fields are only set once per vision frame
+			double frameCenterX = (feretStartX + feretEndX) / 2;
+			double frameCenterY = (feretStartY + feretEndY) / 2;
+
+			if(m_isScalingDown.get()){
+				// scale coordinates back up to a 640x360 frame
+				m_frameCenterX = frameCenterX * 2;
+				m_frameCenterY = frameCenterY * 2;
+			} else {
+				m_frameCenterX = frameCenterX;
+				m_frameCenterY = frameCenterY;
+			}
+
 			calculateDistanceAndAngle(m_frameCenterX, m_frameCenterY, &m_distance, &m_angle);
 		}
 	}
@@ -299,6 +313,13 @@ void VisionSubsystem::markTarget(Image *image) {
 		double feretStartY = m_pM[MFDSY];
 		double feretEndX = m_pM[MFDEX];
 		double feretEndY = m_pM[MFDEY];
+		if(m_isScalingDown.get()){
+			// scale coordinates back up to a 640x360 frame
+			feretStartX *= 2;
+			feretStartY *= 2;
+			feretEndX *= 2;
+			feretEndY *= 2;
+		}
 		// Mutex below is commented out because we're now painting the target on the main thread
 		// std::lock_guard<std::mutex> lock(m_frameMutex);
 		// Send the image to the dashboard with a target indicator
