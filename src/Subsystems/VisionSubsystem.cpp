@@ -23,6 +23,7 @@ VisionSubsystem::VisionSubsystem() :
 		m_visionRequested(true), // run one vision frame on startup
 		m_lastVisionTick(0),
 		m_activeCamera(0),
+		m_isScalingDown("VisionScaleDown"),
 		m_pM(NULL)
 {
 	ledRingSpike.reset(new Relay(RobotMap::RELAY_LED_RING_SPIKE));
@@ -120,7 +121,13 @@ void VisionSubsystem::updateVision(int ticks) {
 				mp_processingFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
 			}
 			// duplicate the current frame for image processing
-			imaqDuplicate(mp_processingFrame, mp_currentFrame);
+			if(m_isScalingDown.get()){
+				// scale 2x down for a potential 4x processing speed increase
+				imaqScale(mp_processingFrame, mp_currentFrame, 2, 2,
+						IMAQ_SCALE_SMALLER, IMAQ_NO_RECT);
+			} else {
+				imaqDuplicate(mp_processingFrame, mp_currentFrame);
+			}
 			m_visionBusy = true;
 			pthread_cond_signal(&m_threadCond);
 			// if a vision request came in while we were still processing, cancel it

@@ -95,6 +95,8 @@ private:
 
 	int m_activeCamera;
 
+	Parameter<bool> m_isScalingDown;
+
 	// managed hardware object
 	std::unique_ptr<Relay> ledRingSpike;
 	double *m_pM;	// pixel measurement
