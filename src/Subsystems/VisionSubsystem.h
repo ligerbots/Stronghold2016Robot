@@ -64,10 +64,15 @@ private:
 	static constexpr double regcoef_d6 =  6.51E+01;
 
 	std::mutex m_frameMutex;
+
+	// the frame we grab from camera 0
 	Image* mp_currentFrame;
+	// the frame that the processing thread handles
 	Image* mp_processingFrame;
+	// the frame displayed on dashboard
 	Image* mp_displayFrame;
 
+	// target X and Y, scaled to 640x360 frame coordinates
 	double m_frameCenterX;
 	double m_frameCenterY;
 	/**
@@ -77,6 +82,8 @@ private:
 	double m_distance;
 	double m_angle;
 
+	// frame width, corrected to 640x360 frame
+	// ie, pretty much always 640
 	double m_frameWidth;
 	int m_numParticles;
 
@@ -96,7 +103,7 @@ private:
 
 	int m_activeCamera;
 
-	Parameter<bool> m_isScalingDown;
+	Parameter<bool> m_lowResCapture;
 
 	// managed hardware object
 	std::unique_ptr<Relay> ledRingSpike;

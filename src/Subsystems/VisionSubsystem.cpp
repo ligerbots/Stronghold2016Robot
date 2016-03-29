@@ -24,7 +24,7 @@ VisionSubsystem::VisionSubsystem() :
 		m_visionRequested(true), // run one vision frame on startup
 		m_lastVisionTick(0),
 		m_activeCamera(0),
-		m_isScalingDown("VisionScaleDown"),
+		m_lowResCapture("VisionScaleDown"),
 		m_pM(NULL)
 {
 	ledRingSpike.reset(new Relay(RobotMap::RELAY_LED_RING_SPIKE));
@@ -81,7 +81,9 @@ void VisionSubsystem::updateVision(int ticks) {
 	if (Camera::GetNumberOfCameras() < 1)
 		return;
 
-	if (enableVision.get()) setLedRingOn(true);		// just in case
+	if (enableVision.get()){
+		setLedRingOn(true);		// just in case
+	}
 
 	Camera::GetCamera(0)->SetExposure(exposure.get());
 	// Get a frame from the current camera
@@ -96,10 +98,13 @@ void VisionSubsystem::updateVision(int ticks) {
 			LCameraServer::GetInstance()->SetImage(mp_processingFrame);
 		} else {
 			if(mp_displayFrame == NULL){
+				printf("VisionSubsystem: Creating display Image*\n");
 				mp_displayFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
 			}
 
-			if(m_isScalingDown.get()){
+			// scale up the display frame to fit the dashboard screen
+			// but only if low res capture is enabled
+			if(m_lowResCapture.get()){
 				imaqScale(mp_displayFrame, image, 2, 2, IMAQ_SCALE_LARGER, IMAQ_NO_RECT);
 			} else {
 				imaqDuplicate(mp_displayFrame, image);
@@ -121,7 +126,7 @@ void VisionSubsystem::updateVision(int ticks) {
 		mp_currentFrame = Camera::GetCamera(0)->GetStoredFrame();
 		int width, height;
 		imaqGetImageSize(mp_currentFrame, &width, &height);
-		if(m_isScalingDown.get()){
+		if(m_lowResCapture.get()){
 			m_frameWidth = ((double) width) * 2.0;
 		} else {
 			m_frameWidth = (double) width;
@@ -136,37 +141,7 @@ void VisionSubsystem::updateVision(int ticks) {
 				mp_processingFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
 			}
 			// duplicate the current frame for image processing
-			if(m_isScalingDown.get()){
-//				int processingFrameWidth, processingFrameHeight;
-//				imaqGetImageSize(mp_processingFrame, &processingFrameWidth, &processingFrameHeight);
-//				if(processingFrameWidth == 640){
-//					imaqDispose(mp_processingFrame);
-//					mp_processingFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
-//				}
-//				// scale 2x down for a potential 4x processing speed increase
-//				imaqResample(mp_processingFrame, mp_currentFrame, width/2, height/2,
-//						InterpolationMethod::IMAQ_BILINEAR, imaqMakeRect(0, 0, height, width));
-//
-//				imaqGetImageSize(mp_processingFrame, &processingFrameWidth, &processingFrameHeight);
-//				printf("Width: %d, height %d\n", processingFrameWidth, processingFrameHeight);
-//
-//				printf("Scaling image\n");
-				int processingFrameWidth, processingFrameHeight;
-								imaqGetImageSize(mp_processingFrame, &processingFrameWidth, &processingFrameHeight);
-								if(processingFrameWidth != 640){
-									imaqDispose(mp_processingFrame);
-									mp_processingFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
-								}
-								imaqDuplicate(mp_processingFrame, mp_currentFrame);
-			} else {
-				int processingFrameWidth, processingFrameHeight;
-				imaqGetImageSize(mp_processingFrame, &processingFrameWidth, &processingFrameHeight);
-				if(processingFrameWidth != 640){
-					imaqDispose(mp_processingFrame);
-					mp_processingFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
-				}
-				imaqDuplicate(mp_processingFrame, mp_currentFrame);
-			}
+			imaqDuplicate(mp_processingFrame, mp_currentFrame);
 			m_visionBusy = true;
 			pthread_cond_signal(&m_threadCond);
 			// if a vision request came in while we were still processing, cancel it
@@ -336,7 +311,7 @@ void VisionSubsystem::measureTarget(Image *image)
 			double frameCenterX = (feretStartX + feretEndX) / 2;
 			double frameCenterY = (feretStartY + feretEndY) / 2;
 
-			if(m_isScalingDown.get()){
+			if(m_lowResCapture.get()){
 				// scale coordinates back up to a 640x360 frame
 				m_frameCenterX = frameCenterX * 2;
 				m_frameCenterY = frameCenterY * 2;
@@ -356,7 +331,7 @@ void VisionSubsystem::markTarget(Image *image) {
 		double feretStartY = m_pM[MFDSY];
 		double feretEndX = m_pM[MFDEX];
 		double feretEndY = m_pM[MFDEY];
-		if(m_isScalingDown.get()){
+		if(m_lowResCapture.get()){
 			// scale coordinates back up to a 640x360 frame
 			feretStartX *= 2;
 			feretStartY *= 2;
@@ -374,7 +349,7 @@ void VisionSubsystem::markTarget(Image *image) {
 			double Xerror = fabs(setpoint * width - m_frameCenterX);
 //			printf("%f\n", Xerror);
 			// Centered means no more than 1.5% off to either side
-			double color = Xerror < 3.2 ? GREEN : RED;
+			double color = Xerror < CenterOnTargetCommand::ACCEPTABLE_ERROR * width ? GREEN : RED;
 
 			if(false){
 				// this code attempts to draw an circle, but ...
@@ -540,7 +515,7 @@ void VisionSubsystem::calculateDistanceAndAngle(double xpos, double ypos, double
 	calculateDistanceAndAngle_FromRegression(xpos, ypos, distance, angle);
 
 	return; // don't use lookup table anymore
-
+#if false
 	FieldInfo::VisionDataPoint closestPoint;
 	double closestPointMeasure = DBL_MAX;
 	for(size_t i = 0; i < sizeof(Robot::instance->fieldInfo.visionData) / sizeof(FieldInfo::VisionDataPoint); i++){
@@ -595,6 +570,7 @@ void VisionSubsystem::calculateDistanceAndAngle(double xpos, double ypos, double
 	} else {
 		*distance = closestPoint.distance;
 	}
+#endif
 }
 
 void VisionSubsystem::calculateDistanceAndAngle_FromRegression(double xpos, double ypos, double* distance, double* angle){

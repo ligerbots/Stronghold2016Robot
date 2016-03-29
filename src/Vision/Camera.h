@@ -26,6 +26,7 @@ private:
 	int frameHeight;
 	static bool enabled;
 	static bool overlay;
+	bool lowResCapture;
 
 public:
 	explicit Camera(uInt32 i);

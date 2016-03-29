@@ -43,6 +43,7 @@ bool Camera::debugOutput;
 // i is the index of the camera we want to open
 Camera::Camera(uInt32 i) :
 		imaqError() {
+	lowResCapture = false;
 	debugOutput = false;
 	if (cameraCount == 0 && i > cameraCount) {
 		printf(
@@ -209,15 +210,25 @@ IMAQdxError Camera::Start() {
 	if (strstr(camInfo[camera].ModelName, "LifeCam") != nullptr) {
 		SetVideoMode(416, 240, 15, false);
 		printf("Detected LifeCam\n");
-	} else if (strstr(camInfo[camera].ModelName, "Logitech Webcam") != nullptr
-			|| strstr(camInfo[camera].ModelName, "HD Webcam") != nullptr) {
+	} else if (strstr(camInfo[camera].ModelName, "Logitech Webcam") != nullptr) {
+		// main (front) cam, now at 320x180
 		SetVideoMode(320, 180, 24, false);
-		printf("Detected Logitech\n");
+		lowResCapture = true;
+		printf("Detected Logitech (main)\n");
+	} else if(strstr(camInfo[camera].ModelName, "HD Webcam") != nullptr) {
+		// 2nd (intake) cam, now at 320x180
+		SetVideoMode(640, 360, 24, false);
+		printf("Detected Logitech (intake)\n");
 	} else {
 		if (!SetVideoMode(800, 600, 10, false)) // Genuis wide angle camera, low frame rate
 			SetVideoMode(320, 240, 15, false); // default to a widely supported mode
 		printf("Using generic settings\n");
 	}
+
+	if(lowResCapture){
+		printf(" Capturing in half resolution\n");
+	}
+
 	if (imaqError != IMAQdxErrorSuccess) {
 		return imaqError;
 	}
