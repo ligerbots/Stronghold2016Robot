@@ -84,7 +84,7 @@ int IVA_ProcessImage(Image *image)
 	int success = 1;
     IVA_Data *ivaData;
     int pParameter[1] = {20};
-    float plower[1] = {50};
+    float plower[1] = {50}; // 50
     float pUpper[1] = {1500};
     int pCalibrated[1] = {0};
     int pExclude[1] = {0};
@@ -94,9 +94,11 @@ int IVA_ProcessImage(Image *image)
     int *pCalibratedMeasurements = 0;
     ImageType imageType;
 
+    printf("Init\n");
     // Initializes internal data (buffers and array of points for caliper measurements)
     VisionErrChk(ivaData = IVA_InitData(7, 0));
 
+    printf("Threshold\n");
 	VisionErrChk(IVA_CLRThreshold(image, 104, 136, 119, 255, 35, 155, 
 		IMAQ_HSI));
 
@@ -104,10 +106,12 @@ int IVA_ProcessImage(Image *image)
     //                  Advanced Morphology: Fill Holes                  //
     //-------------------------------------------------------------------//
 
+	printf("Fill holes\n");
     // Fills holes in particles.
     VisionErrChk(imaqFillHoles(image, image, FALSE));
 
-	VisionErrChk(IVA_ParticleFilter(image, pParameter, plower, pUpper, 
+    printf("Particle filter\n");
+	VisionErrChk(IVA_ParticleFilter(image, pParameter, plower, pUpper,
 		pCalibrated, pExclude, 1, FALSE, TRUE));
 
     //-------------------------------------------------------------------//
@@ -120,12 +124,15 @@ int IVA_ProcessImage(Image *image)
     structElem.hexa = FALSE;
     structElem.kernel = pKernel;
 
+    printf("Morphology\n");
     // Applies a morphological transformation to the binary image.
     VisionErrChk(imaqMorphology(image, image, IMAQ_DILATE, &structElem));
 
+    printf("Particle count\n");
 	VisionErrChk(IVA_Particle(image, TRUE, pPixelMeasurements, 3, 
 		pCalibratedMeasurements, 0, ivaData, 5));
 
+	printf("Equalize\n");
     //-------------------------------------------------------------------//
     //                       Lookup Table: Equalize                      //
     //-------------------------------------------------------------------//
@@ -134,6 +141,7 @@ int IVA_ProcessImage(Image *image)
     VisionErrChk(imaqGetImageType(image, &imageType));
     VisionErrChk(imaqEqualize(image, image, 0, (imageType == IMAQ_IMAGE_U8 ? 255 : 0), NULL));
 
+    printf("Dispose\n");
     // Releases the memory allocated in the IVA_Data structure.
     IVA_DisposeData(ivaData);
 
@@ -166,12 +174,14 @@ static int IVA_CLRThreshold(Image* image, int min1, int max1, int min2, int max2
     Range plane1Range;
     Range plane2Range;
     Range plane3Range;
+    int err_code = 0;
 
 
     //-------------------------------------------------------------------//
     //                          Color Threshold                          //
     //-------------------------------------------------------------------//
 
+    printf("Creating new image\n");
     // Creates an 8 bit image for the thresholded image.
     VisionErrChk(thresholdImage = imaqCreateImage(IMAQ_IMAGE_U8, 7));
 
@@ -183,13 +193,18 @@ static int IVA_CLRThreshold(Image* image, int min1, int max1, int min2, int max2
     plane3Range.minValue = min3;
     plane3Range.maxValue = max3;
 
+    printf("Thresholding\n");
     // Thresholds the color image.
-    VisionErrChk(imaqColorThreshold(thresholdImage, image, 1, colorMode, &plane1Range, &plane2Range, &plane3Range));
+    VisionErrChk(err_code = imaqColorThreshold(thresholdImage, image, 1, colorMode, &plane1Range, &plane2Range, &plane3Range));
 
+    printf("Duplicating\n");
     // Copies the threshold image in the souce image.
     VisionErrChk(imaqDuplicate(image, thresholdImage));
 
 Error:
+	printf("threshold err_code %d\n", err_code);
+	int imaqErr = imaqGetLastError();
+	printf("last err code %d\n", imaqErr);
     imaqDispose(thresholdImage);
 
     return success;

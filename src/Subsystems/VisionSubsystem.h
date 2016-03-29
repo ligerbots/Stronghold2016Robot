@@ -66,6 +66,7 @@ private:
 	std::mutex m_frameMutex;
 	Image* mp_currentFrame;
 	Image* mp_processingFrame;
+	Image* mp_displayFrame;
 
 	double m_frameCenterX;
 	double m_frameCenterY;

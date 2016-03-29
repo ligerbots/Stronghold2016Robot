@@ -211,7 +211,7 @@ IMAQdxError Camera::Start() {
 		printf("Detected LifeCam\n");
 	} else if (strstr(camInfo[camera].ModelName, "Logitech Webcam") != nullptr
 			|| strstr(camInfo[camera].ModelName, "HD Webcam") != nullptr) {
-		SetVideoMode(640, 360, 24, false);
+		SetVideoMode(320, 180, 24, false);
 		printf("Detected Logitech\n");
 	} else {
 		if (!SetVideoMode(800, 600, 10, false)) // Genuis wide angle camera, low frame rate

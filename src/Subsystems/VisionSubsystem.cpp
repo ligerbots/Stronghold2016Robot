@@ -12,6 +12,7 @@ VisionSubsystem::VisionSubsystem() :
 		color("DrawColor"),
 		mp_currentFrame(NULL),
 		mp_processingFrame(NULL),
+		mp_displayFrame(NULL),
 		m_frameCenterX(0),
 		m_frameCenterY(0),
 		m_distance(0),
@@ -94,13 +95,23 @@ void VisionSubsystem::updateVision(int ticks) {
 		if (mp_processingFrame != NULL && showVision.get()) {
 			LCameraServer::GetInstance()->SetImage(mp_processingFrame);
 		} else {
+			if(mp_displayFrame == NULL){
+				mp_displayFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
+			}
+
+			if(m_isScalingDown.get()){
+				imaqScale(mp_displayFrame, image, 2, 2, IMAQ_SCALE_LARGER, IMAQ_NO_RECT);
+			} else {
+				imaqDuplicate(mp_displayFrame, image);
+			}
+
 			if (!isVisionCalculationDirty()) {
 				// If the robot hasn't shifted more than 1.5 degrees off the orientation
 				// it had when we last took a vision position, or more than 1 inch in position,
 				// then display the target markup
-				markTarget(image);
+				markTarget(mp_displayFrame);
 			}
-			LCameraServer::GetInstance()->SetImage(image);
+			LCameraServer::GetInstance()->SetImage(mp_displayFrame);
 		}
 	}
 
@@ -110,7 +121,11 @@ void VisionSubsystem::updateVision(int ticks) {
 		mp_currentFrame = Camera::GetCamera(0)->GetStoredFrame();
 		int width, height;
 		imaqGetImageSize(mp_currentFrame, &width, &height);
-		m_frameWidth = (double) width;
+		if(m_isScalingDown.get()){
+			m_frameWidth = ((double) width) * 2.0;
+		} else {
+			m_frameWidth = (double) width;
+		}
 		// We don't do a SetImage here -- that's done in the Vision Processing thread
 
 		// If it's been more than eight vision ticks since we last processed a frame, do one now
@@ -122,10 +137,34 @@ void VisionSubsystem::updateVision(int ticks) {
 			}
 			// duplicate the current frame for image processing
 			if(m_isScalingDown.get()){
-				// scale 2x down for a potential 4x processing speed increase
-				imaqScale(mp_processingFrame, mp_currentFrame, 2, 2,
-						IMAQ_SCALE_SMALLER, IMAQ_NO_RECT);
+//				int processingFrameWidth, processingFrameHeight;
+//				imaqGetImageSize(mp_processingFrame, &processingFrameWidth, &processingFrameHeight);
+//				if(processingFrameWidth == 640){
+//					imaqDispose(mp_processingFrame);
+//					mp_processingFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
+//				}
+//				// scale 2x down for a potential 4x processing speed increase
+//				imaqResample(mp_processingFrame, mp_currentFrame, width/2, height/2,
+//						InterpolationMethod::IMAQ_BILINEAR, imaqMakeRect(0, 0, height, width));
+//
+//				imaqGetImageSize(mp_processingFrame, &processingFrameWidth, &processingFrameHeight);
+//				printf("Width: %d, height %d\n", processingFrameWidth, processingFrameHeight);
+//
+//				printf("Scaling image\n");
+				int processingFrameWidth, processingFrameHeight;
+								imaqGetImageSize(mp_processingFrame, &processingFrameWidth, &processingFrameHeight);
+								if(processingFrameWidth != 640){
+									imaqDispose(mp_processingFrame);
+									mp_processingFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
+								}
+								imaqDuplicate(mp_processingFrame, mp_currentFrame);
 			} else {
+				int processingFrameWidth, processingFrameHeight;
+				imaqGetImageSize(mp_processingFrame, &processingFrameWidth, &processingFrameHeight);
+				if(processingFrameWidth != 640){
+					imaqDispose(mp_processingFrame);
+					mp_processingFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
+				}
 				imaqDuplicate(mp_processingFrame, mp_currentFrame);
 			}
 			m_visionBusy = true;
@@ -188,6 +227,10 @@ void VisionSubsystem::visionProcessingThread() {
 			}
 
 			int err = IVA_ProcessImage(mp_processingFrame); // run vision script
+			if(err == 0){
+				err = imaqGetLastError();
+				printf("Error: %d\n", imaqGetLastError());
+			}
 			SmartDashboard::PutNumber("Vision/imaq_err", err);
 
 			// compute the distance, angle, etc. and mark target on currentFrame
@@ -363,8 +406,7 @@ void VisionSubsystem::markTarget(Image *image) {
 }
 
 double VisionSubsystem::getCorrectedFrameCenter(double distInches) {
-	if (Camera::GetNumberOfCameras() < 1) return 0;
-	int width = Camera::GetCamera(0)->GetWidth();
+	int width = m_frameWidth;
 
 	if (width == 0) return 0; // no frame captured yet
 	int center = width/2;
