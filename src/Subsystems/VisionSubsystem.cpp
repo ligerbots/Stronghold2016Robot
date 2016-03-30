@@ -89,6 +89,7 @@ void VisionSubsystem::updateVision(int ticks) {
 	// Get a frame from the current camera
 	Camera::GetCamera(m_activeCamera)->GetFrame();
 	Image *image = Camera::GetCamera(m_activeCamera)->GetStoredFrame();
+
 	// if we're not running Vision, just display the frame from the current camera, or
 	// if the alternate camera is current, display its frame, even if we're doing vision on camera 0
 	if (m_activeCamera != 0) {

@@ -62,7 +62,7 @@ void OI::registerSecondControllerButtons() {
 		// section 3 - auto commands
 		registerButton(pFarmController, 11, PRESSED, new PrepareForCrossingSequence());
 		registerButton(pFarmController, 13, PRESSED, new AcquireTarget(true, true));
-		registerButton(pFarmController, 16, PRESSED, new RotateToTarget());
+		registerButton(pFarmController, 16, PRESSED, new DriveDistanceCommand(4 * 12));
 
 		registerButton(pFarmController, 15, PRESSED, new CenterOnTargetCommand());
 //		registerButton(pFarmController, 16, PRESSED, new RotateIMUCommand(0));

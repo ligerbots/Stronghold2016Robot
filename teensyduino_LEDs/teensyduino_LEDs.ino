@@ -14,8 +14,8 @@ void (*animationFunctions[ANIM_MAX])();
 char animationCodes[ANIM_MAX];
 
 // constants
-#define PIN_LEFT 0
-#define PIN_RIGHT 1
+#define PIN_LEFT 4
+#define PIN_RIGHT 6
 #define LEDS_PER_STRIP 23
 #define LEDS_MODE NEO_GRB+NEO_KHZ800
 #define I2C_ADDR 42

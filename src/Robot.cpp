@@ -177,9 +177,9 @@ void Robot::DisabledPeriodic() {
 		printf("\tPosition: %d %s\n",
 				fieldInfo.GetPosition(), FieldInfo::StartingPositionNames[fieldInfo.GetPosition()].c_str());
 		printf("\tDefense: %d %s\n",
-				fieldInfo.GetDefense(), FieldInfo::DefenseNames[fieldInfo.GetDefense()].c_str());
+				fieldInfo.GetDefense(), FieldInfo::TargetNames[fieldInfo.GetDefense()].c_str());
 		printf("\tTarget: %d %s\n",
-				fieldInfo.GetTarget(), FieldInfo::TargetNames[fieldInfo.GetTarget()].c_str());
+				fieldInfo.GetTarget(), FieldInfo::DefenseNames[fieldInfo.GetTarget()].c_str());
 	}
 }
 
