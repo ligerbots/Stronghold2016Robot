@@ -3,23 +3,24 @@
 ToggleLedCommand::ToggleLedCommand() :
 		CommandBase("ToggleLedCommand_") {
 	Requires(visionSubsystem.get());
-	turnOn = false;
-	toggle = true;
+	m_turnOn = false;
+	m_toggle = true;
 }
 
 ToggleLedCommand::ToggleLedCommand(bool on) {
-	toggle = false;
-	turnOn = on;
+	m_toggle = false;
+	m_turnOn = on;
 }
 
 void ToggleLedCommand::Initialize() {
-	if (toggle)
-		turnOn = !visionSubsystem->isLedRingOn();
+	if (m_toggle) {
+		m_turnOn = !visionSubsystem->isLedRingOn();
+	}
 }
 
 void ToggleLedCommand::Execute() {
-	printf("ToggleLedCommand: turning led %s\n", turnOn ? "on" : "off");
-	visionSubsystem->setLedRingOn(turnOn);
+	printf("ToggleLedCommand: turning led %s\n", m_turnOn ? "on" : "off");
+	visionSubsystem->setLedRingState(m_turnOn);
 }
 
 bool ToggleLedCommand::IsFinished() {

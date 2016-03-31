@@ -2,7 +2,7 @@
 
 ShootCommand::ShootCommand() :
 		CommandBase("ShootCommand_") {
-	done = false;
+	m_done = false;
 	m_ticks = 0;
 	Requires(shooterSubsystem.get());
 	Requires(wedgeSubsystem.get());
@@ -11,11 +11,11 @@ ShootCommand::ShootCommand() :
 }
 
 void ShootCommand::Initialize() {
-	done = false;
+	m_done = false;
 	m_ticks = 0;
 	if (/*!wedgeSubsystem->isWedgeDown()
 			&& */!intakeSubsystem->isIntakeArmUp()) {
-		done = true;
+		m_done = true;
 		printf("ShooterCommand: not safe to fire\n");
 	} else {
 		// turns on the shooting animation on the same tick as the actual shooter fire
@@ -32,21 +32,21 @@ void ShootCommand::Execute() {
 		printf("ShooterCommand: firing\n");
 		shooterSubsystem->firePistons();
 	} else if (m_ticks == 1) { // // equivalent to: !wedgeSubsystem->isWedgeDown() && intakeSubsystem->isIntakeReadyToFire()
-		done = true;
+		m_done = true;
 		printf("ShooterCommand: not safe to fire\n");
 	}
-	if (m_ticks == 25) {
-		done = true;
+	if (m_ticks == 25) { // wait for shooting to complete
+		m_done = true;
 	}
 }
 
 bool ShootCommand::IsFinished() {
-	return done;
+	return m_done;
 }
 
 void ShootCommand::End() {
+	shooterSubsystem->retractPistons(); // retract piston once the ball is shot (1/2 second after fire)
 
-	shooterSubsystem->retractPistons();
 	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL)
 		CommandBase::intakeRollerCommand->Start();
 }

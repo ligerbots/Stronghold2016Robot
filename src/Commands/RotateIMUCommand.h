@@ -6,12 +6,12 @@
 
 class RotateIMUCommand: public CommandBase {
 protected:
-	double angle;
-	double targetAngle;
-	double currentAngle;
-	double lastAngle;
-	bool isClockwise;
-	bool isAbsolute;
+	double m_angle;
+	double m_targetAngle;
+	double m_currentAngle;
+	double m_lastAngle;
+	bool m_isClockwise;
+	bool m_isAbsolute;
 	int m_ticks;
 
 	void updateCurrentAngle();

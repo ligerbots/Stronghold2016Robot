@@ -10,12 +10,12 @@ private:
 	enum ButtonEvent {
 		ACTIVE, INACTIVE, PRESSED, RELEASED
 	};
-	JoystickMap_t controllerButtons;
-	JoystickPressed_t buttonsPressed;
+	JoystickMap_t m_controllerButtons;
+	JoystickPressed_t m_buttonsPressed;
 
 public:
-	Joystick* pXboxController;
-	Joystick* pFarmController;
+	Joystick* mp_XboxController;
+	Joystick* mp_FarmController;
 	int m_secondControllerButtonCount;
 	OI();
 	OI(OI& otherOI);
@@ -42,5 +42,5 @@ public:
 	void registerButton(Joystick* joystick, int buttonNumber, ButtonEvent when,
 			Command* command);
 	void registerSecondControllerButtons();
-	bool get2ndControllerButton(int num);
+	bool getSecondControllerRawButton(int num);
 };

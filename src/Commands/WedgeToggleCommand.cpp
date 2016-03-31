@@ -3,13 +3,13 @@
 WedgeToggleCommand::WedgeToggleCommand() :
 		CommandBase("WedgeToggleCommand_") {
 	Requires(wedgeSubsystem.get());
-	action = 2; // toggle
+	m_action = 2; // toggle
 }
 
 WedgeToggleCommand::WedgeToggleCommand(bool wedgeUp) :
 		CommandBase("WedgeToggleCommand_" + std::to_string(wedgeUp)) {
 	Requires(wedgeSubsystem.get());
-	action = wedgeUp;
+	m_action = wedgeUp;
 }
 
 void WedgeToggleCommand::Initialize() {
@@ -17,10 +17,11 @@ void WedgeToggleCommand::Initialize() {
 
 void WedgeToggleCommand::Execute() {
 	bool lift;
-	if (action == 2)
+	if (m_action == 2) {
 		lift = wedgeSubsystem->getWedgeValue() != DoubleSolenoid::kReverse;
-	else
-		lift = action;
+	} else {
+		lift = m_action;
+	}
 	if (lift) {
 		printf("WedgeToggleCommand: lifting wedges\n");
 		wedgeSubsystem->liftWedge();
@@ -31,7 +32,6 @@ void WedgeToggleCommand::Execute() {
 }
 
 bool WedgeToggleCommand::IsFinished() {
-//	return true when the command should terminate
 	return true;
 }
 

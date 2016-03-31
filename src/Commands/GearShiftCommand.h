@@ -13,7 +13,8 @@ public:
 	};
 	explicit GearShiftCommand(Direction direction);
 	void Initialize();
-	void Execute();bool IsFinished();
+	void Execute();
+	bool IsFinished();
 	void End();
 	void Interrupted();
 	// m_direction specifies which type of shift command this is

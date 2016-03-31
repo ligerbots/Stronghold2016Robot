@@ -6,7 +6,7 @@
 class AutoSetFlapsCommand: public CommandBase
 {
 protected:
-	double flapsFractionToSet;
+	double m_flapsFractionToSet;
 public:
 	AutoSetFlapsCommand();
 	void Initialize();

@@ -4,12 +4,12 @@
 // Robot wide globals whose definitions live in the Robot class
 Robot* Robot::instance = NULL;
 int Robot::ticks;
-bool Robot::isRoadkill = false;
-bool Robot::ROBOT_IS_ABOUT_TO_TIP = false;
-timespec Robot::resolution;
+bool Robot::is_roadkill = false;
+bool Robot::robot_is_about_to_tip = false;
+timespec Robot::time_resolution;
 
 Robot::Robot() :
-		ledsCommunication(I2C::kOnboard, 42) {
+		m_ledTeensyCommunication(I2C::kOnboard, 42) {
 	instance = this;
 
 	mp_autonomousCommand = NULL;
@@ -17,8 +17,8 @@ Robot::Robot() :
 	ticks = 0;
 	m_startTicks = 0;
 	m_startTime = 0.0;
-	clock_getres(CLOCK_REALTIME, &resolution);
-	printf("Robot::Robot clock resolution %ld nanoseconds", resolution.tv_nsec);
+	clock_getres(CLOCK_REALTIME, &time_resolution);
+	printf("Robot::Robot clock resolution %ld nanoseconds", time_resolution.tv_nsec);
 }
 
 Robot::~Robot() {
@@ -32,22 +32,28 @@ void Robot::RobotInit() {
 
 	CommandBase::init();
 
+	// initialize all commands and turn cameras on
+	// if we try to do any of this in the constructor, bad things happen
 	mp_operatorInterface->registerCommands();
 	CommandBase::visionSubsystem->camerasOn();
 
-	if (!isRoadkill)
+	// on roadkill, don't be annoying
+	// roadkill detected by DriveSubsystem
+	if (!is_roadkill) {
 		CommandBase::compressorSubsystem->setCompressor(true);
-	else
+	} else {
 		CommandBase::compressorSubsystem->setCompressor(false);
+	}
 
 	CommandBase::flapSubsystem->setFlapsFraction(1.0); // default to flaps down
 
-	fieldInfo.initSelectors();
+	// publish the auto selectors to SmartDashboard
+	m_fieldInfo.initSelectors();
 
 	// set the robot initial position (perhaps)
-	CommandBase::navXSubsystem->zeroYaw(fieldInfo.GetInitialOrientation());
+	CommandBase::navXSubsystem->zeroYaw(m_fieldInfo.GetInitialOrientation());
 
-	printf("Done\n");
+	printf("RobotInit() done\n");
 }
 
 void Robot::AlwaysPeriodic() {
@@ -58,23 +64,27 @@ void Robot::AlwaysPeriodic() {
 //	}
 
 	// Check to see if the robot is about to tip
-	ROBOT_IS_ABOUT_TO_TIP = CommandBase::navXSubsystem->isRobotAboutToTip(RobotMap::MAX_PITCH_ANGLE);
-	SmartDashboard::PutBoolean("SafeToDrive", !ROBOT_IS_ABOUT_TO_TIP);
+	// update the giant red-green indicator on the dashboard
+	robot_is_about_to_tip = CommandBase::navXSubsystem->isRobotAboutToTip(RobotMap::MAX_PITCH_ANGLE);
+	SmartDashboard::PutBoolean("SafeToDrive", !robot_is_about_to_tip);
 
-	// other stuff
 	CommandBase::visionSubsystem->updateVision(Robot::ticks);
 
+	// run through all subsystems and have them publish SmartDashboard values
 	CommandBase::visionSubsystem->sendValuesToSmartDashboard();
 	CommandBase::driveSubsystem->sendValuesToSmartDashboard();
 	CommandBase::navXSubsystem->sendValuesToSmartDashboard();
 	CommandBase::shooterSubsystem->sendValuesToSmartDashboard();
 	CommandBase::flapSubsystem->sendValuesToSmartDashboard();
+	// polling PDP channels tends to crash the program for some reason
+	// perhaps because WPILib is always spamming the can bus to get the battery voltage
 	//CommandBase::pdpSubsystem->sendValuesToSmartDashboard();
 	CommandBase::compressorSubsystem->sendValuesToSmartDashboard();
 	CommandBase::wedgeSubsystem->sendValuesToSmartDashboard();
 	CommandBase::intakeSubsystem->sendValuesToSmartDashboard();
 
-	if (mp_operatorInterface->get2ndControllerButton(28)) {
+	// make red button force kill the auto command and centering, if they are running
+	if (mp_operatorInterface->getSecondControllerRawButton(28)) {
 		printf("Canceling centering/auto\n");
 		if(mp_autonomousCommand != NULL){
 			mp_autonomousCommand->Cancel();
@@ -87,11 +97,11 @@ void Robot::AlwaysPeriodic() {
 		}
 	}
 
-	if (mp_operatorInterface->get2ndControllerButton(21)) {
+	if (mp_operatorInterface->getSecondControllerRawButton(21)) {
 		CommandBase::visionSubsystem->setVisionEnabled(true);
 	}
 
-	if (mp_operatorInterface->get2ndControllerButton(24)) {
+	if (mp_operatorInterface->getSecondControllerRawButton(24)) {
 		CommandBase::visionSubsystem->setVisionEnabled(false);
 	}
 
@@ -135,6 +145,8 @@ void Robot::DisabledInit() {
 }
 
 void Robot::SetLeds(LedState state){
+	// the teensy program accepts single letters as bytes over I2C to set the animation state
+	// for some reason about 50% of messages get lost over I2C so here we spam multiple copies of the letter
 	uint8_t bytes[10];
 	switch(state){
 	case OFF:
@@ -153,33 +165,31 @@ void Robot::SetLeds(LedState state){
 		bytes[0] = 'S';
 		break;
 	}
-	// write the same byte a few more times for good measure
-	// during the brief LED testing time we had at WPI, the I2C bus was
-	// dropping 50% of a transmission
+	// duplicate the byte
 	for(int i = 1; i < 10; i++){
 		bytes[i] = bytes[0];
 	}
-	ledsCommunication.WriteBulk(bytes, 1);
+	m_ledTeensyCommunication.WriteBulk(bytes, 1);
 }
 
 void Robot::DisabledPeriodic() {
 	AlwaysPeriodic();
-	// the commands don't seem to run in disabled
-	if(mp_operatorInterface->pFarmController->GetRawButton(22)){
+	// the camera commands don't seem to run in disabled, even with SetRunInDisabled(true)
+	if(mp_operatorInterface->mp_FarmController->GetRawButton(22)){
 		CommandBase::visionSubsystem->setCameraFeed(0);
 	}
-	if(mp_operatorInterface->pFarmController->GetRawButton(23)){
+	if(mp_operatorInterface->mp_FarmController->GetRawButton(23)){
 		CommandBase::visionSubsystem->setCameraFeed(1);
 	}
 
 	if(ticks % 50 == 0){
 		printf("Selected auto parameters:\n");
 		printf("\tPosition: %d %s\n",
-				fieldInfo.GetPosition(), FieldInfo::StartingPositionNames[fieldInfo.GetPosition()].c_str());
+				m_fieldInfo.GetPosition(), FieldInfo::StartingPositionNames[m_fieldInfo.GetPosition()].c_str());
 		printf("\tDefense: %d %s\n",
-				fieldInfo.GetDefense(), FieldInfo::TargetNames[fieldInfo.GetDefense()].c_str());
+				m_fieldInfo.GetDefense(), FieldInfo::TargetNames[m_fieldInfo.GetDefense()].c_str());
 		printf("\tTarget: %d %s\n",
-				fieldInfo.GetTarget(), FieldInfo::DefenseNames[fieldInfo.GetTarget()].c_str());
+				m_fieldInfo.GetTarget(), FieldInfo::DefenseNames[m_fieldInfo.GetTarget()].c_str());
 	}
 }
 
@@ -189,25 +199,29 @@ void Robot::AutonomousInit() {
 	printf("Robot: AutononmousInit at %f seconds, %d ticks\n",
 			m_startTime, ticks);
 
-	int pos = fieldInfo.GetPosition();
-	int def = fieldInfo.GetDefense();
-	int target = fieldInfo.GetTarget();
-	bool slow = fieldInfo.CrossSlowly();
+	int pos = m_fieldInfo.GetPosition();
+	int def = m_fieldInfo.GetDefense();
+	int target = m_fieldInfo.GetTarget();
+	bool slow = m_fieldInfo.IsCrossingSlowly();
 	printf("Autonomous: Position %d | Defense %d | Target %d, Speed %s\n",
 			pos, def, target, slow ? "SLOW" : "NORMAL");
 
 	// make sure we don't inadvertently leave the LED ring off
-	CommandBase::visionSubsystem->setLedRingOn(true);
+	CommandBase::visionSubsystem->setLedRingState(true);
 
+	// if we've already run auto, delete the existing auto command
 	if (mp_autonomousCommand != NULL) {
 		delete mp_autonomousCommand;
 		mp_autonomousCommand = NULL;
 	}
+	// create a new dynamic auto command with the selected parameters from the SmartDashboard
 	mp_autonomousCommand = new AutonomousDriveAndShoot(pos, def, target);
 	mp_autonomousCommand->Start();
 
+	// reset our coordinate system to where the robot is currently located / oriented
+	// assume robot was set up correctly (there's nothing else we can do)
 	// Robot will start out wedges first, or intake first, depending on the defense
-	CommandBase::navXSubsystem->zeroYaw(fieldInfo.GetInitialOrientation());
+	CommandBase::navXSubsystem->zeroYaw(m_fieldInfo.GetInitialOrientation());
 	CommandBase::navXSubsystem->ResetDisplacement();
 
 	CommandBase::driveSubsystem->SetInitialPosition(FieldInfo::startingLocations[pos].x,
@@ -244,6 +258,7 @@ void Robot::TeleopInit() {
 	if (mp_autonomousCommand != NULL) {
 		mp_autonomousCommand->Cancel();
 	}
+	// begin teleop "polling" commands
 	CommandBase::driveJoystickCommand->Start();
 	CommandBase::intakeRollerCommand->Start();
 	CommandBase::flapCommand->Start();

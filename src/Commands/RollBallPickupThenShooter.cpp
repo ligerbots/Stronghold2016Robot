@@ -15,8 +15,11 @@ void RollBallPickupThenShooter::Initialize(){
 }
 
 bool RollBallPickupThenShooter::IsFinished(){
-	if(m_alreadyInShooter) return true;
-	else return CommandGroup::IsFinished();
+	if(m_alreadyInShooter){
+		return true;
+	} else{
+		return CommandGroup::IsFinished();
+	}
 }
 
 void RollBallPickupThenShooter::End(){

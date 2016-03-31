@@ -22,11 +22,11 @@ void FlapCommand::Execute() {
 //	int hat = Robot::instance->mp_operatorInterface->pXboxController->GetPOV(0);
 
 	int flapButtons =
-			oi->get2ndControllerButton(6) ? 0 :
-					oi->get2ndControllerButton(7) ? 4 :
-							oi->get2ndControllerButton(8) ? 5 :
-									oi->get2ndControllerButton(3) ? 6 :
-											oi->get2ndControllerButton(2) ? 8 : -1;
+			oi->getSecondControllerRawButton(6) ? 0 :
+					oi->getSecondControllerRawButton(7) ? 4 :
+							oi->getSecondControllerRawButton(8) ? 5 :
+									oi->getSecondControllerRawButton(3) ? 6 :
+											oi->getSecondControllerRawButton(2) ? 8 : -1;
 
 	if (flapButtons != -1) {
 		double fraction = 1;
@@ -44,13 +44,13 @@ void FlapCommand::Execute() {
 		// to ignore
 		flapSubsystem->setFlapsFraction(fraction);
 	} else {
-		if (oi->get2ndControllerButton(25)) {
-			if (oi->get2ndControllerButton(26)) {
+		if (oi->getSecondControllerRawButton(25)) {
+			if (oi->getSecondControllerRawButton(26)) {
 				flapPositionLeft -= .01;
 				flapPositionRight -= .01;
 			}
 
-			if (oi->get2ndControllerButton(27)) {
+			if (oi->getSecondControllerRawButton(27)) {
 				flapPositionLeft += .01;
 				flapPositionRight += .01;
 			}

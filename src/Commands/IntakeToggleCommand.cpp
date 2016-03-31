@@ -3,13 +3,13 @@
 IntakeToggleCommand::IntakeToggleCommand() :
 		CommandBase("IntakeToggleCommand_") {
 	Requires(intakeSubsystem.get());
-	mode = 2;
+	m_mode = 2;
 }
 
 IntakeToggleCommand::IntakeToggleCommand(bool intakeUp) :
 		CommandBase("IntakeToggleCommand_") {
 	Requires(intakeSubsystem.get());
-	mode = intakeUp;
+	m_mode = intakeUp;
 }
 
 void IntakeToggleCommand::Initialize() {
@@ -17,7 +17,7 @@ void IntakeToggleCommand::Initialize() {
 }
 
 void IntakeToggleCommand::Execute() {
-	if (mode == 2) {
+	if (m_mode == 2) {
 		if (intakeSubsystem->getIntakeArmValue() != DoubleSolenoid::kReverse) {
 			intakeSubsystem->setIntakeArmUp();
 			printf("IntakeCommand: arm up\n");
@@ -26,7 +26,7 @@ void IntakeToggleCommand::Execute() {
 			printf("IntakeCommand: arm down\n");
 		}
 	} else {
-		if (mode) {
+		if (m_mode) {
 			intakeSubsystem->setIntakeArmUp();
 			printf("IntakeCommand: arm up\n");
 		} else {

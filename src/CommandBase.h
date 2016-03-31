@@ -12,7 +12,7 @@
 #include <Subsystems/DummySubsystem.h>
 
 /**
- * The base for all commands. All atomic commands should subclass CommandBase.
+ * The base for most parameter-less commands. All atomic commands should subclass CommandBase.
  * CommandBase stores creates and stores each control system. To access a
  * subsystem elsewhere in your code in your code use CommandBase.examplesubsystem
  */
@@ -35,7 +35,7 @@ public:
 	static std::unique_ptr<IntakeSubsystem> intakeSubsystem;
 	static std::unique_ptr<DummySubsystem> dummySubsystem;
 
-	// all commands
+	// commands that require a static instance
 	static std::unique_ptr<Command> driveJoystickCommand;
 	static std::unique_ptr<Command> centerOnTargetCommand;
 	static std::unique_ptr<Command> flapCommand;

@@ -136,7 +136,7 @@ DriveSubsystem::DriveSubsystem() :
 	// detect roadkill if both 3rd talons are missing
 	if(!talonsPresent[RobotMap::CT_DRIVE_LEFT3]
 			&& !talonsPresent[RobotMap::CT_DRIVE_RIGHT3]){
-		Robot::isRoadkill = true;
+		Robot::is_roadkill = true;
 		printf("Roadkill detected\n");
 	}
 
@@ -193,7 +193,7 @@ void DriveSubsystem::drive(double y, double x) {
 	if (mp_robotDrive.get() == NULL)
 		return;
 	// Before we do anything, check to see if we're about to tip over
-	if (Robot::ROBOT_IS_ABOUT_TO_TIP && y < 0.0) {
+	if (Robot::robot_is_about_to_tip && y < 0.0) {
 		// Don't let the robot go forward anymore
 		y = 0.0;
 	}
@@ -230,7 +230,7 @@ DriveSubsystem::Position DriveSubsystem::GetPosition() {
 
 void DriveSubsystem::driveDirect(double left, double right){
 	// Before we do anything, check to see if we're about to tip over
-	if (Robot::ROBOT_IS_ABOUT_TO_TIP) {
+	if (Robot::robot_is_about_to_tip) {
 		if (left > 0.0) left = 0.0;
 		if (right > 0.0) right = 0.0;
 	}

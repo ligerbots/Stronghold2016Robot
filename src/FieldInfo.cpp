@@ -75,6 +75,9 @@ void FieldInfo::initSelectors(){
 	SmartDashboard::PutData("Auto Target", mp_target);
 }
 
+// for the next functions, the "line noise"-looking operation is:
+// 1. Cast void* from GetSelected() to int*
+// 2. Dereference int* to int
 int FieldInfo::GetPosition() {
 	return *((int*)mp_position->GetSelected());
 }
@@ -87,7 +90,7 @@ int FieldInfo::GetTarget() {
 	return *((int*)mp_target->GetSelected());
 }
 
-bool FieldInfo::CrossSlowly() {
+bool FieldInfo::IsCrossingSlowly() {
 	return defenseStrategy[*((int*)mp_defense->GetSelected())].speed == SLOW;
 }
 

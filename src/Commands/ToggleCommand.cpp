@@ -1,21 +1,30 @@
 #include "ToggleCommand.h"
 
+/**
+ * This command toggles another command. ie, if the command is not running, it starts the command
+ * If the command is running, it cancels it and restarts all commands passed in the vector of
+ * commands to restart
+ *
+ * This is useful for joystick buttons that cancel their long-running command on a second press
+ * Currently used for the intake command
+ */
+
 ToggleCommand::ToggleCommand(Command* whatToCall) :
-		whatToCall(whatToCall) {
+		mp_whatToCall(whatToCall) {
 }
 
 ToggleCommand::ToggleCommand(Command* whatToCall, std::vector<Command*> whatToRestart) :
-		whatToCall(whatToCall), ma_restartCommands(whatToRestart) {
+		mp_whatToCall(whatToCall), ma_restartCommands(whatToRestart) {
 }
 
 void ToggleCommand::Initialize() {
-	if(whatToCall->IsRunning()){
-		whatToCall->Cancel();
+	if(mp_whatToCall->IsRunning()){
+		mp_whatToCall->Cancel();
 		for(std::vector<Command*>::iterator it = ma_restartCommands.begin(); it != ma_restartCommands.end(); ++it){
 			(*it)->Start();
 		}
 	} else {
-		whatToCall->Start();
+		mp_whatToCall->Start();
 	}
 }
 

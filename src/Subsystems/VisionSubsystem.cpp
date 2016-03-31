@@ -25,9 +25,9 @@ VisionSubsystem::VisionSubsystem() :
 		m_lastVisionTick(0),
 		m_activeCamera(0),
 		m_lowResCapture("VisionScaleDown"),
-		m_pM(NULL)
+		m_pixelMeasurements(NULL)
 {
-	ledRingSpike.reset(new Relay(RobotMap::RELAY_LED_RING_SPIKE));
+	mp_ledRingSpike.reset(new Relay(RobotMap::RELAY_LED_RING_SPIKE));
 	enableVision = true;	// default on
 	m_firstFrame = true;
 
@@ -62,14 +62,14 @@ void VisionSubsystem::camerasOn() {
 }
 
 bool VisionSubsystem::isLedRingOn() {
-	return ledRingSpike->Get() != Relay::kOff;
+	return mp_ledRingSpike->Get() != Relay::kOff;
 }
 
-void VisionSubsystem::setLedRingOn(bool on) {
+void VisionSubsystem::setLedRingState(bool on) {
 	if (on) {
-		ledRingSpike->Set(Relay::kForward);
+		mp_ledRingSpike->Set(Relay::kForward);
 	} else {
-		ledRingSpike->Set(Relay::kOff);
+		mp_ledRingSpike->Set(Relay::kOff);
 	}
 }
 
@@ -82,7 +82,7 @@ void VisionSubsystem::updateVision(int ticks) {
 		return;
 
 	if (enableVision.get()){
-		setLedRingOn(true);		// just in case
+		setLedRingState(true);		// just in case
 	}
 
 	Camera::GetCamera(0)->SetExposure(exposure.get());
@@ -151,7 +151,7 @@ void VisionSubsystem::updateVision(int ticks) {
 	}
 }
 
-void VisionSubsystem::runVision() {
+void VisionSubsystem::requestVisionFrame() {
 	m_visionRequested = true;
 }
 
@@ -197,12 +197,10 @@ void VisionSubsystem::visionProcessingThread() {
 		// for now in the new scheme we don't allow Vision disable
 		if (true && enableVision.get()) {
 			if (mp_currentFrame == NULL) {
-				// wait for first frame
-				usleep(34000); 	// 34 ms - about a tick and half
-				continue;
+				continue; // cameras have not initialized yet; wait for first frame
 			}
 
-			int err = IVA_ProcessImage(mp_processingFrame); // run vision script
+			int err = IVA_ProcessImage(mp_processingFrame); // run vision script generated from Vision Assistant
 			if(err == 0){
 				err = imaqGetLastError();
 				printf("Error: %d\n", imaqGetLastError());
@@ -226,18 +224,15 @@ void VisionSubsystem::visionProcessingThread() {
 			}
 			printf("Vision: Finished a vision frame\n");
 			m_firstFrame = false;
-		}
-		else {
+		} else {
 			// if we didn't process any images, display something
 			// this probably only gets executed the first time
-			//LCameraServer::GetInstance()->SetImage(mp_currentFrame);
+			// LCameraServer::GetInstance()->SetImage(mp_currentFrame);
 			m_numParticles = 0;
 		}
 		m_visionBusy = false;
 		m_visionRequested = false;
 		m_lastVisionTick = Robot::ticks;
-		// with pthread_cond_wait, we don't need Mutex anymore
-		//usleep(33000);
 	}
 }
 
@@ -293,17 +288,17 @@ void VisionSubsystem::measureTarget(Image *image)
 //					particleToChoose = i;
 //				}
 			}
-			m_pM = mprArray->pixelMeasurements[particleToChoose];
+			m_pixelMeasurements = mprArray->pixelMeasurements[particleToChoose];
 
 			//double areaConvexHull = m_pM[CHA];
 			//double areaParticle = m_pM[AREA];
 			//double widthBoundingBox = pM[BRW];
 			//double heightBoundingBox = pM[BRH];
 			//double feret = pM[MFDO];
-			double feretStartX = m_pM[MFDSX];
-			double feretStartY = m_pM[MFDSY];
-			double feretEndX = m_pM[MFDEX];
-			double feretEndY = m_pM[MFDEY];
+			double feretStartX = m_pixelMeasurements[MFDSX];
+			double feretStartY = m_pixelMeasurements[MFDSY];
+			double feretEndX = m_pixelMeasurements[MFDEX];
+			double feretEndY = m_pixelMeasurements[MFDEY];
 
 			// assign to temporary variables first so that we don't
 			// accidentally get unscaled center coordinates because
@@ -327,11 +322,11 @@ void VisionSubsystem::measureTarget(Image *image)
 }
 
 void VisionSubsystem::markTarget(Image *image) {
-	if (paintTarget.get() && image!=NULL && m_pM!=NULL) {
-		double feretStartX = m_pM[MFDSX];
-		double feretStartY = m_pM[MFDSY];
-		double feretEndX = m_pM[MFDEX];
-		double feretEndY = m_pM[MFDEY];
+	if (paintTarget.get() && image!=NULL && m_pixelMeasurements!=NULL) {
+		double feretStartX = m_pixelMeasurements[MFDSX];
+		double feretStartY = m_pixelMeasurements[MFDSY];
+		double feretEndX = m_pixelMeasurements[MFDEX];
+		double feretEndY = m_pixelMeasurements[MFDEY];
 		if(m_lowResCapture.get()){
 			// scale coordinates back up to a 640x360 frame
 			feretStartX *= 2;
@@ -420,11 +415,11 @@ double VisionSubsystem::getTargetCenterY() {
 }
 
 double VisionSubsystem::getBoundingBoxWidth() {
-	return m_pM[IMAQ_MT_BOUNDING_RECT_WIDTH];
+	return m_pixelMeasurements[IMAQ_MT_BOUNDING_RECT_WIDTH];
 }
 
 double VisionSubsystem::getBoundingBoxHeight() {
-	return m_pM[IMAQ_MT_BOUNDING_RECT_HEIGHT];
+	return m_pixelMeasurements[IMAQ_MT_BOUNDING_RECT_HEIGHT];
 }
 
 double VisionSubsystem::getDistanceToTarget() {
@@ -451,10 +446,10 @@ double VisionSubsystem::getFlapsFractionForDistance(double distance) {
 }
 
 void VisionSubsystem::sendValuesToSmartDashboard() {
-	if (ledRingSpike->GetError().GetCode() != 0) {
+	if (mp_ledRingSpike->GetError().GetCode() != 0) {
 		SmartDashboard::PutString("LED", "Not Present");
 	} else {
-		Relay::Value val = ledRingSpike->Get();
+		Relay::Value val = mp_ledRingSpike->Get();
 		if (val == Relay::kOff) {
 			SmartDashboard::PutString("LED", "Off");
 		} else if (val == Relay::kForward) {

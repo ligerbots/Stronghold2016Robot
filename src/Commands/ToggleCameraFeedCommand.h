@@ -4,7 +4,7 @@
 #include "WPILib.h"
 
 class ToggleCameraFeedCommand: public CommandBase {
-	int whichCamera;
+	int m_whichCamera;
 public:
 	ToggleCameraFeedCommand();
 	explicit ToggleCameraFeedCommand(int whichCamera);

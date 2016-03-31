@@ -13,7 +13,7 @@ void AcquireTarget::Initialize() {
 	// otherwise skip it
 	m_isRunningVision = m_forceUpdate || visionSubsystem->isVisionCalculationDirty();
 	if(m_isRunningVision){
-		visionSubsystem->runVision();
+		visionSubsystem->requestVisionFrame();
 	} else {
 		printf("AcquireTarget: skipping vision frame because position hasn't changed\n");
 	}

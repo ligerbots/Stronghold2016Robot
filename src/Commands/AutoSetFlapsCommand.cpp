@@ -2,16 +2,16 @@
 
 AutoSetFlapsCommand::AutoSetFlapsCommand() {
 	Requires(flapSubsystem.get());
-	flapsFractionToSet = 0;
+	m_flapsFractionToSet = 0;
 }
 
 void AutoSetFlapsCommand::Initialize() {
 	SetTimeout(0.25); // enough time for servos to get into position
-	flapsFractionToSet = visionSubsystem->getFlapsFractionForDistance(visionSubsystem->getDistanceToTarget());
+	m_flapsFractionToSet = visionSubsystem->getFlapsFractionForDistance(visionSubsystem->getDistanceToTarget());
 }
 
 void AutoSetFlapsCommand::Execute() {
-	flapSubsystem->setFlapsFraction(flapsFractionToSet);
+	flapSubsystem->setFlapsFraction(m_flapsFractionToSet);
 }
 
 bool AutoSetFlapsCommand::IsFinished() {

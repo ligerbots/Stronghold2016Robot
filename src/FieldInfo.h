@@ -26,7 +26,7 @@ public:
 	int GetPosition();
 	int GetDefense();
 	int GetTarget();
-	bool CrossSlowly();
+	bool IsCrossingSlowly();
 	double GetInitialOrientation();
 	void initSelectors();
 

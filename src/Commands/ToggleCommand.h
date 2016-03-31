@@ -7,7 +7,7 @@
 class ToggleCommand: public CommandBase
 {
 protected:
-	Command* whatToCall;
+	Command* mp_whatToCall;
 	std::vector<Command*> ma_restartCommands;
 public:
 	explicit ToggleCommand(Command* whatToCall);

@@ -7,7 +7,7 @@
 class ShootCommand: public CommandBase {
 protected:
 	int m_ticks;
-	bool done;
+	bool m_done;
 public:
 	explicit ShootCommand();
 	void Initialize();

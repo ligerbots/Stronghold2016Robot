@@ -14,7 +14,7 @@
  * use
  * <pre><code>Parameter<int> myInt("MyInt");</code></pre>
  *
- * Parameter also includes many overriden operator functions, so you can
+ * Parameter also includes many overridden operator functions, so you can
  * directly use operators on Parameters and have them update on file and in network tables
  */
 template<typename Parameter_Type> class Parameter: public IParameter {

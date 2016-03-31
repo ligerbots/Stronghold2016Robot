@@ -3,18 +3,19 @@
 ToggleCompressorCommand::ToggleCompressorCommand() :
 		CommandBase("ToggleCompressorCommand_") {
 	Requires(compressorSubsystem.get());
-	mode = 2;
+	m_mode = 2;
 }
 
 ToggleCompressorCommand::ToggleCompressorCommand(bool on) {
-	mode = on;
+	m_mode = on;
 }
 
 void ToggleCompressorCommand::Initialize() {
-	if (mode == 2)
+	if (m_mode == 2) {
 		compressorSubsystem->toggleCompressor();
-	else
-		compressorSubsystem->setCompressor(mode);
+	} else {
+		compressorSubsystem->setCompressor(m_mode);
+	}
 }
 
 void ToggleCompressorCommand::Execute() {

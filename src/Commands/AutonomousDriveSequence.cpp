@@ -92,7 +92,7 @@ void AutonomousDriveSequence::Interrupted(){
 }
 
 void AutonomousDriveSequence::cleanup(){
-	if(DriverStation::GetInstance().IsOperatorControl()){
+	if(DriverStation::GetInstance().IsOperatorControl() && GetGroup() == NULL){
 		CommandBase::driveJoystickCommand->Start();
 	}
 }

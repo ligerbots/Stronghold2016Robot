@@ -3,6 +3,7 @@
 #include "Commands/Subsystem.h"
 #include "WPILib.h"
 
+// or "Adjustable Rotating Shooter Tips" Subsystem
 class FlapSubsystem: public Subsystem {
 private:
 	std::unique_ptr<Servo> mp_leftFlap;
@@ -15,8 +16,8 @@ private:
 
 	int m_robotTickAtFlapsDown;
 
-	double currentLeftPosition;
-	double currentRightPosition;
+	double m_currentLeftPosition;
+	double m_currentRightPosition;
 public:
 	FlapSubsystem();
 	void InitDefaultCommand();

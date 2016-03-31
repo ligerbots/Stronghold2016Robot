@@ -8,7 +8,8 @@ class WaitForIntakeUpCommand: public CommandBase {
 public:
 	WaitForIntakeUpCommand();
 	void Initialize();
-	void Execute();bool IsFinished();
+	void Execute();
+	bool IsFinished();
 	void End();
 	void Interrupted();
 };

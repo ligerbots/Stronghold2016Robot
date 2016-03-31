@@ -7,7 +7,7 @@
 
 class WedgeToggleCommand: public CommandBase {
 private:
-	int action;
+	int m_action;
 public:
 	WedgeToggleCommand();
 	explicit WedgeToggleCommand(bool wedgeUp);

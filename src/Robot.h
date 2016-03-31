@@ -8,18 +8,18 @@ class Robot: public IterativeRobot {
 public:
 	static Robot* instance;
 	static int ticks;		// make this globally available
-	static timespec resolution;
+	static timespec time_resolution;
 	/**
 	 * True if the program is currently running on roadkill
 	 * Only useful after CommandBase::init()
 	 */
-	static bool isRoadkill;
+	static bool is_roadkill;
 
-	I2C ledsCommunication;
+	I2C m_ledTeensyCommunication;
 	enum LedState {
-		OFF,
-		NORMAL,
-		SHOOT
+		OFF, // all LEDs off
+		NORMAL, // detect mode auto, blue alliance, or red alliance and set mode accordingly
+		SHOOT // play shoot animation
 	};
 	void SetLeds(LedState state);
 
@@ -30,11 +30,11 @@ public:
 
 	OI* mp_operatorInterface;
 
-	FieldInfo fieldInfo;
+	FieldInfo m_fieldInfo;
 
 	Command* mp_autonomousCommand;
 
-	static bool ROBOT_IS_ABOUT_TO_TIP;
+	static bool robot_is_about_to_tip;
 
 	Robot();
 	virtual ~Robot();

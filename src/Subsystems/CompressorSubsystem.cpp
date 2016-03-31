@@ -5,14 +5,17 @@ CompressorSubsystem::CompressorSubsystem() :
 	// Since they ripped the PCM off of Road Kill, we'd better not reference it
 	// It would be better if we could test for the presence/absence of the PCM
 	// directly, but unfortunately that doesn't seem possible through WPILib
-	m_Enable = !Robot::isRoadkill;
-	if (m_Enable) mp_compressor.reset(new Compressor(RobotMap::PCM_CAN));
+	m_Enable = !Robot::is_roadkill;
+	if (m_Enable){
+		mp_compressor.reset(new Compressor(RobotMap::PCM_CAN));
+	}
 	m_haveSensor = false;
 	mp_pressureSensor.reset(new AnalogInput(RobotMap::AI_PRESSURE_SENSOR));
 	double reading = mp_pressureSensor->GetVoltage();
 	// if the sensor exists, it should be giving a nonzero input
-	if(mp_pressureSensor->GetError().GetCode() == 0 && reading > 0)
+	if(mp_pressureSensor->GetError().GetCode() == 0 && reading > 0){
 		m_haveSensor = true;
+	}
 }
 
 void CompressorSubsystem::InitDefaultCommand() {
@@ -48,9 +51,11 @@ void CompressorSubsystem::toggleCompressor() {
 
 void CompressorSubsystem::sendValuesToSmartDashboard() {
 	SmartDashboard::PutBoolean("Compressor/On", isCompressorOn());
-	if (Robot::ticks % 50 == 12) // don't spam the can bus and stagger with other polling
+	if (Robot::ticks % 50 == 12){
+		// don't spam the can bus and stagger with other polling
 		SmartDashboard::PutBoolean("Compressor/PressureSwitch",
 				isPressureSwitchTriggered());
+	}
 
 	SmartDashboard::PutNumber("Pneumatics_PSI", getPressurePSI());
 }

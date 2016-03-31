@@ -6,11 +6,12 @@
 
 class FlapSetCommand: public CommandBase {
 protected:
-	double fraction;
+	double m_fraction;
 public:
 	explicit FlapSetCommand(double fraction);
 	void Initialize();
-	void Execute();bool IsFinished();
+	void Execute();
+	bool IsFinished();
 	void End();
 	void Interrupted();
 };

@@ -6,12 +6,13 @@
 
 class PrepareForAutoCommand: public CommandBase {
 protected:
-	bool wedgesUp;
-	bool intakeUp;
+	bool m_setWedgesUp;
+	bool m_setIntakeUp;
 public:
 	PrepareForAutoCommand(bool wedgesUp, bool intakeUp);
 	void Initialize();
-	void Execute();bool IsFinished();
+	void Execute();
+	bool IsFinished();
 	void End();
 	void Interrupted();
 };

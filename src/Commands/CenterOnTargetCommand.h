@@ -6,7 +6,7 @@
 class CenterOnTargetCommand: public CommandBase {
 protected:
 	PIDController *mp_softwarePID;
-	double centerTo;
+	double m_centerTo;
 	Parameter<double> centerMediumZone;
 	Parameter<double> centerSlowZone;
 	Parameter<double> fastSpeed;
@@ -17,7 +17,8 @@ protected:
 public:
 	explicit CenterOnTargetCommand();
 	void Initialize();
-	void Execute();bool IsFinished();
+	void Execute();
+	bool IsFinished();
 	void End();
 	void Interrupted();
 

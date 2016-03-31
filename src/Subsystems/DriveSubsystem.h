@@ -113,8 +113,8 @@ private:
 	 * @param r_talon The talon to check
 	 * @return True if the talon is present, false otherwise
 	 */
-	bool IsTalonPresent(CANTalon& r_talon);bool IsEncoderPresent(
+	bool IsTalonPresent(CANTalon& r_talon);
+	bool IsEncoderPresent(
 			CANTalon& r_talon);
-
 
 };

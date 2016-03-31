@@ -106,10 +106,10 @@ private:
 	Parameter<bool> m_lowResCapture;
 
 	// managed hardware object
-	std::unique_ptr<Relay> ledRingSpike;
-	double *m_pM;	// pixel measurement
+	std::unique_ptr<Relay> mp_ledRingSpike;
+	double *m_pixelMeasurements; // array of all measurements from NI vision
 
-
+	// this method runs in the separate thread
 	void visionProcessingThread();
 	void measureTarget(Image *image);
 	void markTarget(Image *image);
@@ -121,7 +121,7 @@ public:
 	void camerasOn();
 	void updateVision(int ticks);
 	bool isLedRingOn();
-	void setLedRingOn(bool on);
+	void setLedRingState(bool on);
 	void toggleCameraFeed();
 	void setCameraFeed(int whichCamera);
 	void setVisionEnabled(bool enabled);
@@ -134,7 +134,7 @@ public:
 	static constexpr double horizontal_field_of_view = 78.442;
 	static constexpr double tan_half_horizontal_field_of_view = 0.8162;
 
-	void runVision();
+	void requestVisionFrame();
 	double getCorrectedFrameCenter(double distInches);
 	bool isTargetVisible();
 	bool isVisionCalculationDirty();
@@ -156,7 +156,7 @@ public:
 	void calculateDistanceAndAngle_FromRegression(double xpos, double ypos, double* distance, double* angle);
 
 	/**
-	 * Bad implementation that uses lookup table values from the test data
+	 * Implementation that uses lookup table values from the test data
 	 */
 	double getFlapsFractionForDistance(double distance);
 

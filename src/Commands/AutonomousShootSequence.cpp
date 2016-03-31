@@ -39,7 +39,7 @@ void AutonomousShootSequence::End(){
 }
 
 void AutonomousShootSequence::cleanup(){
-	if(DriverStation::GetInstance().IsOperatorControl()){
+	if(DriverStation::GetInstance().IsOperatorControl() && GetGroup() == NULL){
 		CommandBase::intakeRollerCommand->Start();
 		CommandBase::driveJoystickCommand->Start();
 	}

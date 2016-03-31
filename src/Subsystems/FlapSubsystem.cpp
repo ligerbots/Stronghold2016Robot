@@ -3,7 +3,7 @@
 FlapSubsystem::FlapSubsystem() :
 		Subsystem("FlapSubsystem"), leftLowLimit("FlapLeftLowLimit"), leftHighLimit(
 				"FlapLeftHighLimit"), rightLowLimit("FlapRightLowLimit"), rightHighLimit(
-				"FlapRightHighLimit"), currentLeftPosition(0), currentRightPosition(0) {
+				"FlapRightHighLimit"), m_currentLeftPosition(0), m_currentRightPosition(0) {
 	mp_leftFlap.reset(new Servo(RobotMap::PWM_SERVO_SHOOTER_LEFT));
 	mp_rightFlap.reset(new Servo(RobotMap::PWM_SERVO_SHOOTER_RIGHT));
 	m_robotTickAtFlapsDown = 0;
@@ -17,18 +17,19 @@ void FlapSubsystem::setFlapsFraction(double fractionBoth) {
 	setFlapsFraction(fractionBoth, fractionBoth);
 }
 
+// takes parameters from 0 to 1, scales to angles for both flaps
 void FlapSubsystem::setFlapsFraction(double fractionLeft,
 		double fractionRight) {
 	// don't break the servos; make sure we have valid values
 	fractionLeft = fmax(fmin(fractionLeft, 1), 0);
 	fractionRight = fmax(fmin(fractionRight, 1), 0);
 
-	if(fractionLeft == 1.0 && fractionRight == 1.0 && (currentLeftPosition != 1.0 || currentRightPosition != 1.0)){
+	if(fractionLeft == 1.0 && fractionRight == 1.0 && (m_currentLeftPosition != 1.0 || m_currentRightPosition != 1.0)){
 		m_robotTickAtFlapsDown = Robot::ticks;
 	}
 
-	currentLeftPosition = fractionLeft;
-	currentRightPosition = fractionRight;
+	m_currentLeftPosition = fractionLeft;
+	m_currentRightPosition = fractionRight;
 
 	// transform [0, 1] to [flapLow, flapHigh]
 	double leftFlapPosition = (leftHighLimit.get() - leftLowLimit.get())
@@ -42,7 +43,7 @@ void FlapSubsystem::setFlapsFraction(double fractionLeft,
 bool FlapSubsystem::isSafeToIntake(){
 	// did we set both flaps down more than 20 ticks ago?
 //	printf("FlapSubsystem: left %f right %f ticksAtDown %d ticks %d\n", currentLeftPosition,currentRightPosition, m_robotTickAtFlapsDown, Robot::ticks);
-	return currentLeftPosition == 1.0 && currentRightPosition == 1.0 && (Robot::ticks - m_robotTickAtFlapsDown) > 20;
+	return m_currentLeftPosition == 1.0 && m_currentRightPosition == 1.0 && (Robot::ticks - m_robotTickAtFlapsDown) > 20;
 }
 
 void FlapSubsystem::sendValuesToSmartDashboard() {
@@ -60,11 +61,11 @@ void FlapSubsystem::setRightFlapAngle(double angle) {
 }
 
 double FlapSubsystem::getLeftFlapFraction(){
-	return currentLeftPosition;
+	return m_currentLeftPosition;
 }
 
 double FlapSubsystem::getRightFlapFraction(){
-	return currentRightPosition;
+	return m_currentRightPosition;
 }
 
 double FlapSubsystem::getLeftFlapAngle() {

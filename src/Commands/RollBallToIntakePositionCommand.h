@@ -13,22 +13,22 @@ public:
 		BACK_TO_SHOOTING_POSITION // if we overshot the shooter, pull down
 	};
 protected:
-	IntakePosition where;
-	bool sensorFlag;
-	bool moveUp;
-	int ticks;
-	int shooter_switch_state;
-	int waiting_ticks;
-	bool needsToWaitForFlaps;
-	bool switchAlreadyPressed;
+	IntakePosition m_targetIntakePosition;
+	bool m_sensorFlag;
+	bool m_moveUp;
+	int m_ticks;
+	int m_shooterSwitchState;
+	int m_waitingTicks;
+	bool m_needsToWaitForFlaps;
+	bool m_switchAlreadyPressed;
 
-	int ticks_since_crossing_position;
+	int m_ticksSinceCrossingPosition;
 	static constexpr int STATE_UP = 0;
 	static constexpr int STATE_WAIT_FOR_RELEASE = 1;
 	static constexpr int STATE_BACK = 2;
 	static constexpr int STATE_WAIT = 3;
 public:
-	explicit RollBallToIntakePositionCommand(IntakePosition where);
+	explicit RollBallToIntakePositionCommand(IntakePosition targetIntakePositon);
 	void Initialize();
 	void Execute();
 	bool IsFinished();

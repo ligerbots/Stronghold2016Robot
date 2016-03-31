@@ -3,12 +3,9 @@
 PDPSubsystem::PDPSubsystem() :
 		Subsystem("PDPSubsystem") {
 	mp_pdp.reset(new PowerDistributionPanel(RobotMap::PDP_CAN));
-//	mp_pdp->StartLiveWindowMode();
 }
 
 void PDPSubsystem::InitDefaultCommand() {
-	// Set the default command for a subsystem here.
-	//SetDefaultCommand(new MySpecialCommand());
 }
 
 void PDPSubsystem::sendValuesToSmartDashboard() {
@@ -19,14 +16,13 @@ void PDPSubsystem::sendValuesToSmartDashboard() {
 		//SmartDashboard::PutNumber("PDP/TotalCurrent", mp_pdp->GetTotalCurrent());
 		SmartDashboard::PutNumber("PDP/Watts", mp_pdp->GetTotalPower());
 		SmartDashboard::PutNumber("PDP/Temperature", mp_pdp->GetTemperature());
-		/*
-		 * Polling the individual channels overloads the CAN bus and spams the dashboard
-		for(int i=0;i<16;i++) {
-			std::string name = "PDP/Channel/";
-			name += std::to_string(i);
-			name += "_Current";
-			SmartDashboard::PutNumber(name, mp_pdp->GetCurrent(i));
-		 */
-		}
+		// Polling the individual channels overloads the CAN bus and spams the dashboard
+//		for(int i=0;i<16;i++) {
+//			std::string name = "PDP/Channel/";
+//			name += std::to_string(i);
+//			name += "_Current";
+//			SmartDashboard::PutNumber(name, mp_pdp->GetCurrent(i));
+//		}
+	}
 }
 

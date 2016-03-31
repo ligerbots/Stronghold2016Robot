@@ -1,8 +1,8 @@
 #include <Stronghold2016Robot.h>
 
 RotateIMUCommand::RotateIMUCommand(double targetAngle, bool absolute) :
-		CommandBase("RotateIMUCommand_" + std::to_string(targetAngle)), angle(targetAngle), targetAngle(0), currentAngle(
-				0), lastAngle(0), isClockwise(false), isAbsolute(absolute) {
+		CommandBase("RotateIMUCommand_" + std::to_string(targetAngle)), m_angle(targetAngle), m_targetAngle(0), m_currentAngle(
+				0), m_lastAngle(0), m_isClockwise(false), m_isAbsolute(absolute) {
 	Requires(driveSubsystem.get());
 	SetInterruptible(false);
 	m_ticks = 0;
@@ -14,57 +14,59 @@ void RotateIMUCommand::Initialize() {
 	driveSubsystem->shiftDown();
 
 	updateCurrentAngle();
-	if (isAbsolute) {
-		targetAngle = angle;
+	if (m_isAbsolute) {
+		m_targetAngle = m_angle;
 	} else {
-		targetAngle = currentAngle + angle;
+		m_targetAngle = m_currentAngle + m_angle;
 	}
-	printf("Current angle %f, angle %f, targetAngle %f, absolute %d\n", currentAngle, angle, targetAngle, isAbsolute);
-	targetAngle = fmod(targetAngle + 360.0, 360.0);
+	printf("Current angle %f, angle %f, targetAngle %f, absolute %d\n", m_currentAngle, m_angle, m_targetAngle, m_isAbsolute);
+	m_targetAngle = fmod(m_targetAngle + 360.0, 360.0);
 
 	// find the shortest direction to turn
-	if (targetAngle > currentAngle) {
-		isClockwise = (targetAngle - currentAngle
-				< currentAngle + 360 - targetAngle);
+	if (m_targetAngle > m_currentAngle) {
+		m_isClockwise = (m_targetAngle - m_currentAngle
+				< m_currentAngle + (360 - m_targetAngle));
 	} else {
-		isClockwise = (currentAngle - targetAngle
-				> targetAngle + 360 - currentAngle);
+		m_isClockwise = (m_currentAngle - m_targetAngle
+				> m_targetAngle + (360 - m_currentAngle));
 	}
 
-	printf("Turn clockwise: %d\n", isClockwise);
+	printf("Turn clockwise: %d\n", m_isClockwise);
 
-	lastAngle = currentAngle;
+	m_lastAngle = m_currentAngle;
 
 	SetTimeout(5);
 }
 
 void RotateIMUCommand::updateCurrentAngle() {
-	currentAngle = navXSubsystem->GetYaw();
-	currentAngle = fmod(currentAngle + 360.0, 360.0); // turn -180,180 to 0,360
+	m_currentAngle = navXSubsystem->GetYaw();
+	m_currentAngle = fmod(m_currentAngle + 360.0, 360.0); // turn -180,180 to 0,360
 }
 
 void RotateIMUCommand::Execute() {
 	double speed = 1;
 	m_ticks++;
 
-	double error = fabs(currentAngle - targetAngle);
-	if(error > 180) error = 360 - error; // we always try to go the minimum number of degrees
-	if(error < RAMP_DOWN_ZONE){
+	double error = fabs(m_currentAngle - m_targetAngle);
+	if(error > 180){
+		error = 360 - error; // we always try to go the minimum number of degrees
+	}
+	if(error < RAMP_DOWN_ZONE){ // ramp down as we approach target
 		speed = error * (1 - MIN_SPEED) / RAMP_DOWN_ZONE + MIN_SPEED;
-	} else if(m_ticks < RAMP_UP_TICKS){
+	} else if(m_ticks < RAMP_UP_TICKS){ // ramp up as we begin
 		speed = MIN_SPEED + ((1 - MIN_SPEED) * m_ticks / RAMP_UP_TICKS);
 	}
 
-	driveSubsystem->drive(0, isClockwise ? speed : -speed);
-	lastAngle = currentAngle;
+	driveSubsystem->drive(0, m_isClockwise ? speed : -speed);
+	m_lastAngle = m_currentAngle;
 	updateCurrentAngle();
 }
 
 bool RotateIMUCommand::IsFinished() {
 	bool finished = false;
 	// find if we passed the target angle (in mod 360)
-	printf("Rotate: %f %f %f\n", lastAngle, targetAngle, currentAngle);
-	if(lastAngle == currentAngle) return IsTimedOut(); // first iteration
+	printf("Rotate: %f %f %f\n", m_lastAngle, m_targetAngle, m_currentAngle);
+	if(m_lastAngle == m_currentAngle) return IsTimedOut(); // first iteration
 //	if ((isClockwise && lastAngle < currentAngle) || (!isClockwise && currentAngle < lastAngle)) {
 //		finished = isClockwise ? lastAngle <= targetAngle && targetAngle <= currentAngle
 //				: lastAngle >= targetAngle && targetAngle >= currentAngle;
@@ -73,9 +75,10 @@ bool RotateIMUCommand::IsFinished() {
 //				: currentAngle >= targetAngle && targetAngle >= lastAngle);
 //	}
 
-	double error1 = fabs(targetAngle - currentAngle);
+	// check "error" in both turn directions
+	double error1 = fabs(m_targetAngle - m_currentAngle);
 	double error2 = fabs(360 - error1);
-	finished = error1 < 1.5 || error2 < 1.5;
+	finished = error1 < 1.5 || error2 < 1.5; // if either is very small, we are on target
 
 	return IsTimedOut() || finished;
 }

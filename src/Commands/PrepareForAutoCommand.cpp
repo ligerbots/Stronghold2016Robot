@@ -1,7 +1,7 @@
 #include <Stronghold2016Robot.h>
 
 PrepareForAutoCommand::PrepareForAutoCommand(bool wedgesUp, bool intakeUp) :
-		CommandBase("PrepareForAutoCommand"), wedgesUp(wedgesUp), intakeUp(
+		CommandBase("PrepareForAutoCommand"), m_setWedgesUp(wedgesUp), m_setIntakeUp(
 				intakeUp) {
 	Requires(wedgeSubsystem.get());
 	Requires(intakeSubsystem.get());
@@ -9,18 +9,18 @@ PrepareForAutoCommand::PrepareForAutoCommand(bool wedgesUp, bool intakeUp) :
 
 void PrepareForAutoCommand::Initialize() {
 	printf("PrepareForAuto: setting wedges %s | intake %s\n",
-			wedgesUp ? "up" : "down", intakeUp ? "up" : "down");
+			m_setWedgesUp ? "up" : "down", m_setIntakeUp ? "up" : "down");
 	visionSubsystem->setVisionEnabled(true);
 	SetTimeout(0.5); // give enough time for things to go into position
 }
 
 void PrepareForAutoCommand::Execute() {
-	if (wedgesUp)
+	if (m_setWedgesUp)
 		wedgeSubsystem->liftWedge();
 	else
 		wedgeSubsystem->lowerWedge();
 
-	if (intakeUp)
+	if (m_setIntakeUp)
 		intakeSubsystem->setIntakeArmUp();
 	else
 		intakeSubsystem->setIntakeArmDown();

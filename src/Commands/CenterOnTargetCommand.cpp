@@ -1,7 +1,7 @@
 #include <Stronghold2016Robot.h>
 
 CenterOnTargetCommand::CenterOnTargetCommand() :
-		CommandBase("CenterOnTargetCommand"), mp_softwarePID(NULL), centerTo(0), centerMediumZone(
+		CommandBase("CenterOnTargetCommand"), mp_softwarePID(NULL), m_centerTo(0), centerMediumZone(
 				"CenterMediumZone"), centerSlowZone("CenterSlowZone"), fastSpeed(
 				"CenterFastSpeed"), mediumSpeed("CenterMediumSpeed"), slowSpeed(
 				"CenterSlowSpeed") {
@@ -24,7 +24,7 @@ CenterOnTargetCommand::CenterOnTargetCommand() :
 void CenterOnTargetCommand::Initialize() {
 	printf("CenterOnTarget: initialize\n");
 	visionSubsystem->setVisionEnabled(true);
-	visionSubsystem->setLedRingOn(true);
+	visionSubsystem->setLedRingState(true);
 	driveSubsystem->zeroMotors();
 	driveSubsystem->shiftDown(); // untested in high gear
 
@@ -66,12 +66,12 @@ void CenterOnTargetCommand::Execute() {
 
 	// continuously run vision for this command, since it's closed loop
 	// see RotateToTarget for centering without continuous vision
-	visionSubsystem->runVision();
+	visionSubsystem->requestVisionFrame();
 
-	centerTo = visionSubsystem->getCorrectedFrameCenter(
+	m_centerTo = visionSubsystem->getCorrectedFrameCenter(
 			visionSubsystem->getDistanceToTarget());
 
-	double error = centerTo - visionSubsystem->PIDGet();
+	double error = m_centerTo - visionSubsystem->PIDGet();
 	double sign = error < 0 ? -1 : 1;
 	if (!m_isCentered) {
 		if (fabs(error) > centerMediumZone.get()) {
@@ -87,12 +87,12 @@ void CenterOnTargetCommand::Execute() {
 }
 
 bool CenterOnTargetCommand::IsFinished() {
-	if (Robot::instance->mp_operatorInterface->get2ndControllerButton(28)) {
+	if (Robot::instance->mp_operatorInterface->getSecondControllerRawButton(28)) {
 		printf("Center: ending command\n");
 		return true;
 	}
 
-	m_isCentered = fabs(centerTo - visionSubsystem->PIDGet())
+	m_isCentered = fabs(m_centerTo - visionSubsystem->PIDGet())
 			< ACCEPTABLE_ERROR;
 	if (m_isCentered) {
 		m_ticksSinceCentered++;
