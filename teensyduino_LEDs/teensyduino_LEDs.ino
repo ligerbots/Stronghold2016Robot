@@ -98,6 +98,17 @@ void loop() {
   delay(20);
 }
 
+void animate_fade(int r, int g, int b){
+  int val_r = (int) (((double) abs((ticks % 50) - 25)) * r / 25.0);
+  int val_g = (int) (((double) abs((ticks % 50) - 25)) * g / 25.0);
+  int val_b = (int) (((double) abs((ticks % 50) - 25)) * b / 25.0);
+  uint32_t color = stripLeft.Color(val_r, val_g, val_b);
+  for (int i = 0; i < LEDS_PER_STRIP; i++) {
+    stripLeft.setPixelColor(i, color);
+    stripRight.setPixelColor(i, color);
+  }
+}
+
 void animation_ALL_OFF() {
   for (int i = 0; i < LEDS_PER_STRIP; i++) {
     stripLeft.setPixelColor(i, black);
@@ -105,12 +116,7 @@ void animation_ALL_OFF() {
   }
 }
 void animation_AUTO() {
-  int val = (int) (((double) abs((ticks % 50) - 25)) * 255.0 / 25.0);
-  uint32_t color = stripLeft.Color(val, val, 0);
-  for (int i = 0; i < LEDS_PER_STRIP; i++) {
-    stripLeft.setPixelColor(i, color);
-    stripRight.setPixelColor(i, color);
-  }
+  animate_fade(255, 255, 0);
 }
 void animation_ALLIANCE_RED() {
   int move_pos = ticks % (LEDS_PER_STRIP + 10);
@@ -119,6 +125,7 @@ void animation_ALLIANCE_RED() {
     stripLeft.setPixelColor(i, color);
     stripRight.setPixelColor(i, color);
   }
+  //animate_fade(255, 0, 0);
 }
 void animation_ALLIANCE_BLUE() {
   int move_pos = ticks % (LEDS_PER_STRIP + 10);
@@ -127,11 +134,12 @@ void animation_ALLIANCE_BLUE() {
     stripLeft.setPixelColor(i, color);
     stripRight.setPixelColor(i, color);
   }
+  //animate_fade(0, 0, 255);
 }
 void animation_SHOOT() {
-  int display_pos = ticks;
+  int display_pos = LEDS_PER_STRIP - ticks;
   for (int i = 0; i < LEDS_PER_STRIP; i++) {
-    uint32_t color = (i < display_pos) ? green : black;
+    uint32_t color = (i > display_pos) ? green : black;
     stripLeft.setPixelColor(i, color);
     stripRight.setPixelColor(i, color);
   }

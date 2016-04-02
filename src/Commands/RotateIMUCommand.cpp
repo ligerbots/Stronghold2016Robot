@@ -47,14 +47,17 @@ void RotateIMUCommand::Execute() {
 	double speed = 1;
 	m_ticks++;
 
+	// use the slow speed from centering since it's what we need
+	double minSpeed = Preferences::GetInstance()->GetDouble("CenterSlowSpeed", .37);
+
 	double error = fabs(m_currentAngle - m_targetAngle);
 	if(error > 180){
 		error = 360 - error; // we always try to go the minimum number of degrees
 	}
 	if(error < RAMP_DOWN_ZONE){ // ramp down as we approach target
-		speed = error * (1 - MIN_SPEED) / RAMP_DOWN_ZONE + MIN_SPEED;
+		speed = error * (1 - minSpeed) / RAMP_DOWN_ZONE + minSpeed;
 	} else if(m_ticks < RAMP_UP_TICKS){ // ramp up as we begin
-		speed = MIN_SPEED + ((1 - MIN_SPEED) * m_ticks / RAMP_UP_TICKS);
+		speed = minSpeed + ((1 - minSpeed) * m_ticks / RAMP_UP_TICKS);
 	}
 
 	driveSubsystem->drive(0, m_isClockwise ? speed : -speed);

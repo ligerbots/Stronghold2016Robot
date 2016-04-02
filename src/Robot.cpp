@@ -165,11 +165,12 @@ void Robot::SetLeds(LedState state){
 		bytes[0] = 'S';
 		break;
 	}
+	printf("LEDs: Mode = %c\n", (char) (bytes[0]));
 	// duplicate the byte
 	for(int i = 1; i < 10; i++){
 		bytes[i] = bytes[0];
 	}
-	m_ledTeensyCommunication.WriteBulk(bytes, 1);
+	m_ledTeensyCommunication.WriteBulk(bytes, 10);
 }
 
 void Robot::DisabledPeriodic() {

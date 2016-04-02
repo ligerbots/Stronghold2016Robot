@@ -22,5 +22,5 @@ public:
 	void End();
 	void Interrupted();
 
-	static constexpr double ACCEPTABLE_ERROR = 0.00625;
+	static constexpr double ACCEPTABLE_ERROR = 0.007;
 };

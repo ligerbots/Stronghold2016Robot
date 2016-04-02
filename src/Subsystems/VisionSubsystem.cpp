@@ -343,9 +343,9 @@ void VisionSubsystem::markTarget(Image *image) {
 		if (m_numParticles != 0) {
 			// If the target is centered in our field of view, paint it green; else red
 			double Xerror = fabs(setpoint * width - m_frameCenterX);
-//			printf("%f\n", Xerror);
+//			printf("%f %f\n", Xerror, CenterOnTargetCommand::ACCEPTABLE_ERROR * width);
 			// Centered means no more than 1.5% off to either side
-			double color = Xerror < CenterOnTargetCommand::ACCEPTABLE_ERROR * width ? GREEN : RED;
+			double color = (Xerror < (CenterOnTargetCommand::ACCEPTABLE_ERROR * width)) ? GREEN : RED;
 
 			if(false){
 				// this code attempts to draw an circle, but ...
@@ -357,11 +357,11 @@ void VisionSubsystem::markTarget(Image *image) {
 				imaqDrawLineOnImage(image, image, DrawMode::IMAQ_DRAW_VALUE,
 						{ (int) m_frameCenterX - 5, (int) m_frameCenterY },
 						{ (int) m_frameCenterX + 5, (int) m_frameCenterY },
-						CYAN);
+						color);
 				imaqDrawLineOnImage(image, image, DrawMode::IMAQ_DRAW_VALUE,
 						{ (int) m_frameCenterX, (int) m_frameCenterY - 5 },
 						{ (int) m_frameCenterX, (int) m_frameCenterY + 5 },
-						CYAN);
+						color);
 			// Draw the whole feret diagonal
 			imaqDrawLineOnImage(image, image, DrawMode::IMAQ_DRAW_VALUE,
 					{(int) feretStartX, (int) feretStartY},

@@ -38,8 +38,9 @@ void OI::registerCommands() {
 void OI::registerSecondControllerButtons() {
 	// avoid excessive errors if this joystick isn't connected
 	// Commented out -- the second controller is now essential. We don't want to just silently fail if it's not there.
-	m_secondControllerButtonCount = mp_FarmController->GetButtonCount();
-	printf("Controller 2 has %d buttons.\n", m_secondControllerButtonCount);
+//	m_secondControllerButtonCount = mp_FarmController->GetButtonCount();
+//	printf("Controller 2 has %d buttons.\n", m_secondControllerButtonCount);
+	m_secondControllerButtonCount = 28; // having issues with buttons not being bound
 
 	// we register the buttons even if the controller wasn't present on startup
 	// because it might be connected later
@@ -75,7 +76,7 @@ void OI::registerSecondControllerButtons() {
 			new AutonomousShootSequence());
 	registerButton(mp_FarmController, 15, PRESSED, new CenterOnTargetCommand());
 	registerButton(mp_FarmController, 16, PRESSED,
-			new DriveDistanceCommand(4 * 12));
+			new RotateIMUCommand(90, false));
 
 	// if the farm controller isn't available, we might be using a Logitech Thurstmaster or something
 	// that likely gives out around 16 buttons
