@@ -48,7 +48,7 @@ public:
 	// Although the defenses are actually 47.2" wide, one drives the full 48" to get across
 	static constexpr double DefenseDepth = 48;
 	// After we cross the defense, drive one more foot in autonomous
-	static constexpr double DrivePastDefense = 12.0;
+	static constexpr double DrivePastDefense = 18.0; // +6in
 
 	// Identity array so we can pass pointers to our enum values
 	static int I[32];
@@ -80,6 +80,7 @@ public:
 		TARGET_LEFT,
 		TARGET_CENTER,
 		TARGET_RIGHT,
+		TARGET_NONE,
 		TARGET_MAX
 	};
 	static const std::string TargetNames[];
@@ -91,15 +92,17 @@ public:
 	static constexpr TargetLocations targetLocations[] = {
 			{ -87.0, 212.0 },
 			{ 10.0, 176.0 },
-			{ 62.0, 212.0 }
+			{ 56.0, 190.0 },
+			{ 0, 0 } // target_none
 	};
 
 	// angles we need to move to roughly using the navx so that we can see the target
 	// in navx angles (clockwise is positive, forward at start of auto is 0)
-	static constexpr double targetLineUpAngles[3] = {
+	static constexpr double targetLineUpAngles[] = {
 			60,
 			0,
-			300
+			330,
+			0 // target_none
 	};
 
 	enum Defenses {

@@ -212,7 +212,7 @@ void VisionSubsystem::visionProcessingThread() {
 			m_robotPos = CommandBase::driveSubsystem->GetPosition();
 
 			// print out CPU statistics periodically, but not so often as to spam the console
-			if (loopCounter%40 == 0) {
+			if (loopCounter%2 == 0) {
 				double elapsedTime = Robot::GetRTC() - startTime;
 				int elapsedTicks = Robot::ticks - startTicks;
 				clock_gettime(cid, &endCPUTime);
@@ -230,6 +230,7 @@ void VisionSubsystem::visionProcessingThread() {
 			// LCameraServer::GetInstance()->SetImage(mp_currentFrame);
 			m_numParticles = 0;
 		}
+		SmartDashboard::PutNumber("VisionTickUpdate", Robot::ticks);
 		m_visionBusy = false;
 		m_visionRequested = false;
 		m_lastVisionTick = Robot::ticks;

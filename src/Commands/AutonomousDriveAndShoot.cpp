@@ -24,6 +24,9 @@ AutonomousDriveAndShoot::AutonomousDriveAndShoot(int position, int defense, int 
 	FieldInfo::Speeds speed = FieldInfo::defenseStrategy[defense].speed;
 	if (speed!=FieldInfo::NOGO) {
 		AddSequential(new AutonomousDriveSequence(position, defense, target));
-		AddSequential(new AutonomousShootSequence);
+		// don't shoot if we set cross only
+		if(target != FieldInfo::TARGET_NONE){
+			AddSequential(new AutonomousShootSequence);
+		}
 	}
 }

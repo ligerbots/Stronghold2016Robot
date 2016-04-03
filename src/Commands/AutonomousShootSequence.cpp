@@ -20,6 +20,7 @@ AutonomousShootSequence::AutonomousShootSequence()
 	// arm.
 
 	//TODO: switch back
+//	AddSequential(new AcquireTarget(true));
 	AddParallel(new RollBallAndIntakeUpSequence());
 	AddSequential(new AcquireTarget(true));
 	AddSequential(new CenterOnTargetCommand());

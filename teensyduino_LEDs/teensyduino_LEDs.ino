@@ -99,9 +99,9 @@ void loop() {
 }
 
 void animate_fade(int r, int g, int b){
-  int val_r = (int) (((double) abs((ticks % 50) - 25)) * r / 25.0);
-  int val_g = (int) (((double) abs((ticks % 50) - 25)) * g / 25.0);
-  int val_b = (int) (((double) abs((ticks % 50) - 25)) * b / 25.0);
+  int val_r = (int) (((double) abs((((int) ticks) % 50) - 25)) * r / 25.0);
+  int val_g = (int) (((double) abs((((int) ticks) % 50) - 25)) * g / 25.0);
+  int val_b = (int) (((double) abs((((int) ticks) % 50) - 25)) * b / 25.0);
   uint32_t color = stripLeft.Color(val_r, val_g, val_b);
   for (int i = 0; i < LEDS_PER_STRIP; i++) {
     stripLeft.setPixelColor(i, color);

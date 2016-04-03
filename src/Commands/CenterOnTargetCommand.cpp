@@ -110,6 +110,7 @@ void CenterOnTargetCommand::End() {
 	driveSubsystem->zeroMotors();
 
 	SmartDashboard::PutNumber("AngleAfterFineCenter", navXSubsystem->GetYaw());
+	Robot::end_of_centering_yaw = navXSubsystem->GetYaw();
 
 //	SmartDashboard::PutData("CenterOnTargetPID", mp_softwarePID);
 	if (DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL)

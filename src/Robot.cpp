@@ -5,6 +5,7 @@
 Robot* Robot::instance = NULL;
 int Robot::ticks;
 bool Robot::is_roadkill = false;
+double Robot::end_of_centering_yaw = 0;
 bool Robot::robot_is_about_to_tip = false;
 timespec Robot::time_resolution;
 

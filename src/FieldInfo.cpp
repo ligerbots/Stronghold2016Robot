@@ -21,6 +21,7 @@ const std::string FieldInfo::DefenseNames[] = {
 		"TARGET_LEFT",
 		"TARGET_CENTER",
 		"TARGET_RIGHT",
+		"TARGET_NONE",
 		"TARGET_MAX"
 	};
 const std::string FieldInfo::TargetNames[] = {
@@ -70,6 +71,7 @@ void FieldInfo::initSelectors(){
 	mp_target->AddDefault("Left", &I[TARGET_LEFT]);
 	mp_target->AddObject("Center", &I[TARGET_CENTER]);
 	mp_target->AddObject("Right", &I[TARGET_RIGHT]);
+	mp_target->AddObject("ONLY CROSS", &I[TARGET_NONE]);
 	SmartDashboard::PutData("Auto Position", mp_position);
 	SmartDashboard::PutData("Auto Defense", mp_defense);
 	SmartDashboard::PutData("Auto Target", mp_target);

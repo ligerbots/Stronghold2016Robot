@@ -20,6 +20,8 @@ RollBallAndIntakeUpSequence::RollBallAndIntakeUpSequence()
 	// arm.
 
 	AddSequential(new RollBallToIntakePositionCommand(RollBallToIntakePositionCommand::SHOOTING_POSITION));
+	// added line for test
+//	AddSequential(new AutoSetFlapsCommand());
 	AddSequential(new IntakeToggleCommand(true));
 }
 

@@ -14,6 +14,15 @@ public:
 	 * Only useful after CommandBase::init()
 	 */
 	static bool is_roadkill;
+	/*
+	 * Stored angle at the end of the last center, so by the time we get to shooting, we can check
+	 * if we're off
+	 */
+	static double end_of_centering_yaw;
+	/**
+	 * RollBallToIntakePositionCommand sets this flag if it's just moved the ball into
+	 * shooting position
+	 */
 
 	I2C m_ledTeensyCommunication;
 	enum LedState {
