@@ -63,6 +63,13 @@ private:
 	static constexpr double regcoef_d5 =  0.00E+00;
 	static constexpr double regcoef_d6 =  6.51E+01;
 
+	static constexpr double regcoef_b1 = -3.423E-04;
+	static constexpr double regcoef_b2 =  5.092E-01;
+	static constexpr double regcoef_b3 =  3.526E-05;
+	static constexpr double regcoef_b4 =  1.197E-01;
+	static constexpr double regcoef_b5 = -4.828E-04;
+	static constexpr double regcoef_b6 = -1.186E+02;
+
 	std::mutex m_frameMutex;
 
 	// the frame we grab from camera 0
@@ -154,6 +161,8 @@ public:
 
 	void calculateDistanceAndAngle(double xpos, double ypos, double* distance, double* angle);
 	void calculateDistanceAndAngle_FromRegression(double xpos, double ypos, double* distance, double* angle);
+
+	double calculateFineAngle(double xpos, double ypos);
 
 	/**
 	 * Implementation that uses lookup table values from the test data
