@@ -17,6 +17,24 @@ void FlapSubsystem::setFlapsFraction(double fractionBoth) {
 	setFlapsFraction(fractionBoth, fractionBoth);
 }
 
+void FlapSubsystem::setFlapsFractionDifferential(double fractionBoth, double dFraction){
+	// method 1
+	if(dFraction > 0){ // lower "left" flap, shoot to the left
+		setFlapsFraction(fractionBoth - fabs(dFraction), fractionBoth);
+	} else { // // lower "right" flap, shoot to the right
+		setFlapsFraction(fractionBoth, fractionBoth - fabs(dFraction));
+	}
+
+#if false
+	// method 2
+	if(dFraction > 0){
+		setFlapsFraction(fractionBoth - fabs(dFraction), fractionBoth + fabs(dFraction));
+	} else {
+		setFlapsFraction(fractionBoth + fabs(dFraction), fractionBoth - fabs(dFraction));
+	}
+#endif
+}
+
 // takes parameters from 0 to 1, scales to angles for both flaps
 void FlapSubsystem::setFlapsFraction(double fractionLeft,
 		double fractionRight) {

@@ -33,6 +33,7 @@ public:
 	 * @param fraction 0 to 1
 	 */
 	void setFlapsFraction(double fractionBoth);
+	void setFlapsFractionDifferential(double fractionBoth, double dFraction);
 	void setFlapsFraction(double fractionLeft, double fractionRight);
 
 	bool isSafeToIntake();

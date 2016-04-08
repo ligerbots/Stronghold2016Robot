@@ -2,7 +2,7 @@
 
 FlapCommand::FlapCommand() :
 		CommandBase("FlapCommand_"), flapPositionLeft("FlapCommandPositionLeft",
-				false), flapPositionRight("FlapCommandPositionRight", false) {
+				false), flapPositionRight("FlapCommandPositionRight", false), flapUseDifferential("FlapCommandDifferential") {
 	Requires(flapSubsystem.get());
 	SetInterruptible(true);
 	oi = Robot::instance->mp_operatorInterface;
@@ -56,7 +56,11 @@ void FlapCommand::Execute() {
 			}
 		}
 
-		flapSubsystem->setFlapsFraction(/*flapPositionLeft.get(), */flapPositionRight.get());
+		if(!(flapUseDifferential.get())){
+			flapSubsystem->setFlapsFraction(/*flapPositionLeft.get(), */flapPositionRight.get());
+		} else {
+			flapSubsystem->setFlapsFraction(flapPositionLeft.get(), flapPositionRight.get());
+		}
 	}
 }
 

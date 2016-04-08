@@ -11,6 +11,7 @@ protected:
 public:
 	Parameter<double> flapPositionLeft;
 	Parameter<double> flapPositionRight;
+	Parameter<bool> flapUseDifferential;
 
 	explicit FlapCommand();
 	void Initialize();
