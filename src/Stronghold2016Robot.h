@@ -38,6 +38,7 @@
 #include "Commands/IntakeToggleCommand.h"
 #include "Commands/PrepareForAutoCommand.h"
 #include "Commands/PrepareForCrossingSequence.h"
+#include "Commands/RecordValuesCommand.h"
 #include "Commands/RollBallAndIntakeUpSequence.h"
 #include "Commands/RollBallPickupThenShooter.h"
 #include "Commands/RollBallToIntakePositionCommand.h"

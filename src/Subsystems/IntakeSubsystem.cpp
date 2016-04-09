@@ -62,15 +62,13 @@ double IntakeSubsystem::getRollerRevolutions() {
 }
 
 void IntakeSubsystem::setIntakeArmUp() {
-	if (m_rollerTalonPresent)
-		mp_intakeArmSolenoid->Set(DoubleSolenoid::kReverse);
+	mp_intakeArmSolenoid->Set(DoubleSolenoid::kReverse);
 
 	m_robotTickWhenSetUp = Robot::ticks;
 }
 
 void IntakeSubsystem::setIntakeArmDown() {
-	if (m_rollerTalonPresent)
-		mp_intakeArmSolenoid->Set(DoubleSolenoid::kForward);
+	mp_intakeArmSolenoid->Set(DoubleSolenoid::kForward);
 }
 
 DoubleSolenoid::Value IntakeSubsystem::getIntakeArmValue() {

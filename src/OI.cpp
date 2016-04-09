@@ -94,7 +94,8 @@ void OI::registerSecondControllerButtons() {
 		// section 5 - cameras
 
 		// the big button (21)
-		// turns vision on - handled somewhere else (?)
+		registerButton(mp_FarmController, 21, PRESSED,
+				new RecordValuesCommand());
 
 		registerButton(mp_FarmController, 22, PRESSED,
 				new ToggleCameraFeedCommand(0));

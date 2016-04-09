@@ -27,9 +27,11 @@ uint32_t red;
 uint32_t blue;
 uint32_t green;
 uint32_t black;
-unsigned int ticks = 0;
+int ticks = 0;
+int shootStartTicks = 0;
 AnimationMode currentMode = ALL_OFF;
 AnimationMode preShootMode = ALL_OFF;
+
 
 void setup() {
   // initialize function table and i2c codes array
@@ -81,16 +83,13 @@ void i2cReceive(int numBytes) {
   Serial.println();
 
   if (currentMode == SHOOT) {
-    ticks = 0;
+    shootStartTicks = ticks;
     preShootMode = previousMode;
   }
 }
 
 void loop() {
   ticks++;
-  if (ticks > 65534) {
-    ticks = 0;
-  }
 
   (*animationFunctions[currentMode])();
   stripLeft.show();
@@ -99,9 +98,9 @@ void loop() {
 }
 
 void animate_fade(int r, int g, int b){
-  int val_r = (int) (((double) abs((((int) ticks) % 50) - 25)) * r / 25.0);
-  int val_g = (int) (((double) abs((((int) ticks) % 50) - 25)) * g / 25.0);
-  int val_b = (int) (((double) abs((((int) ticks) % 50) - 25)) * b / 25.0);
+  int val_r = (int) (((double) abs((ticks % 50) - 25)) * r / 25.0);
+  int val_g = (int) (((double) abs((ticks % 50) - 25)) * g / 25.0);
+  int val_b = (int) (((double) abs((ticks % 50) - 25)) * b / 25.0);
   uint32_t color = stripLeft.Color(val_r, val_g, val_b);
   for (int i = 0; i < LEDS_PER_STRIP; i++) {
     stripLeft.setPixelColor(i, color);
@@ -125,7 +124,6 @@ void animation_ALLIANCE_RED() {
     stripLeft.setPixelColor(i, color);
     stripRight.setPixelColor(i, color);
   }
-  //animate_fade(255, 0, 0);
 }
 void animation_ALLIANCE_BLUE() {
   int move_pos = ticks % (LEDS_PER_STRIP + 10);
@@ -134,7 +132,6 @@ void animation_ALLIANCE_BLUE() {
     stripLeft.setPixelColor(i, color);
     stripRight.setPixelColor(i, color);
   }
-  //animate_fade(0, 0, 255);
 }
 void animation_SHOOT() {
   int display_pos = LEDS_PER_STRIP - ticks;
@@ -143,7 +140,7 @@ void animation_SHOOT() {
     stripLeft.setPixelColor(i, color);
     stripRight.setPixelColor(i, color);
   }
-  if(ticks > LEDS_PER_STRIP){
+  if((ticks - shootStartTicks) > LEDS_PER_STRIP * 3){
     currentMode = preShootMode;
   }
 }

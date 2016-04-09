@@ -98,13 +98,13 @@ void Robot::AlwaysPeriodic() {
 		}
 	}
 
-	if (mp_operatorInterface->getSecondControllerRawButton(21)) {
-		CommandBase::visionSubsystem->setVisionEnabled(true);
-	}
-
-	if (mp_operatorInterface->getSecondControllerRawButton(24)) {
-		CommandBase::visionSubsystem->setVisionEnabled(false);
-	}
+//	if (mp_operatorInterface->getSecondControllerRawButton(21)) {
+//		CommandBase::visionSubsystem->setVisionEnabled(true);
+//	}
+//
+//	if (mp_operatorInterface->getSecondControllerRawButton(24)) {
+//		CommandBase::visionSubsystem->setVisionEnabled(false);
+//	}
 
 //	if (mp_operatorInterface->joystickButtonPressed(
 //			mp_operatorInterface->pXboxController, 3)) {
