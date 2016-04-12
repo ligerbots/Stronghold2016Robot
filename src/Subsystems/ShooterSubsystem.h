@@ -9,8 +9,8 @@ private:
 public:
 	ShooterSubsystem();
 	void InitDefaultCommand();
-	void firePistons();
-	void retractPistons();
+	void firePiston();
+	void retractPiston();
 	void sendValuesToSmartDashboard();
 
 };

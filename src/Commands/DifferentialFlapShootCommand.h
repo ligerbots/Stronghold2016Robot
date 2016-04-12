@@ -9,15 +9,16 @@
 class DifferentialFlapShootCommand: public CommandBase {
 protected:
 	RollBallToIntakePositionCommand* mp_rollerCommand;
-	bool m_rollFinished;
+	bool m_intakeFinished;
 	RotateToTarget* mp_centeringCommand;
 	int m_ticksSinceFire;
+	bool m_die;
 
 	enum State {
-		GET_FRAME,
-		CENTERING,
-		INTAKE_UP,
-		SHOOTING
+		GET_FRAME, // waiting for the next vision frame
+		CENTERING, // running the centering command
+		INTAKE_FLAPS, // waiting for intake to complete while continuously checking vision and setting flaps
+		SHOOTING // taking the shot
 	};
 
 	State m_state;

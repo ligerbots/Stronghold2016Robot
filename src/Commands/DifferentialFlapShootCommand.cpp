@@ -10,37 +10,44 @@ DifferentialFlapShootCommand::DifferentialFlapShootCommand() {
 	mp_centeringCommand = new RotateToTarget();
 	mp_centeringCommand->m_restartDriveCommand = false;
 	m_state = GET_FRAME;
-	m_rollFinished = false;
+	m_intakeFinished = false;
 	m_ticksSinceFire = 0;
+	m_die = false;
 }
 
 void DifferentialFlapShootCommand::Initialize() {
 	printf("DifferentialFlapShootCommand: init\n");
 	m_state = GET_FRAME;
+	m_die = false;
 	visionSubsystem->requestVisionFrame();
-	m_rollFinished = false;
+	m_intakeFinished = false;
 	m_ticksSinceFire = 0;
 	mp_rollerCommand->Initialize();
 }
 
 void DifferentialFlapShootCommand::Execute() {
-	if(!m_rollFinished){
+	// run intake in parallel. INTAKE_FLAPS will wait for this to complete before going into SHOOTING
+	if(!m_intakeFinished){
 		mp_rollerCommand->Execute();
 		if(mp_rollerCommand->IsFinished()){
-			m_rollFinished = true;
+			m_intakeFinished = true;
 			mp_rollerCommand->End();
+			intakeSubsystem->setIntakeArmUp();
 		}
 	}
-	switch(m_state) { // TODO: finish this, make intake arm wait for roll
+
+	bool success;
+
+	switch(m_state) {
 	case GET_FRAME:
 		if(!visionSubsystem->isVisionBusy()){
-			if(fabs(visionSubsystem->TargetAngle()) < 5){
-				m_state = INTAKE_UP;
-				intakeSubsystem->setIntakeArmUp();
-				// TODO: add the differential flaps stuff here
-				// flapSubsystem->setFlapsFractionDifferential(0, 0);
+			if(fabs(visionSubsystem->TargetFineAngle()) < FieldInfo::flapDataMaxAngle){
+				m_state = INTAKE_FLAPS;
+				flapSubsystem->setFlapsDifferential(
+						visionSubsystem->getDistanceToTarget(), visionSubsystem->TargetFineAngle());
 			} else {
 				m_state = CENTERING;
+				mp_centeringCommand->SetUseFineAngle(fabs(visionSubsystem->TargetAngle()) < 7);
 				mp_centeringCommand->Initialize();
 			}
 		}
@@ -50,13 +57,23 @@ void DifferentialFlapShootCommand::Execute() {
 		if(mp_centeringCommand->IsFinished()){
 			mp_centeringCommand->End();
 			m_state = GET_FRAME;
+			visionSubsystem->requestVisionFrame();
 		}
 		break;
-	case INTAKE_UP:
-		if(intakeSubsystem->isIntakeArmUp() && m_rollFinished){
+	case INTAKE_FLAPS:
+		visionSubsystem->requestVisionFrame();
+		success = flapSubsystem->setFlapsDifferential(
+				visionSubsystem->getDistanceToTarget(), visionSubsystem->TargetFineAngle());
+		if(!success) {
+			m_die = true;
+		} else if(m_intakeFinished && intakeSubsystem->isBallInShooterPosition()){
 			m_state = SHOOTING;
 			m_ticksSinceFire = 0;
-			shooterSubsystem->firePistons();
+			shooterSubsystem->firePiston();
+		}
+		// if we got hit and the ball fell out, don't shoot
+		if(m_intakeFinished && !intakeSubsystem->isBallInShooterPosition()){
+			m_die = true;
 		}
 		break;
 	case SHOOTING:
@@ -66,6 +83,10 @@ void DifferentialFlapShootCommand::Execute() {
 }
 
 bool DifferentialFlapShootCommand::IsFinished() {
+	if(m_die){
+		printf("DifferentialFlapShootCommand: exiting because robot was pushed\n");
+		return true;
+	}
 	if (Robot::instance->mp_operatorInterface->getSecondControllerRawButton(28)) {
 		printf("DifferentialFlapShootCommand: canceling\n");
 		return true;
@@ -75,7 +96,7 @@ bool DifferentialFlapShootCommand::IsFinished() {
 
 void DifferentialFlapShootCommand::End() {
 	printf("DifferentialFlapShootCommand: end\n");
-	shooterSubsystem->retractPistons();
+	shooterSubsystem->retractPiston();
 	flapCommand->Start();
 	driveJoystickCommand->Start();
 	intakeRollerCommand->Start();

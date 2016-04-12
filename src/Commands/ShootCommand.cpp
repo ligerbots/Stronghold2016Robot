@@ -44,7 +44,7 @@ void ShootCommand::Execute() {
 	if (/*wedgeSubsystem->isWedgeDown() &&*/ intakeSubsystem->isIntakeArmUp()
 			&& m_ticks == 1) {
 		printf("ShooterCommand: firing\n");
-		shooterSubsystem->firePistons();
+		shooterSubsystem->firePiston();
 	} else if (m_ticks == 1) { // // equivalent to: !wedgeSubsystem->isWedgeDown() && intakeSubsystem->isIntakeReadyToFire()
 		m_done = true;
 		printf("ShooterCommand: not safe to fire\n");
@@ -59,7 +59,7 @@ bool ShootCommand::IsFinished() {
 }
 
 void ShootCommand::End() {
-	shooterSubsystem->retractPistons(); // retract piston once the ball is shot (1/2 second after fire)
+	shooterSubsystem->retractPiston(); // retract piston once the ball is shot (1/2 second after fire)
 
 	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL)
 		CommandBase::intakeRollerCommand->Start();

@@ -12,11 +12,11 @@ void ShooterSubsystem::InitDefaultCommand() {
 	//SetDefaultCommand(new MySpecialCommand());
 }
 
-void ShooterSubsystem::firePistons() {
+void ShooterSubsystem::firePiston() {
 	mp_shooterSolenoid->Set(DoubleSolenoid::kForward);
 }
 
-void ShooterSubsystem::retractPistons() {
+void ShooterSubsystem::retractPiston() {
 	mp_shooterSolenoid->Set(DoubleSolenoid::kOff);
 }
 

@@ -23,7 +23,7 @@ bool FlapSubsystem::setFlapsDifferential(double distInches, double angle){
 	FieldInfo::VisionFlapDataPoint distHangleL = {0, 0, 0, 0};
 	FieldInfo::VisionFlapDataPoint distHangleH = {0, 0, 0, 0};
 	bool isDistLower = true;
-	printf("Starting\n");
+	printf("Starting, %f %f\n", distInches, angle);
 	for(unsigned int i = 0; i < sizeof(FieldInfo::differentialFlapData) / sizeof(FieldInfo::VisionFlapDataPoint); i++){
 		printf("Loop %d\n", i);
 		FieldInfo::VisionFlapDataPoint current = FieldInfo::differentialFlapData[i];
@@ -47,7 +47,7 @@ bool FlapSubsystem::setFlapsDifferential(double distInches, double angle){
 			if(angle > current.fineAngle){
 				distHangleL = current;
 				printf("Setting dHaL\n");
-			} else if(distLangleH.distance == 0){
+			} else if(distHangleH.distance == 0){
 				distHangleH = current;
 				printf("Setting dHaH\n");
 				break;
