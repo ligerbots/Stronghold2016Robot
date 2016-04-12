@@ -7,6 +7,7 @@ constexpr FieldInfo::TargetLocations FieldInfo::targetLocations[];
 constexpr double FieldInfo::targetLineUpAngles[];
 constexpr FieldInfo::DefenseStrategy FieldInfo::defenseStrategy[];
 constexpr FieldInfo::VisionDataPoint FieldInfo::visionData[];
+constexpr FieldInfo::VisionFlapDataPoint FieldInfo::differentialFlapData[];
 
 
 const std::string FieldInfo::StartingPositionNames[] = {

@@ -3,15 +3,29 @@
 AutoSetFlapsCommand::AutoSetFlapsCommand() {
 	Requires(flapSubsystem.get());
 	m_flapsFractionToSet = 0;
+	m_isDifferential = false;
+}
+
+AutoSetFlapsCommand::AutoSetFlapsCommand(bool isDifferential) {
+	Requires(flapSubsystem.get());
+	m_flapsFractionToSet = 0;
+	m_isDifferential = isDifferential;
 }
 
 void AutoSetFlapsCommand::Initialize() {
 	SetTimeout(0.25); // enough time for servos to get into position
-	m_flapsFractionToSet = visionSubsystem->getFlapsFractionForDistance(visionSubsystem->getDistanceToTarget());
+	if(!m_isDifferential) {
+		m_flapsFractionToSet = visionSubsystem->getFlapsFractionForDistance(visionSubsystem->getDistanceToTarget());
+	}
 }
 
 void AutoSetFlapsCommand::Execute() {
-	flapSubsystem->setFlapsFraction(m_flapsFractionToSet);
+	if(m_isDifferential) {
+		flapSubsystem->setFlapsDifferential(
+				visionSubsystem->getDistanceToTarget(), visionSubsystem->TargetFineAngle());
+	} else {
+		flapSubsystem->setFlapsFraction(m_flapsFractionToSet);
+	}
 }
 
 bool AutoSetFlapsCommand::IsFinished() {

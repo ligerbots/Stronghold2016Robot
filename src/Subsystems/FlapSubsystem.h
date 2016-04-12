@@ -33,8 +33,11 @@ public:
 	 * @param fraction 0 to 1
 	 */
 	void setFlapsFraction(double fractionBoth);
-	void setFlapsFractionDifferential(double fractionBoth, double dFraction);
 	void setFlapsFraction(double fractionLeft, double fractionRight);
+
+	// returns true for success; false for failure
+	bool setFlapsDifferential(double distInches, double angle);
+	double calculateWeight(FieldInfo::VisionFlapDataPoint point, double distInches, double angle);
 
 	bool isSafeToIntake();
 

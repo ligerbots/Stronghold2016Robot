@@ -95,7 +95,7 @@ void OI::registerSecondControllerButtons() {
 
 		// the big button (21)
 		registerButton(mp_FarmController, 21, PRESSED,
-				new RecordValuesCommand());
+				new AutoSetFlapsCommand(true));
 
 		registerButton(mp_FarmController, 22, PRESSED,
 				new ToggleCameraFeedCommand(0));

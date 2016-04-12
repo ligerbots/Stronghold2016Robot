@@ -31,7 +31,7 @@ void DifferentialFlapShootCommand::Execute() {
 			mp_rollerCommand->End();
 		}
 	}
-	switch(m_state) { // TODO: finish this
+	switch(m_state) { // TODO: finish this, make intake arm wait for roll
 	case GET_FRAME:
 		if(!visionSubsystem->isVisionBusy()){
 			if(fabs(visionSubsystem->TargetAngle()) < 5){

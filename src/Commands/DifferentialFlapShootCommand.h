@@ -16,7 +16,6 @@ protected:
 	enum State {
 		GET_FRAME,
 		CENTERING,
-		WAIT_FOR_INTAKE,
 		INTAKE_UP,
 		SHOOTING
 	};
