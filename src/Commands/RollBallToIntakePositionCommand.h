@@ -12,6 +12,7 @@ public:
 		SHOOTING_POSITION, // pull up to shooter
 		BACK_TO_SHOOTING_POSITION // if we overshot the shooter, pull down
 	};
+	bool m_restartRollerCommand;
 protected:
 	IntakePosition m_targetIntakePosition;
 	bool m_sensorFlag;

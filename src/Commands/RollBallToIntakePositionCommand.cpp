@@ -9,6 +9,7 @@ RollBallToIntakePositionCommand::RollBallToIntakePositionCommand(IntakePosition 
 	m_ticksSinceCrossingPosition = 0;
 	m_needsToWaitForFlaps = true;
 	m_switchAlreadyPressed = false;
+	m_restartRollerCommand = true;
 //	SetInterruptible(false);
 }
 
@@ -133,7 +134,8 @@ bool RollBallToIntakePositionCommand::IsFinished() {
 void RollBallToIntakePositionCommand::End() {
 	printf("RollBallToIntakePositionCommand: End\n");
 	intakeSubsystem->rollStop();
-	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL){
+	if(m_restartRollerCommand && DriverStation::GetInstance().IsOperatorControl()
+			&& this->GetGroup() == NULL){
 		CommandBase::intakeRollerCommand->Start();
 		CommandBase::flapCommand->Start();
 	}

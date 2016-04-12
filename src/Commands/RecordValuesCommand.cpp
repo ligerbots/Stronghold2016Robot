@@ -1,8 +1,16 @@
 #include "RecordValuesCommand.h"
+#include <ctime>
 
 RecordValuesCommand::RecordValuesCommand() {
-	dataFile = fopen("data.csv", "a");
-	fprintf(dataFile, "X\tY\tDistance\tRough Angle\tFine Angle\tLeft Flap\tRight Flap\n");
+	dataFile = fopen("/home/lvuser/data.csv", "a");
+	time_t rawtime;
+	tm* timeinfo;
+	char buffer[80];
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+	strftime(buffer, 80, "%d-%m-%Y %I:%M:%S", timeinfo);
+	fprintf(dataFile, "X\tY\tDistance\tRough Angle\tFine Angle\tLeft Flap\tRight Flap\t%s\n", buffer);
+	fflush(dataFile);
 }
 
 void RecordValuesCommand::Initialize() {

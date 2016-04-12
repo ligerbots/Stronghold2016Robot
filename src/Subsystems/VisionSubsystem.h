@@ -88,6 +88,7 @@ private:
 	 */
 	double m_distance;
 	double m_angle;
+	double m_fineAngle;
 
 	// frame width, corrected to 640x360 frame
 	// ie, pretty much always 640
@@ -176,4 +177,5 @@ public:
 	PIDSourceType GetPIDSourceType() const;
 	double PIDGet();
 	double TargetAngle();
+	double TargetFineAngle();
 };

@@ -6,6 +6,7 @@ RotateIMUCommand::RotateIMUCommand(double targetAngle, bool absolute) :
 	Requires(driveSubsystem.get());
 	SetInterruptible(false);
 	m_ticks = 0;
+	m_restartDriveCommand = true;
 }
 
 void RotateIMUCommand::Initialize() {
@@ -89,7 +90,7 @@ bool RotateIMUCommand::IsFinished() {
 void RotateIMUCommand::End() {
 	printf("RotateIMUCommand: end\n");
 	driveSubsystem->zeroMotors();
-	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL){
+	if(m_restartDriveCommand && DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL){
 		CommandBase::driveJoystickCommand->Start();
 	}
 }

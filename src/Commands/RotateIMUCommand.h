@@ -16,6 +16,7 @@ protected:
 
 	void updateCurrentAngle();
 public:
+	bool m_restartDriveCommand;
 //	static constexpr double MIN_SPEED = .38;
 	static constexpr double RAMP_UP_TICKS = 20;
 	static constexpr double RAMP_DOWN_ZONE = 40;

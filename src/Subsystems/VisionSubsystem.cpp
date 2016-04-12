@@ -17,6 +17,7 @@ VisionSubsystem::VisionSubsystem() :
 		m_frameCenterY(0),
 		m_distance(0),
 		m_angle(0),
+		m_fineAngle(0),
 		m_frameWidth(640.0), 		// guess
 		m_numParticles(0),
 		m_processingThread(&VisionSubsystem::visionProcessingThread,this),
@@ -318,6 +319,7 @@ void VisionSubsystem::measureTarget(Image *image)
 			}
 
 			calculateDistanceAndAngle(m_frameCenterX, m_frameCenterY, &m_distance, &m_angle);
+			m_fineAngle = calculateFineAngle(m_frameCenterX, m_frameCenterY);
 		}
 	}
 }
@@ -474,13 +476,13 @@ void VisionSubsystem::sendValuesToSmartDashboard() {
 	SmartDashboard::PutNumber("NewVision Target Distance", m_distance);
 	SmartDashboard::PutNumber("NewVision Target Angle", m_angle);
 
-	double angle_regBased;
-	double distance_regBased;
-	calculateDistanceAndAngle_FromRegression(m_frameCenterX, m_frameCenterY, &distance_regBased, &angle_regBased);
-	SmartDashboard::PutNumber("Max's NewVision Target Distance", distance_regBased);
-	SmartDashboard::PutNumber("Max's NewVision Target Angle", angle_regBased);
+//	double angle_regBased;
+//	double distance_regBased;
+//	calculateDistanceAndAngle_FromRegression(m_frameCenterX, m_frameCenterY, &distance_regBased, &angle_regBased);
+//	SmartDashboard::PutNumber("Max's NewVision Target Distance", distance_regBased);
+//	SmartDashboard::PutNumber("Max's NewVision Target Angle", angle_regBased);
 
-	SmartDashboard::PutNumber("Small (10 degree) angle", calculateFineAngle(m_frameCenterX, m_frameCenterY));
+	SmartDashboard::PutNumber("Small (10 degree) angle", m_fineAngle);
 }
 
 void VisionSubsystem::SetPIDSourceType(PIDSourceType pidSource) {
@@ -499,7 +501,9 @@ double VisionSubsystem::PIDGet() {
 
 // returns the TargetAngle RELATIVE to the current robot angle
 double VisionSubsystem::TargetAngle() {
-	if (m_numParticles==0) return 0.0;
+	if (m_numParticles==0) {
+		return 0.0;
+	}
 //	double centerToFraction = getCorrectedFrameCenter(m_distance);
 //	double angle2 = atan(centerToFraction * tan_half_horizontal_field_of_view / 0.5) * 180 / M_PI;
 	double angle1 = m_angle;
@@ -508,6 +512,13 @@ double VisionSubsystem::TargetAngle() {
 //	printf("---> Angle to target relative %5.2f\n", angle);
 	SmartDashboard::PutNumber("AngleToTarget", angle1);
 	return angle1;
+}
+
+double VisionSubsystem::TargetFineAngle() {
+	if (m_numParticles==0) {
+		return 0.0;
+	}
+	return m_fineAngle;
 }
 
 void VisionSubsystem::calculateDistanceAndAngle(double xpos, double ypos, double* distance, double* angle){
