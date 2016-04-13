@@ -99,22 +99,29 @@ void VisionSubsystem::updateVision(int ticks) {
 	} else if (mp_processingFrame != NULL && showVision.get()) {
 			LCameraServer::GetInstance()->SetImage(mp_processingFrame);
 		} else {
-			if(mp_displayFrame == NULL){
+			if (mp_displayFrame == NULL) {
 				printf("VisionSubsystem: Creating display Image*\n");
 				mp_displayFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
+			}
+			if (mp_processingFrame == NULL) {
+				// First time: create our processing frame
+				printf("VisionSubsystem: Creating mp_processingFrame \n");
+				mp_processingFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
 			}
 			// for now in the new scheme we don't allow Vision disable
 			{
 				std::lock_guard<std::mutex> lock(m_frameMutex);
-				// If we just asked camera zero to get a frame, don't do it again here
-				if (m_activeCamera != 0) Camera::GetCamera(0)->GetFrame();
-				mp_displayFrame = Camera::GetCamera(0)->GetStoredFrame();
-			}
-
-			// scale up the display frame to fit the dashboard screen
-			// but only if low res capture is enabled
-			if (m_lowResCapture.get()) {
-				imaqScale(mp_displayFrame, mp_displayFrame, 2, 2, IMAQ_SCALE_LARGER, IMAQ_NO_RECT);
+				if (!m_visionBusy && !m_visionRequested) {
+					Camera::GetCamera(0)->GetFrame();
+					mp_processingFrame = Camera::GetCamera(0)->GetStoredFrame();
+				}
+				else if (m_lastVisionTick == 0) return; // haven't gotten first Vision processing frame yet
+				// scale up the display frame to fit the dashboard screen
+				// but only if low res capture is enabled
+				if (m_lowResCapture.get()) {
+					imaqScale(mp_displayFrame, mp_processingFrame, 2, 2, IMAQ_SCALE_LARGER, IMAQ_NO_RECT);
+				}
+				else imaqDuplicate(mp_displayFrame, mp_processingFrame);
 			}
 
 			if (!isVisionCalculationDirty()) {
@@ -133,8 +140,6 @@ void VisionSubsystem::updateVision(int ticks) {
 		}
 
 }
-
-
 
 void VisionSubsystem::requestVisionFrame() {
 	m_visionRequested = true;
@@ -171,14 +176,9 @@ void VisionSubsystem::visionProcessingThread() {
 	pthread_getcpuclockid(pthread_self(), &cid);
 
 	while (true) {
-		if (mp_processingFrame == NULL) {
-			// First time: create our processing frame
-			printf("VisionSubsystem: Creating mp_processingFrame \n");
-			mp_processingFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
-			if (mp_processingFrame == NULL) continue; // cameras have not initialized yet; wait for first frame
-		}
 		// wait here forever until we get a signal
 		pthread_cond_wait(&m_threadCond, &m_threadMutex);
+		if (mp_processingFrame == NULL) continue; // cameras have not initialized yet; wait for first frame
 		m_visionBusy = true;
 		loopCounter++;
 		int startTicks = Robot::ticks;
@@ -200,8 +200,6 @@ void VisionSubsystem::visionProcessingThread() {
 		} else {
 			m_frameWidth = (double) width;
 		}
-
-
 
 		int err = IVA_ProcessImage(mp_processingFrame); // run vision script generated from Vision Assistant
 		if(err == 0){
