@@ -88,28 +88,33 @@ void VisionSubsystem::updateVision(int ticks) {
 
 	Camera::GetCamera(0)->SetExposure(exposure.get());
 	// Get a frame from the current camera
-	Camera::GetCamera(m_activeCamera)->GetFrame();
-	Image *image = Camera::GetCamera(m_activeCamera)->GetStoredFrame();
 
 	// if we're not running Vision, just display the frame from the current camera, or
 	// if the alternate camera is current, display its frame, even if we're doing vision on camera 0
 	if (m_activeCamera != 0) {
+		Camera::GetCamera(m_activeCamera)->GetFrame();
+		Image *image = Camera::GetCamera(m_activeCamera)->GetStoredFrame();
 		LCameraServer::GetInstance()->SetImage(image);
-	} else {
-		if (mp_processingFrame != NULL && showVision.get()) {
+		imaqDispose(image);
+	} else if (mp_processingFrame != NULL && showVision.get()) {
 			LCameraServer::GetInstance()->SetImage(mp_processingFrame);
 		} else {
 			if(mp_displayFrame == NULL){
 				printf("VisionSubsystem: Creating display Image*\n");
 				mp_displayFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
 			}
+			// for now in the new scheme we don't allow Vision disable
+			{
+				std::lock_guard<std::mutex> lock(m_frameMutex);
+				// If we just asked camera zero to get a frame, don't do it again here
+				if (m_activeCamera != 0) Camera::GetCamera(0)->GetFrame();
+				mp_displayFrame = Camera::GetCamera(0)->GetStoredFrame();
+			}
 
 			// scale up the display frame to fit the dashboard screen
 			// but only if low res capture is enabled
-			if(m_lowResCapture.get()){
-				imaqScale(mp_displayFrame, image, 2, 2, IMAQ_SCALE_LARGER, IMAQ_NO_RECT);
-			} else {
-				imaqDuplicate(mp_displayFrame, image);
+			if (m_lowResCapture.get()) {
+				imaqScale(mp_displayFrame, mp_displayFrame, 2, 2, IMAQ_SCALE_LARGER, IMAQ_NO_RECT);
 			}
 
 			if (!isVisionCalculationDirty()) {
@@ -120,40 +125,20 @@ void VisionSubsystem::updateVision(int ticks) {
 			}
 			LCameraServer::GetInstance()->SetImage(mp_displayFrame);
 		}
-	}
 
-	if (m_visionRequested) {
-		// If we just asked camera zero to get a frame, don't do it again here
-		if (m_activeCamera != 0) Camera::GetCamera(0)->GetFrame();
-		mp_currentFrame = Camera::GetCamera(0)->GetStoredFrame();
-		int width, height;
-		imaqGetImageSize(mp_currentFrame, &width, &height);
-		if(m_lowResCapture.get()){
-			m_frameWidth = ((double) width) * 2.0;
-		} else {
-			m_frameWidth = (double) width;
-		}
-		// We don't do a SetImage here -- that's done in the Vision Processing thread
-
-		// If it's been more than eight vision ticks since we last processed a frame, do one now
-		if ((Robot::ticks > m_lastVisionTick + 8) && !m_visionBusy) {
-			if (mp_processingFrame == NULL) {
-				// First time: create our processing frame
-				printf("VisionSubsystem: Creating second Image*\n");
-				mp_processingFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
-			}
-			// duplicate the current frame for image processing
-			imaqDuplicate(mp_processingFrame, mp_currentFrame);
-			m_visionBusy = true;
+	if (m_visionRequested && (Robot::ticks > m_lastVisionTick + 8) && !m_visionBusy) {
 			pthread_cond_signal(&m_threadCond);
 			// if a vision request came in while we were still processing, cancel it
 			m_visionRequested = false;
 		}
-	}
+
 }
+
+
 
 void VisionSubsystem::requestVisionFrame() {
 	m_visionRequested = true;
+	pthread_cond_signal(&m_threadCond);
 }
 
 void VisionSubsystem::toggleCameraFeed() {
@@ -186,6 +171,12 @@ void VisionSubsystem::visionProcessingThread() {
 	pthread_getcpuclockid(pthread_self(), &cid);
 
 	while (true) {
+		if (mp_processingFrame == NULL) {
+			// First time: create our processing frame
+			printf("VisionSubsystem: Creating mp_processingFrame \n");
+			mp_processingFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
+			if (mp_processingFrame == NULL) continue; // cameras have not initialized yet; wait for first frame
+		}
 		// wait here forever until we get a signal
 		pthread_cond_wait(&m_threadCond, &m_threadMutex);
 		m_visionBusy = true;
@@ -196,41 +187,46 @@ void VisionSubsystem::visionProcessingThread() {
 		clock_gettime(cid, &startCPUTime);
 
 		// for now in the new scheme we don't allow Vision disable
-		if (true && enableVision.get()) {
-			if (mp_currentFrame == NULL) {
-				continue; // cameras have not initialized yet; wait for first frame
-			}
-
-			int err = IVA_ProcessImage(mp_processingFrame); // run vision script generated from Vision Assistant
-			if(err == 0){
-				err = imaqGetLastError();
-				printf("Error: %d\n", imaqGetLastError());
-			}
-			SmartDashboard::PutNumber("Vision/imaq_err", err);
-
-			// compute the distance, angle, etc. and mark target on currentFrame
-			measureTarget(mp_processingFrame);
-			m_robotPos = CommandBase::driveSubsystem->GetPosition();
-
-			// print out CPU statistics periodically, but not so often as to spam the console
-			if (loopCounter%2 == 0) {
-				double elapsedTime = Robot::GetRTC() - startTime;
-				int elapsedTicks = Robot::ticks - startTicks;
-				clock_gettime(cid, &endCPUTime);
-				double startCPU = (double) startCPUTime.tv_sec + (double) startCPUTime.tv_nsec/1.0E9;
-				double endCPU = (double) endCPUTime.tv_sec + (double) endCPUTime.tv_nsec/1.0E9;
-				double elapsedCPUTime = endCPU - startCPU;
-				printf("Vision frame done in %f seconds, %f CPU seconds, %d ticks\n",
-						elapsedTime, elapsedCPUTime, elapsedTicks);
-			}
-			printf("Vision: Finished a vision frame\n");
-			m_firstFrame = false;
-		} else {
-			// if we didn't process any images, display something
-			// this probably only gets executed the first time
-			// LCameraServer::GetInstance()->SetImage(mp_currentFrame);
-			m_numParticles = 0;
+		{
+			std::lock_guard<std::mutex> lock(m_frameMutex);
+			// If we just asked camera zero to get a frame, don't do it again here
+			if (m_activeCamera != 0) Camera::GetCamera(0)->GetFrame();
+			mp_processingFrame = Camera::GetCamera(0)->GetStoredFrame();
 		}
+		int width, height;
+		imaqGetImageSize(mp_processingFrame, &width, &height);
+		if(m_lowResCapture.get()) {
+			m_frameWidth = ((double) width) * 2.0;
+		} else {
+			m_frameWidth = (double) width;
+		}
+
+
+
+		int err = IVA_ProcessImage(mp_processingFrame); // run vision script generated from Vision Assistant
+		if(err == 0){
+			err = imaqGetLastError();
+			printf("Error: %d\n", imaqGetLastError());
+		}
+		SmartDashboard::PutNumber("Vision/imaq_err", err);
+
+		// compute the distance, angle, etc. and mark target on currentFrame
+		measureTarget(mp_processingFrame);
+		m_robotPos = CommandBase::driveSubsystem->GetPosition();
+
+		// print out CPU statistics periodically, but not so often as to spam the console
+		if (loopCounter%2 == 0) {
+			double elapsedTime = Robot::GetRTC() - startTime;
+			int elapsedTicks = Robot::ticks - startTicks;
+			clock_gettime(cid, &endCPUTime);
+			double startCPU = (double) startCPUTime.tv_sec + (double) startCPUTime.tv_nsec/1.0E9;
+			double endCPU = (double) endCPUTime.tv_sec + (double) endCPUTime.tv_nsec/1.0E9;
+			double elapsedCPUTime = endCPU - startCPU;
+			printf("Vision frame done in %f seconds, %f CPU seconds, %d ticks\n",
+					elapsedTime, elapsedCPUTime, elapsedTicks);
+		}
+		printf("Vision: Finished a vision frame\n");
+		m_firstFrame = false;
 		SmartDashboard::PutNumber("VisionTickUpdate", Robot::ticks);
 		m_visionBusy = false;
 		m_visionRequested = false;
