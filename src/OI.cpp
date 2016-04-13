@@ -68,8 +68,7 @@ void OI::registerSecondControllerButtons() {
 	registerButton(mp_FarmController, 11, PRESSED,
 			new PrepareForCrossingSequence());
 	registerButton(mp_FarmController, 12, PRESSED,
-			new AutonomousDriveSequence(FieldInfo::POS_THREE,
-					FieldInfo::DEF_MOAT, FieldInfo::TARGET_CENTER));
+			new DifferentialFlapShootCommand());
 	registerButton(mp_FarmController, 13, PRESSED,
 			new AcquireTarget(true, true));
 	registerButton(mp_FarmController, 14, PRESSED,

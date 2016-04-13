@@ -18,7 +18,7 @@ IntakeSubsystem::IntakeSubsystem() :
 		m_rollerTalonPresent = true;
 	}
 
-	m_robotTickWhenSetUp = -1;
+	m_robotRTCWhenSetUp = -1;
 
 	mp_ballInShooterSwitch.reset(
 			new DigitalInput(RobotMap::LIMIT_SWITCH_INTAKE_BALL_IN_SHOOTER));
@@ -62,9 +62,10 @@ double IntakeSubsystem::getRollerRevolutions() {
 }
 
 void IntakeSubsystem::setIntakeArmUp() {
-	mp_intakeArmSolenoid->Set(DoubleSolenoid::kReverse);
-
-	m_robotTickWhenSetUp = Robot::ticks;
+	if(mp_intakeArmSolenoid->Get() != DoubleSolenoid::kReverse){
+		m_robotRTCWhenSetUp = Robot::GetRTC();
+		mp_intakeArmSolenoid->Set(DoubleSolenoid::kReverse);
+	}
 }
 
 void IntakeSubsystem::setIntakeArmDown() {
@@ -84,7 +85,7 @@ bool IntakeSubsystem::isIntakeArmUp() {
 #else
 	// flip value so that it's false if it's not connected
 	// TODO: DANGER
-	return mp_intakeArmSolenoid->Get() == DoubleSolenoid::kReverse && (Robot::ticks - m_robotTickWhenSetUp) > 30;//!mp_intakeUpSwitch->Get();
+	return mp_intakeArmSolenoid->Get() == DoubleSolenoid::kReverse && (Robot::GetRTC() - m_robotRTCWhenSetUp) > .8;//!mp_intakeUpSwitch->Get();
 #endif
 }
 

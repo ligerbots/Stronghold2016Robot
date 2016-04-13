@@ -16,7 +16,7 @@ private:
 
 	bool m_rollerTalonPresent;
 
-	int m_robotTickWhenSetUp;
+	double m_robotRTCWhenSetUp;
 
 	static constexpr double ROLLER_SPEED = 1;
 public:

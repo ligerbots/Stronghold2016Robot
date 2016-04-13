@@ -13,6 +13,8 @@ protected:
 	RotateToTarget* mp_centeringCommand;
 	int m_ticksSinceFire;
 	bool m_die;
+	double m_RTCWhenFlapSet;
+	double m_yawAtCenteringEnd;
 
 	enum State {
 		GET_FRAME, // waiting for the next vision frame

@@ -38,18 +38,27 @@ void RollBallToIntakePositionCommand::Initialize() {
 		m_moveUp = true;
 	}
 
+	if(m_targetIntakePosition == SHOOTING_POSITION || m_targetIntakePosition == BACK_TO_SHOOTING_POSITION){
+		m_switchAlreadyPressed = intakeSubsystem->isBallInShooterPosition();
+	} else {
+		m_switchAlreadyPressed = intakeSubsystem->isBallInDefensesCrossingPosition();
+	}
+
+	printf("Switch already pressed: %d\n", m_switchAlreadyPressed);
+
 	if(flapSubsystem->isSafeToIntake()){
 		m_needsToWaitForFlaps = false;
 		printf("Skipping flaps wait\n");
 	} else {
-		flapSubsystem->setFlapsFraction(1); // all the way down
+		if(!m_switchAlreadyPressed){
+			flapSubsystem->setFlapsFraction(1); // all the way down
+		}
 		m_needsToWaitForFlaps = true;
 		printf("Waiting for flaps\n");
 	}
-	intakeSubsystem->setIntakeArmDown();
 
-	if(m_targetIntakePosition == SHOOTING_POSITION){
-		m_switchAlreadyPressed = intakeSubsystem->isBallInShooterPosition();
+	if(!m_switchAlreadyPressed){
+		intakeSubsystem->setIntakeArmDown();
 	}
 
 	m_ticks = 0;
@@ -77,8 +86,9 @@ void RollBallToIntakePositionCommand::Execute() {
 	}
 
 	double rollSpeed = .5;
-	if(m_targetIntakePosition == LOW_GOAL || m_targetIntakePosition == PICKUP)
+	if(m_targetIntakePosition == LOW_GOAL || m_targetIntakePosition == PICKUP) {
 		rollSpeed = 1; // max speed
+	}
 
 	if(m_targetIntakePosition == SHOOTING_POSITION){
 		// implement a small state machine for rolling the ball to the shooter
@@ -116,8 +126,9 @@ void RollBallToIntakePositionCommand::Execute() {
 	}
 
 	// make sure this doesn't move the rollers on the first execute if the ball is already there
-	if(!m_sensorFlag)
+	if(!m_sensorFlag && !m_switchAlreadyPressed){
 		intakeSubsystem->setRollSpeed(m_moveUp ? rollSpeed : -rollSpeed); // roll slowly (TODO: test and adjust this value)
+	}
 }
 
 bool RollBallToIntakePositionCommand::IsFinished() {

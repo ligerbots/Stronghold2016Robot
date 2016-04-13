@@ -10,7 +10,7 @@ RotateToTarget::RotateToTarget() :
 void RotateToTarget::Initialize() {
 	// Get the target angle from Vision. Will be zero if we have no target.
 	if(m_useFineAngle) {
-		m_angle = -(visionSubsystem->TargetFineAngle());
+		m_angle = (visionSubsystem->TargetFineAngle());
 	} else {
 		m_angle = -(visionSubsystem->TargetAngle());
 	}

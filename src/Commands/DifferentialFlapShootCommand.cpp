@@ -12,16 +12,21 @@ DifferentialFlapShootCommand::DifferentialFlapShootCommand() {
 	m_state = GET_FRAME;
 	m_intakeFinished = false;
 	m_ticksSinceFire = 0;
+	m_RTCWhenFlapSet = -1;
 	m_die = false;
+	m_yawAtCenteringEnd = 0;
 }
 
 void DifferentialFlapShootCommand::Initialize() {
 	printf("DifferentialFlapShootCommand: init\n");
 	m_state = GET_FRAME;
+	printf("DifferentialFlapShootCommand: GET_FRAME\n");
 	m_die = false;
 	visionSubsystem->requestVisionFrame();
 	m_intakeFinished = false;
 	m_ticksSinceFire = 0;
+	m_RTCWhenFlapSet = -1;
+	m_yawAtCenteringEnd = 0;
 	mp_rollerCommand->Initialize();
 }
 
@@ -33,20 +38,24 @@ void DifferentialFlapShootCommand::Execute() {
 			m_intakeFinished = true;
 			mp_rollerCommand->End();
 			intakeSubsystem->setIntakeArmUp();
+			printf("DifferentialFlapShootCommand: intake rolling ended; intake arm up\n");
 		}
 	}
 
 	bool success;
+	double yawDiff;
 
 	switch(m_state) {
 	case GET_FRAME:
 		if(!visionSubsystem->isVisionBusy()){
 			if(fabs(visionSubsystem->TargetFineAngle()) < FieldInfo::flapDataMaxAngle){
 				m_state = INTAKE_FLAPS;
-				flapSubsystem->setFlapsDifferential(
-						visionSubsystem->getDistanceToTarget(), visionSubsystem->TargetFineAngle());
+				m_RTCWhenFlapSet = -1;
+				m_yawAtCenteringEnd = navXSubsystem->GetYaw();
+				printf("DifferentialFlapShootCommand: INTAKE_FLAPS\n");
 			} else {
 				m_state = CENTERING;
+				printf("DifferentialFlapShootCommand: CENTERING\n");
 				mp_centeringCommand->SetUseFineAngle(fabs(visionSubsystem->TargetAngle()) < 7);
 				mp_centeringCommand->Initialize();
 			}
@@ -57,23 +66,43 @@ void DifferentialFlapShootCommand::Execute() {
 		if(mp_centeringCommand->IsFinished()){
 			mp_centeringCommand->End();
 			m_state = GET_FRAME;
+			printf("DifferentialFlapShootCommand: GET_FRAME\n");
 			visionSubsystem->requestVisionFrame();
 		}
 		break;
 	case INTAKE_FLAPS:
 		visionSubsystem->requestVisionFrame();
-		success = flapSubsystem->setFlapsDifferential(
-				visionSubsystem->getDistanceToTarget(), visionSubsystem->TargetFineAngle());
-		if(!success) {
+		success = true;
+		if(m_intakeFinished){
+			success = flapSubsystem->setFlapsDifferential(
+					visionSubsystem->getDistanceToTarget(), visionSubsystem->TargetFineAngle());
+			if(m_RTCWhenFlapSet < 0){
+				m_RTCWhenFlapSet = Robot::GetRTC();
+			}
+		}
+		// double check using navx in case vision doesn't get a frame in time
+		// navx can go into a sudden .1deg/sec drift so the margin for the check is high
+		yawDiff = fabs(m_yawAtCenteringEnd - navXSubsystem->GetYaw());
+		if(yawDiff > 180){
+			yawDiff -= 180;
+		}
+		if(!success || yawDiff > 5.0) {
 			m_die = true;
-		} else if(m_intakeFinished && intakeSubsystem->isBallInShooterPosition()){
-			m_state = SHOOTING;
-			m_ticksSinceFire = 0;
-			shooterSubsystem->firePiston();
+			printf("DifferentialFlapShootCommand: die\n");
+		} else if(intakeSubsystem->isIntakeArmUp() && intakeSubsystem->isBallInShooterPosition() && Robot::GetRTC() - m_RTCWhenFlapSet > .2){
+			if(intakeSubsystem->isBallInDefensesCrossingPosition()){ // BAD, regardless of the cable coming loose
+				m_die = true;
+			} else {
+				m_state = SHOOTING;
+				printf("DifferentialFlapShootCommand: SHOOTING\n");
+				m_ticksSinceFire = 0;
+				shooterSubsystem->firePiston();
+			}
 		}
 		// if we got hit and the ball fell out, don't shoot
 		if(m_intakeFinished && !intakeSubsystem->isBallInShooterPosition()){
 			m_die = true;
+			printf("DifferentialFlapShootCommand: die\n");
 		}
 		break;
 	case SHOOTING:
