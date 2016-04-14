@@ -21,6 +21,9 @@ void ShooterSubsystem::retractPiston() {
 }
 
 void ShooterSubsystem::sendValuesToSmartDashboard() {
+	if(Robot::ticks % 10) {
+		return;
+	}
 	if (mp_shooterSolenoid->GetError().GetCode() != 0) {
 		SmartDashboard::PutString("Shooter/Solenoid", "Not Present");
 	} else {

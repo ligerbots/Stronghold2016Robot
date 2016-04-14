@@ -1,4 +1,5 @@
 #include "NavXSubsystem.h"
+#include "Robot.h"
 
 NavXSubsystem::NavXSubsystem(SPI::Port port) :
 	Subsystem("NavXSubsystem"),
@@ -28,6 +29,9 @@ bool NavXSubsystem::isRobotAboutToTip(float maxPitchAngle) {
 }
 
 void NavXSubsystem::sendValuesToSmartDashboard() {
+	if(Robot::ticks % 10) {
+		return;
+	}
 	SmartDashboard::PutBoolean("NavX/IMU_Connected", IsConnected());
 	SmartDashboard::PutNumber("NavX/IMU_Yaw", GetYaw());
 	// Since the NavX is mounted on the side of the robot, we have

@@ -449,6 +449,9 @@ double VisionSubsystem::getFlapsFractionForDistance(double distance) {
 }
 
 void VisionSubsystem::sendValuesToSmartDashboard() {
+	if(Robot::ticks % 10) {
+		return;
+	}
 	if (mp_ledRingSpike->GetError().GetCode() != 0) {
 		SmartDashboard::PutString("LED", "Not Present");
 	} else {

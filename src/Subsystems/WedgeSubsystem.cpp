@@ -36,6 +36,9 @@ void WedgeSubsystem::lowerWedge() {
 }
 
 void WedgeSubsystem::sendValuesToSmartDashboard() {
+	if(Robot::ticks % 10) {
+		return;
+	}
 	SmartDashboard::PutBoolean("Wedge_Clear", isWedgeDown());
 	SmartDashboard::PutBoolean("Wedge/IsClear", isWedgeDown());
 	if (mp_wedgeArmSolenoid->GetError().GetCode() != 0) {

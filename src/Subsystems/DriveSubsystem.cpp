@@ -278,7 +278,7 @@ bool DriveSubsystem::IsEncoderPresent(CANTalon& r_talon) {
 }
 
 void DriveSubsystem::sendValuesToSmartDashboard() {
-	if (Robot::ticks % 2) {
+	if (Robot::ticks % 10 == 0) {
 		for (int i = 1; i < 7; i++) {
 			std::string key = "Drive/Talon";
 			key += std::to_string(i);

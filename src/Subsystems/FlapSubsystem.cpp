@@ -124,6 +124,9 @@ bool FlapSubsystem::isSafeToIntake(){
 }
 
 void FlapSubsystem::sendValuesToSmartDashboard() {
+	if(Robot::ticks % 10) {
+		return;
+	}
 	SmartDashboard::PutNumber("LeftFlapAngle", mp_leftFlap->GetAngle());
 	SmartDashboard::PutNumber("RightFlapAngle", mp_rightFlap->GetAngle());
 }

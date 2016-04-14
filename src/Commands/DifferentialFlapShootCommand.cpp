@@ -89,7 +89,7 @@ void DifferentialFlapShootCommand::Execute() {
 		if(!success || yawDiff > 5.0) {
 			m_die = true;
 			printf("DifferentialFlapShootCommand: die\n");
-		} else if(intakeSubsystem->isIntakeArmUp() && intakeSubsystem->isBallInShooterPosition() && Robot::GetRTC() - m_RTCWhenFlapSet > .2){
+		} else if(m_intakeFinished && intakeSubsystem->isIntakeArmUp() && intakeSubsystem->isBallInShooterPosition() && Robot::GetRTC() - m_RTCWhenFlapSet > .2){
 			if(intakeSubsystem->isBallInDefensesCrossingPosition()){ // BAD, regardless of the cable coming loose
 				m_die = true;
 			} else {
@@ -97,6 +97,7 @@ void DifferentialFlapShootCommand::Execute() {
 				printf("DifferentialFlapShootCommand: SHOOTING\n");
 				m_ticksSinceFire = 0;
 				shooterSubsystem->firePiston();
+				Robot::instance->SetLeds(Robot::SHOOT);
 			}
 		}
 		// if we got hit and the ball fell out, don't shoot

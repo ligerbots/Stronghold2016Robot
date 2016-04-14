@@ -126,8 +126,8 @@ void RollBallToIntakePositionCommand::Execute() {
 	}
 
 	// make sure this doesn't move the rollers on the first execute if the ball is already there
-	if(!m_sensorFlag && !m_switchAlreadyPressed){
-		intakeSubsystem->setRollSpeed(m_moveUp ? rollSpeed : -rollSpeed); // roll slowly (TODO: test and adjust this value)
+	if(!m_switchAlreadyPressed){
+		intakeSubsystem->setRollSpeed(m_moveUp ? rollSpeed : -rollSpeed); // roll slowly
 	}
 }
 

@@ -11,7 +11,7 @@ void PrepareForAutoCommand::Initialize() {
 	printf("PrepareForAuto: setting wedges %s | intake %s\n",
 			m_setWedgesUp ? "up" : "down", m_setIntakeUp ? "up" : "down");
 	visionSubsystem->setVisionEnabled(true);
-	SetTimeout(0.5); // give enough time for things to go into position
+	SetTimeout(0.1); // give enough time for things to go into position
 }
 
 void PrepareForAutoCommand::Execute() {

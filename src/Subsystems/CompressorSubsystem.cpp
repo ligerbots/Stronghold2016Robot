@@ -50,12 +50,14 @@ void CompressorSubsystem::toggleCompressor() {
 }
 
 void CompressorSubsystem::sendValuesToSmartDashboard() {
+	if(Robot::ticks % 10) {
+		return;
+	}
 	SmartDashboard::PutBoolean("Compressor/On", isCompressorOn());
-	if (Robot::ticks % 50 == 12){
-		// don't spam the can bus and stagger with other polling
+	if(Robot::ticks % 50 == 0){
 		SmartDashboard::PutBoolean("Compressor/PressureSwitch",
 				isPressureSwitchTriggered());
 	}
 
-	SmartDashboard::PutNumber("Pneumatics_PSI", getPressurePSI());
+//	SmartDashboard::PutNumber("Pneumatics_PSI", getPressurePSI());
 }

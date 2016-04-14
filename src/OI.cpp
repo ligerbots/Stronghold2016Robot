@@ -17,7 +17,8 @@ void OI::registerCommands() {
 	// XBox X command
 	registerButton(mp_XboxController, 3, PRESSED, CommandBase::shootCommand.get());
 	// XBox Y command
-	registerButton(mp_XboxController, 4, PRESSED, CommandBase::wedgeToggleCommand.get());
+	registerButton(mp_XboxController, 4, PRESSED, /*CommandBase::wedgeToggleCommand.get()*/
+			CommandBase::diffShootCommand.get());
 
 	// Left bumper
 	registerButton(mp_XboxController, 5, PRESSED, CommandBase::gearShiftCommand.get());
@@ -68,7 +69,7 @@ void OI::registerSecondControllerButtons() {
 	registerButton(mp_FarmController, 11, PRESSED,
 			new PrepareForCrossingSequence());
 	registerButton(mp_FarmController, 12, PRESSED,
-			new DifferentialFlapShootCommand());
+			CommandBase::diffShootCommand.get());
 	registerButton(mp_FarmController, 13, PRESSED,
 			new AcquireTarget(true, true));
 	registerButton(mp_FarmController, 14, PRESSED,
