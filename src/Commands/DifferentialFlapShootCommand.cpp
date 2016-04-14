@@ -15,6 +15,7 @@ DifferentialFlapShootCommand::DifferentialFlapShootCommand() {
 	m_RTCWhenFlapSet = -1;
 	m_die = false;
 	m_yawAtCenteringEnd = 0;
+	m_haveFlapsBeenSet = false;
 }
 
 void DifferentialFlapShootCommand::Initialize() {
@@ -27,6 +28,7 @@ void DifferentialFlapShootCommand::Initialize() {
 	m_ticksSinceFire = 0;
 	m_RTCWhenFlapSet = -1;
 	m_yawAtCenteringEnd = 0;
+	m_haveFlapsBeenSet = false;
 	mp_rollerCommand->Initialize();
 }
 
@@ -48,7 +50,7 @@ void DifferentialFlapShootCommand::Execute() {
 	switch(m_state) {
 	case GET_FRAME:
 		if(!visionSubsystem->isVisionBusy()){
-			if(fabs(visionSubsystem->TargetFineAngle()) < FieldInfo::flapDataMaxAngle){
+			if(fabs(visionSubsystem->TargetFineAngle()) < 2){
 				m_state = INTAKE_FLAPS;
 				m_RTCWhenFlapSet = -1;
 				m_yawAtCenteringEnd = navXSubsystem->GetYaw();
@@ -79,6 +81,9 @@ void DifferentialFlapShootCommand::Execute() {
 			if(m_RTCWhenFlapSet < 0){
 				m_RTCWhenFlapSet = Robot::GetRTC();
 			}
+			if(success){
+				m_haveFlapsBeenSet = true;
+			}
 		}
 		// double check using navx in case vision doesn't get a frame in time
 		// navx can go into a sudden .1deg/sec drift so the margin for the check is high
@@ -86,7 +91,10 @@ void DifferentialFlapShootCommand::Execute() {
 		if(yawDiff > 180){
 			yawDiff -= 180;
 		}
-		if(!success || yawDiff > 5.0) {
+		// take the shot anyway in auto
+		// fix after Q3
+		if(!(DriverStation::GetInstance().IsAutonomous() && m_haveFlapsBeenSet)
+				&& (!success || yawDiff > 5.0)) {
 			m_die = true;
 			printf("DifferentialFlapShootCommand: die\n");
 		} else if(m_intakeFinished && intakeSubsystem->isIntakeArmUp() && intakeSubsystem->isBallInShooterPosition() && Robot::GetRTC() - m_RTCWhenFlapSet > .2){

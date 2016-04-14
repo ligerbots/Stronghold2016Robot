@@ -5,6 +5,7 @@ PrepareForAutoCommand::PrepareForAutoCommand(bool wedgesUp, bool intakeUp) :
 				intakeUp) {
 	Requires(wedgeSubsystem.get());
 	Requires(intakeSubsystem.get());
+	Requires(flapSubsystem.get());
 }
 
 void PrepareForAutoCommand::Initialize() {
@@ -15,15 +16,18 @@ void PrepareForAutoCommand::Initialize() {
 }
 
 void PrepareForAutoCommand::Execute() {
-	if (m_setWedgesUp)
+	if (m_setWedgesUp) {
 		wedgeSubsystem->liftWedge();
-	else
+	} else {
 		wedgeSubsystem->lowerWedge();
+	}
 
-	if (m_setIntakeUp)
+	if (m_setIntakeUp) {
 		intakeSubsystem->setIntakeArmUp();
-	else
+	} else {
 		intakeSubsystem->setIntakeArmDown();
+	}
+	flapSubsystem->setFlapsFraction(.5, .5);
 }
 
 bool PrepareForAutoCommand::IsFinished() {

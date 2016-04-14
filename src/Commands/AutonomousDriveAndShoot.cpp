@@ -2,6 +2,7 @@
 #include "AutonomousShootSequence.h"
 #include "AutonomousDriveAndShoot.h"
 #include "../FieldInfo.h"
+#include "DifferentialFlapShootCommand.h"
 
 AutonomousDriveAndShoot::AutonomousDriveAndShoot(int position, int defense, int target)
 {
@@ -26,7 +27,8 @@ AutonomousDriveAndShoot::AutonomousDriveAndShoot(int position, int defense, int 
 		AddSequential(new AutonomousDriveSequence(position, defense, target));
 		// don't shoot if we set cross only
 		if(target != FieldInfo::TARGET_NONE){
-			AddSequential(new AutonomousShootSequence);
+			//AddSequential(new AutonomousShootSequence);
+			AddSequential(new DifferentialFlapShootCommand);
 		}
 	}
 }

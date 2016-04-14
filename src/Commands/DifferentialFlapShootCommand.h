@@ -15,6 +15,7 @@ protected:
 	bool m_die;
 	double m_RTCWhenFlapSet;
 	double m_yawAtCenteringEnd;
+	bool m_haveFlapsBeenSet;
 
 	enum State {
 		GET_FRAME, // waiting for the next vision frame

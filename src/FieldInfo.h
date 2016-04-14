@@ -46,7 +46,7 @@ public:
 	// (this is drive distance, we end up at a Y offset that's this + StartY)
 	static constexpr double StartToDefenseDistance = StartingTapeToDefense - RobotLength;
 	// Although the defenses are actually 47.2" wide, one drives the full 48" to get across
-	static constexpr double DefenseDepth = 48;
+	static constexpr double DefenseDepth = 60;
 	// After we cross the defense, drive one more foot in autonomous
 	static constexpr double DrivePastDefense = 18.0; // +6in
 
@@ -92,7 +92,7 @@ public:
 	static constexpr TargetLocations targetLocations[] = {
 			{ -87.0, 212.0 },
 			{ 10.0, 176.0 },
-			{ 56.0, 190.0 },
+			{ 60.0, 200.0 },
 			{ 0, 0 } // target_none
 	};
 

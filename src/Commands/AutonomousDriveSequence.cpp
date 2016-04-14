@@ -75,7 +75,7 @@ AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense, int 
 
 			// Drive to the target spot in high gear, but let's leave it low speed for now
 			AddSequential(new DriveDistanceCommand(-distanceToShootingPosition,
-					FieldInfo::FAST, DriveDistanceCommand::HIGH));
+					FieldInfo::FAST, DriveDistanceCommand::/*HIGH*/LOW));
 			AddSequential(new DelayCommand(0.1));
 			AddSequential(new RotateIMUCommand(secondAngle));
 			AddSequential(new DelayCommand(0.1));

@@ -18,6 +18,9 @@ void FlapSubsystem::setFlapsFraction(double fractionBoth) {
 }
 
 bool FlapSubsystem::setFlapsDifferential(double distInches, double angle){
+	if(distInches < 50.0){
+		distInches = 50.0;
+	}
 	FieldInfo::VisionFlapDataPoint distLangleL = {0, 0, 0, 0};
 	FieldInfo::VisionFlapDataPoint distLangleH = {0, 0, 0, 0};
 	FieldInfo::VisionFlapDataPoint distHangleL = {0, 0, 0, 0};
