@@ -148,7 +148,7 @@ void Robot::DisabledInit() {
 void Robot::SetLeds(LedState state){
 	// the teensy program accepts single letters as bytes over I2C to set the animation state
 	// for some reason about 50% of messages get lost over I2C so here we spam multiple copies of the letter
-	uint8_t bytes[10];
+	uint8_t bytes[10] = {0};
 	switch(state){
 	case OFF:
 		bytes[0] = 'O';

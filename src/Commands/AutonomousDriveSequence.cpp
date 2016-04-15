@@ -73,7 +73,7 @@ AutonomousDriveSequence::AutonomousDriveSequence(int position, int defense, int 
 
 			AddSequential(new DelayCommand(0.1));
 
-			// Drive to the target spot in high gear, but let's leave it low speed for now
+			// staying as low gear for now because the shifter came loose at one point
 			AddSequential(new DriveDistanceCommand(-distanceToShootingPosition,
 					FieldInfo::FAST, DriveDistanceCommand::/*HIGH*/LOW));
 			AddSequential(new DelayCommand(0.1));

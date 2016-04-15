@@ -13,7 +13,7 @@ void OI::registerCommands() {
 	rollBallRestartCommands.push_back(CommandBase::flapCommand.get());
 	registerButton(mp_XboxController, 1, PRESSED, new ToggleCommand(new RollBallPickupThenShooter(), rollBallRestartCommands));
 	// XBox B command
-	registerButton(mp_XboxController, 2, PRESSED, new AutonomousShootSequence());
+	registerButton(mp_XboxController, 2, PRESSED, new DriveDistanceCommand(5.5)/*new AutonomousShootSequence()*/);
 	// XBox X command
 	registerButton(mp_XboxController, 3, PRESSED, CommandBase::shootCommand.get());
 	// XBox Y command
