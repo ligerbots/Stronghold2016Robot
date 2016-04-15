@@ -59,7 +59,9 @@ void VisionSubsystem::InitDefaultCommand() {
 void VisionSubsystem::camerasOn() {
 	printf("VisionSubsystem: camerasOn\n");
 	Camera::EnumerateCameras();
-	Camera::EnableCameras();
+	if(Camera::GetCamera(0) != NULL){
+		Camera::EnableCameras();
+	}
 }
 
 bool VisionSubsystem::isLedRingOn() {
@@ -79,8 +81,9 @@ void VisionSubsystem::updateVision(int ticks) {
 	if (ticks % 2 == 0)
 		return;
 
-	if (Camera::GetNumberOfCameras() < 1)
+	if (Camera::GetNumberOfCameras() < 1 || Camera::GetCamera(0) == NULL) {
 		return;
+	}
 
 	if (enableVision.get()){
 		setLedRingState(true);		// just in case
@@ -188,6 +191,9 @@ void VisionSubsystem::visionProcessingThread() {
 	while (true) {
 		// wait here forever until we get a signal
 		pthread_cond_wait(&m_threadCond, &m_threadMutex);
+		if(mp_currentFrame == NULL || mp_processingFrame == NULL){
+			continue;
+		}
 		m_visionBusy = true;
 		loopCounter++;
 		int startTicks = Robot::ticks;

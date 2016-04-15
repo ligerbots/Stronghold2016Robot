@@ -16,6 +16,7 @@ DifferentialFlapShootCommand::DifferentialFlapShootCommand() {
 	m_die = false;
 	m_yawAtCenteringEnd = 0;
 	m_haveFlapsBeenSet = false;
+	m_RTCWhenIntakeFinished = 0;
 }
 
 void DifferentialFlapShootCommand::Initialize() {
@@ -29,6 +30,7 @@ void DifferentialFlapShootCommand::Initialize() {
 	m_RTCWhenFlapSet = -1;
 	m_yawAtCenteringEnd = 0;
 	m_haveFlapsBeenSet = false;
+	m_RTCWhenIntakeFinished = 0;
 	mp_rollerCommand->Initialize();
 }
 
@@ -38,6 +40,7 @@ void DifferentialFlapShootCommand::Execute() {
 		mp_rollerCommand->Execute();
 		if(mp_rollerCommand->IsFinished()){
 			m_intakeFinished = true;
+			m_RTCWhenIntakeFinished = Robot::GetRTC();
 			mp_rollerCommand->End();
 			intakeSubsystem->setIntakeArmUp();
 			printf("DifferentialFlapShootCommand: intake rolling ended; intake arm up\n");
@@ -46,6 +49,8 @@ void DifferentialFlapShootCommand::Execute() {
 
 	bool success;
 	double yawDiff;
+	double rtcNow;
+	bool ballInShooter;
 
 	switch(m_state) {
 	case GET_FRAME:
@@ -92,14 +97,18 @@ void DifferentialFlapShootCommand::Execute() {
 			yawDiff -= 180;
 		}
 		// take the shot anyway in auto
-		// fix after Q3
+		// added after Hartford Q3
+		rtcNow = Robot::GetRTC();
+		ballInShooter = intakeSubsystem->isBallInShooterPosition();
+
 		if(!(DriverStation::GetInstance().IsAutonomous() && m_haveFlapsBeenSet)
 				&& (!success || yawDiff > 5.0)) {
 			m_die = true;
-			printf("DifferentialFlapShootCommand: die\n");
-		} else if(m_intakeFinished && intakeSubsystem->isIntakeArmUp() && intakeSubsystem->isBallInShooterPosition() && Robot::GetRTC() - m_RTCWhenFlapSet > .2){
+			printf("DifferentialFlapShootCommand: die because flap interpolation failed\n");
+		} else if(m_intakeFinished && intakeSubsystem->isIntakeArmUp() && ballInShooter && rtcNow - m_RTCWhenFlapSet > .2){
 			if(intakeSubsystem->isBallInDefensesCrossingPosition()){ // BAD, regardless of the cable coming loose
 				m_die = true;
+				printf("DifferentialFlapShootCommand: die because ball hit defense crossing switch\n");
 			} else {
 				m_state = SHOOTING;
 				printf("DifferentialFlapShootCommand: SHOOTING\n");
@@ -109,9 +118,10 @@ void DifferentialFlapShootCommand::Execute() {
 			}
 		}
 		// if we got hit and the ball fell out, don't shoot
-		if(m_intakeFinished && !intakeSubsystem->isBallInShooterPosition()){
+		// wait for bouncing for for .5 secs
+		if(m_intakeFinished && rtcNow - m_RTCWhenIntakeFinished > 0.5 && !ballInShooter){
 			m_die = true;
-			printf("DifferentialFlapShootCommand: die\n");
+			printf("DifferentialFlapShootCommand: die because ball is not in shooter\n");
 		}
 		break;
 	case SHOOTING:
@@ -122,11 +132,11 @@ void DifferentialFlapShootCommand::Execute() {
 
 bool DifferentialFlapShootCommand::IsFinished() {
 	if(m_die){
-		printf("DifferentialFlapShootCommand: exiting because robot was pushed\n");
+		printf("DifferentialFlapShootCommand: exiting because m_die == true\n");
 		return true;
 	}
 	if (Robot::instance->mp_operatorInterface->getSecondControllerRawButton(28)) {
-		printf("DifferentialFlapShootCommand: canceling\n");
+		printf("DifferentialFlapShootCommand: canceling because kill button pressed\n");
 		return true;
 	}
 	return m_state == SHOOTING && m_ticksSinceFire > 25;
