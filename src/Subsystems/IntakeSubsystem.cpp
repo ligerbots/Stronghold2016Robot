@@ -28,6 +28,8 @@ IntakeSubsystem::IntakeSubsystem() :
 					RobotMap::LIMIT_SWITCH_INTAKE_BALL_DEFENSES_POSITION));
 //	mp_ballInDefensePositionCounter.reset(new Counter(mp_ballInDefensePositionSwitch.get()));
 	mp_intakeUpSwitch.reset(new DigitalInput(RobotMap::LIMIT_SWITCH_INTAKE_UP));
+
+	mp_ballPositionSensor.reset(new AnalogInput(RobotMap::AI_INTAKE_DISTANCE_SENSOR));
 }
 
 void IntakeSubsystem::InitDefaultCommand() {
@@ -105,6 +107,7 @@ void IntakeSubsystem::sendValuesToSmartDashboard() {
 	if(Robot::ticks % 10) {
 		return;
 	}
+	SmartDashboard::PutNumber("Intake/Position_Sensor", mp_ballPositionSensor->GetVoltage());
 	SmartDashboard::PutBoolean("Intake/Arm_Clear", isIntakeArmUp() /*!mp_intakeUpSwitch->Get()*/);
 	SmartDashboard::PutBoolean("Intake/Ball_In", isBallInShooterPosition());
 	SmartDashboard::PutBoolean("Intake/Ball_Defenses", isBallInDefensesCrossingPosition());

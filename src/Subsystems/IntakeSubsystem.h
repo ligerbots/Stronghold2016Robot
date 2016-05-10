@@ -12,6 +12,7 @@ private:
 	std::unique_ptr<DigitalInput> mp_ballInShooterSwitch;
 //	std::unique_ptr<Counter> mp_ballInShooterCounter;
 	std::unique_ptr<DigitalInput> mp_ballInDefensePositionSwitch;
+	std::unique_ptr<AnalogInput> mp_ballPositionSensor;
 //	std::unique_ptr<Counter> mp_ballInDefensePositionCounter;
 
 	bool m_rollerTalonPresent;
