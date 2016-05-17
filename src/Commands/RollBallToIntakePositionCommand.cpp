@@ -71,7 +71,7 @@ void RollBallToIntakePositionCommand::Execute() {
 	if(m_targetIntakePosition == CROSSING_POSITION || m_targetIntakePosition == PICKUP){
 		m_sensorFlag = intakeSubsystem->isBallInDefensesCrossingPosition();
 	} else if(m_targetIntakePosition == SHOOTING_POSITION || m_targetIntakePosition == BACK_TO_SHOOTING_POSITION){
-		m_sensorFlag = intakeSubsystem->isBallInShooterPosition();
+		m_sensorFlag = intakeSubsystem->isShooterSwitchPressed();
 	} // else, always false for low goal shot
 
 	if(m_targetIntakePosition == CROSSING_POSITION && m_sensorFlag){

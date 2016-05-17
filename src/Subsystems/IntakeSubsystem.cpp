@@ -91,7 +91,19 @@ bool IntakeSubsystem::isIntakeArmUp() {
 #endif
 }
 
+bool IntakeSubsystem::isShooterSwitchPressed(){
+	return mp_ballInShooterSwitch->Get();
+}
+
 bool IntakeSubsystem::isBallInShooterPosition() {
+	// the switch may not be pressed if the ball is too high up
+	// if the distance sensor value is greater than 1.55, the ball is at the distance of
+	// the shooting position or closer, so assume the ball is at the shooting position
+	float distanceSensorValue = mp_ballPositionSensor->GetVoltage();
+	if(distanceSensorValue > 1.55){
+		return true;
+	}
+
 	return mp_ballInShooterSwitch->Get();
 }
 

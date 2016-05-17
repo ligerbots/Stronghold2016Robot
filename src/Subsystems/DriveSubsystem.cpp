@@ -258,10 +258,12 @@ double DriveSubsystem::getRightEncoderPosition() {
 
 void DriveSubsystem::TalonMasterInit(CANTalon& r_talon) {
 	r_talon.SetControlMode(CANTalon::kPercentVbus);
+	r_talon.ConfigNeutralMode(CANTalon::kNeutralMode_Brake);
 }
 
 void DriveSubsystem::TalonSlaveInit(CANTalon& r_slaveTalon, int masterId) {
 	r_slaveTalon.SetControlMode(CANTalon::kFollower);
+	r_slaveTalon.ConfigNeutralMode(CANTalon::kNeutralMode_Brake);
 	r_slaveTalon.Set(masterId);
 	r_slaveTalon.EnableControl();
 }

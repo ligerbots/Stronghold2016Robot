@@ -31,6 +31,7 @@ public:
 	bool isIntakeArmUp();
 	DoubleSolenoid::Value getIntakeArmValue();
 	bool isBallInShooterPosition();
+	bool isShooterSwitchPressed();
 	bool isBallInDefensesCrossingPosition();
 	bool isIntakeReadyToFire();
 	void setIntakeArmUp();
