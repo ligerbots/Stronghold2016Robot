@@ -85,9 +85,11 @@ bool IntakeSubsystem::isIntakeArmUp() {
 #pragma message "Warning: disabling intake arm check. Run without -DROBOT_2_TEST to enable"
 	return true;
 #else
+	return !mp_intakeUpSwitch->Get();
+
 	// flip value so that it's false if it's not connected
 	// TODO: DANGER
-	return mp_intakeArmSolenoid->Get() == DoubleSolenoid::kReverse && (Robot::GetRTC() - m_robotRTCWhenSetUp) > .8;//!mp_intakeUpSwitch->Get();
+	//return mp_intakeArmSolenoid->Get() == DoubleSolenoid::kReverse && (Robot::GetRTC() - m_robotRTCWhenSetUp) > .8;//!mp_intakeUpSwitch->Get();
 #endif
 }
 

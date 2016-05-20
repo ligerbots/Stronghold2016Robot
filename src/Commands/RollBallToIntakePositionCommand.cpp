@@ -101,7 +101,7 @@ void RollBallToIntakePositionCommand::Execute() {
 		} else {
 			m_moveUp = true;
 		}
-		int ticksTimeout = 45;
+		int ticksTimeout = 55;
 		if(m_needsToWaitForFlaps) {
 			ticksTimeout += 20; // add additional wait time for flaps to get into position
 		}
