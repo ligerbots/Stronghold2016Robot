@@ -18,6 +18,8 @@ private:
 	bool m_rollerTalonPresent;
 
 	double m_robotRTCWhenSetUp;
+	bool m_intakeSwitchHitOnce;
+	double m_robotRTCWhenIntakeSwitchHitOnce;
 
 	static constexpr double ROLLER_SPEED = 1;
 public:

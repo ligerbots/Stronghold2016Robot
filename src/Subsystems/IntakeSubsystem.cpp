@@ -19,6 +19,8 @@ IntakeSubsystem::IntakeSubsystem() :
 	}
 
 	m_robotRTCWhenSetUp = -1;
+	m_intakeSwitchHitOnce = false;
+	m_robotRTCWhenIntakeSwitchHitOnce = -1;
 
 	mp_ballInShooterSwitch.reset(
 			new DigitalInput(RobotMap::LIMIT_SWITCH_INTAKE_BALL_IN_SHOOTER));
@@ -67,11 +69,13 @@ void IntakeSubsystem::setIntakeArmUp() {
 	if(mp_intakeArmSolenoid->Get() != DoubleSolenoid::kReverse){
 		m_robotRTCWhenSetUp = Robot::GetRTC();
 		mp_intakeArmSolenoid->Set(DoubleSolenoid::kReverse);
+		m_intakeSwitchHitOnce = false;
 	}
 }
 
 void IntakeSubsystem::setIntakeArmDown() {
 	mp_intakeArmSolenoid->Set(DoubleSolenoid::kForward);
+	m_intakeSwitchHitOnce = false;
 }
 
 DoubleSolenoid::Value IntakeSubsystem::getIntakeArmValue() {
@@ -85,7 +89,17 @@ bool IntakeSubsystem::isIntakeArmUp() {
 #pragma message "Warning: disabling intake arm check. Run without -DROBOT_2_TEST to enable"
 	return true;
 #else
-	return !mp_intakeUpSwitch->Get();
+	bool intakeSwitchValue = !mp_intakeUpSwitch->Get();
+	if(intakeSwitchValue){
+		if(!m_intakeSwitchHitOnce){
+			m_intakeSwitchHitOnce = true;
+			m_robotRTCWhenIntakeSwitchHitOnce = Robot::GetRTC();
+		}
+	}
+
+	return intakeSwitchValue
+			&& m_intakeSwitchHitOnce
+			&& Robot::GetRTC() - m_robotRTCWhenIntakeSwitchHitOnce > 0.3;
 
 	// flip value so that it's false if it's not connected
 	// TODO: DANGER
