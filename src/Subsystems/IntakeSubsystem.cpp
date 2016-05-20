@@ -92,6 +92,7 @@ bool IntakeSubsystem::isIntakeArmUp() {
 	bool intakeSwitchValue = !mp_intakeUpSwitch->Get();
 	if(intakeSwitchValue){
 		if(!m_intakeSwitchHitOnce){
+			printf("Intake switch hit for the first time\n");
 			m_intakeSwitchHitOnce = true;
 			m_robotRTCWhenIntakeSwitchHitOnce = Robot::GetRTC();
 		}
