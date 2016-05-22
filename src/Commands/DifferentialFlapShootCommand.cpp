@@ -122,6 +122,7 @@ void DifferentialFlapShootCommand::Execute() {
 		if(m_intakeFinished && rtcNow - m_RTCWhenIntakeFinished > 0.5 && !ballInShooter){
 			m_die = true;
 			printf("DifferentialFlapShootCommand: die because ball is not in shooter\n");
+			printf("Distance sensor: %f\n", SmartDashboard::GetNumber("Intake/Position_Sensor", 0));
 		}
 		break;
 	case SHOOTING:

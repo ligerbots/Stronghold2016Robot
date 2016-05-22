@@ -117,7 +117,7 @@ bool IntakeSubsystem::isBallInShooterPosition() {
 	// if the distance sensor value is greater than 1.55, the ball is at the distance of
 	// the shooting position or closer, so assume the ball is at the shooting position
 	float distanceSensorValue = mp_ballPositionSensor->GetVoltage();
-	if(distanceSensorValue > 1.55){
+	if(distanceSensorValue > 1.5){
 		return true;
 	}
 

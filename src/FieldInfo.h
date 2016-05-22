@@ -140,12 +140,13 @@ public:
 		{  0.0, FAST,   false},	// DEF_PORTCULLIS,
 		{  0.0, FAST,   false},	// DEF_CHEVAL,
 		{180.0, FAST,   true},	// DEF_MOAT,
-		{180.0, FAST,   true},// DEF_RAMPARTS,
+		{180.0, FAST,   true},  // DEF_RAMPARTS,
 		{  0.0, NORMAL, true},	// DEF_DRAWBRIDGE, should we actually just block this choice?
 		{  0.0, NORMAL, true},	// DEF_SALLY_PORT, should we actually just block this choice?
 		{    0,	FAST,   true},	// DEF_ROCK_WALL,
 		{    0, FAST,   true},	// DEF_ROUGH_TERRAIN,
-		{  0.0, FAST,   true}	// DEF_MAX (there is no defense max, but just in case)
+		{    0, NOGO,   true},  // DEF_NO_AUTO
+		{  0.0, NOGO,   true}	// DEF_MAX (there is no defense max, but just in case)
 	};
 
 	struct VisionDataPoint {
