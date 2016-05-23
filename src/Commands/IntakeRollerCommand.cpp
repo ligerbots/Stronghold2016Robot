@@ -29,7 +29,7 @@ void IntakeRollerCommand::Execute() {
 		}
 	}
 
-	if (fabs(speed) > 0.1)
+	if (DemoLimits::IsManualIntakeAllowed() && fabs(speed) > 0.1)
 		intakeSubsystem->setRollSpeed(speed);
 	else
 		intakeSubsystem->rollStop();

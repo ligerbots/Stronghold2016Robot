@@ -15,10 +15,14 @@ void OI::registerCommands() {
 	// XBox B command
 	registerButton(mp_XboxController, 2, PRESSED, CommandBase::wedgeToggleCommand.get()/*new DriveDistanceCommand(12.0, FieldInfo::SLOW)*/ /*new AutonomousShootSequence()*/);
 	// XBox X command
-	registerButton(mp_XboxController, 3, PRESSED, CommandBase::shootCommand.get());
+	if(DemoLimits::IsManualShootingAllowed()){
+		registerButton(mp_XboxController, 3, PRESSED, CommandBase::shootCommand.get());
+	}
 	// XBox Y command
-	registerButton(mp_XboxController, 4, PRESSED, /*CommandBase::wedgeToggleCommand.get()*/
-			CommandBase::diffShootCommand.get());
+	if(DemoLimits::IsAutoShootingAllowed()){
+		registerButton(mp_XboxController, 4, PRESSED, /*CommandBase::wedgeToggleCommand.get()*/
+				CommandBase::diffShootCommand.get());
+	}
 
 	// Left bumper
 	registerButton(mp_XboxController, 5, PRESSED, CommandBase::gearShiftCommand.get());
@@ -66,17 +70,17 @@ void OI::registerSecondControllerButtons() {
 					RollBallToIntakePositionCommand::BACK_TO_SHOOTING_POSITION));
 
 	// section 3 - auto-related and test commands
-	registerButton(mp_FarmController, 11, PRESSED,
-			new PrepareForCrossingSequence());
-	registerButton(mp_FarmController, 12, PRESSED,
-			CommandBase::diffShootCommand.get());
+//	registerButton(mp_FarmController, 11, PRESSED,
+//			new PrepareForCrossingSequence());
+//	registerButton(mp_FarmController, 12, PRESSED,
+//			CommandBase::diffShootCommand.get());
 	registerButton(mp_FarmController, 13, PRESSED,
 			new AcquireTarget(true, true));
-	registerButton(mp_FarmController, 14, PRESSED,
-			new AutonomousShootSequence());
-	registerButton(mp_FarmController, 15, PRESSED, new CenterOnTargetCommand());
-	registerButton(mp_FarmController, 16, PRESSED,
-			new RotateIMUCommand(90, false));
+//	registerButton(mp_FarmController, 14, PRESSED,
+//			new AutonomousShootSequence());
+//	registerButton(mp_FarmController, 15, PRESSED, new CenterOnTargetCommand());
+//	registerButton(mp_FarmController, 16, PRESSED,
+//			new RotateIMUCommand(90, false));
 
 	// if the farm controller isn't available, we might be using a Logitech Thurstmaster or something
 	// that likely gives out around 16 buttons
@@ -94,8 +98,8 @@ void OI::registerSecondControllerButtons() {
 		// section 5 - cameras
 
 		// the big button (21)
-		registerButton(mp_FarmController, 21, PRESSED,
-				new AutoSetFlapsCommand(true));
+//		registerButton(mp_FarmController, 21, PRESSED,
+//				new AutoSetFlapsCommand(true));
 
 		registerButton(mp_FarmController, 22, PRESSED,
 				new ToggleCameraFeedCommand(0));

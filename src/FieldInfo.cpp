@@ -58,7 +58,8 @@ void FieldInfo::initSelectors(){
 	mp_position->AddObject("4", &I[POS_FOUR]);
 	mp_position->AddObject("5", &I[POS_FIVE]);
 
-	mp_defense->AddDefault("Low Bar", &I[DEF_LOW_BAR]);
+	mp_defense->AddDefault("NO AUTONOMOUS", &I[DEF_NO_AUTO]);
+	mp_defense->AddObject("Low Bar", &I[DEF_LOW_BAR]);
 	mp_defense->AddObject("A Portcullis", &I[DEF_PORTCULLIS]);
 	mp_defense->AddObject("A Cheval de Frise", &I[DEF_CHEVAL]);
 	mp_defense->AddObject("B Moat", &I[DEF_MOAT]);
@@ -67,12 +68,12 @@ void FieldInfo::initSelectors(){
 	mp_defense->AddObject("C Sally Port", &I[DEF_SALLY_PORT]);
 	mp_defense->AddObject("D Rock Wall", &I[DEF_ROCK_WALL]);
 	mp_defense->AddObject("D Rough Terrain", &I[DEF_ROUGH_TERRAIN]);
-	mp_defense->AddObject("NO AUTONOMOUS", &I[DEF_NO_AUTO]);
 
-	mp_target->AddDefault("Left", &I[TARGET_LEFT]);
+	mp_target->AddDefault("ONLY CROSS", &I[TARGET_NONE]);
+	mp_target->AddObject("Left", &I[TARGET_LEFT]);
 	mp_target->AddObject("Center", &I[TARGET_CENTER]);
 	mp_target->AddObject("Right", &I[TARGET_RIGHT]);
-	mp_target->AddObject("ONLY CROSS", &I[TARGET_NONE]);
+
 	SmartDashboard::PutData("Auto Position", mp_position);
 	SmartDashboard::PutData("Auto Defense", mp_defense);
 	SmartDashboard::PutData("Auto Target", mp_target);

@@ -53,6 +53,7 @@
 #include "Commands/ToggleLedCommand.h"
 #include "Commands/WaitForIntakeUpCommand.h"
 #include "Commands/WedgeToggleCommand.h"
+#include "DemoLimits.h"
 #include "FieldInfo.h"
 #include "Includes.h"
 #include "OI.h"
