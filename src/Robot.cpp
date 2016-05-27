@@ -1,5 +1,6 @@
 #include <Stronghold2016Robot.h>
 #include <time.h>
+#include "DemoLimits.h"
 
 // Robot wide globals whose definitions live in the Robot class
 Robot* Robot::instance = NULL;
@@ -136,6 +137,8 @@ void Robot::DisabledInit() {
 	printf("\n");
 	m_startTicks = ticks;
 	m_startTime = startTime;
+
+	DemoLimits::Init();
 
 	if (mp_autonomousCommand != NULL) {
 		mp_autonomousCommand->Cancel();

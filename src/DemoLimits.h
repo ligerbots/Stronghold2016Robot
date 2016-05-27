@@ -3,6 +3,8 @@
 class DemoLimits {
 public:
 
+	static void Init();
+
 	/**
 	 * (especially on high gear) the maximum speed of the drive is dangerously high
 	 */

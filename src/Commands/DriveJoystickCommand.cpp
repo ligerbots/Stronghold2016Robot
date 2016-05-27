@@ -29,8 +29,8 @@ void DriveJoystickCommand::Execute() {
 	//SmartDashboard::PutNumber("DriveJoystick_x", x);
 	//SmartDashboard::PutNumber("DriveJoystick_y", y);
 
-	double xAxis = p_XboxController->GetRawAxis(1) + p_FarmController->GetRawAxis(4);
-	double yAxis = p_XboxController->GetRawAxis(4)+ p_FarmController->GetRawAxis(5);
+	double yAxis = p_XboxController->GetRawAxis(1) + p_FarmController->GetRawAxis(4);
+	double xAxis = p_XboxController->GetRawAxis(4)+ p_FarmController->GetRawAxis(5);
 	double limit = DemoLimits::GetMaxSpeed();
 
 	driveSubsystem->drive(yAxis * limit, xAxis * limit);
