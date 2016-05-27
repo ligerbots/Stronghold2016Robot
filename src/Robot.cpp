@@ -9,6 +9,8 @@ double Robot::end_of_centering_yaw = 0;
 bool Robot::robot_is_about_to_tip = false;
 timespec Robot::time_resolution;
 
+double dashboardTime, visionTime, schedulerTime, inbetweenStart, inbetweenTime;
+
 Robot::Robot() :
 		m_ledTeensyCommunication(I2C::kOnboard, 42) {
 	instance = this;
@@ -64,12 +66,17 @@ void Robot::AlwaysPeriodic() {
 //		printf("Main thread running\n");
 //	}
 
+	double start = GetRTC();
+	CommandBase::visionSubsystem->updateVision(Robot::ticks);
+	visionTime = GetRTC() - start;
+
+	start = GetRTC();
 	// Check to see if the robot is about to tip
 	// update the giant red-green indicator on the dashboard
 	robot_is_about_to_tip = CommandBase::navXSubsystem->isRobotAboutToTip(RobotMap::MAX_PITCH_ANGLE);
 	SmartDashboard::PutBoolean("SafeToDrive", !robot_is_about_to_tip);
 
-	CommandBase::visionSubsystem->updateVision(Robot::ticks);
+
 
 	// run through all subsystems and have them publish SmartDashboard values
 	CommandBase::visionSubsystem->sendValuesToSmartDashboard();
@@ -84,6 +91,7 @@ void Robot::AlwaysPeriodic() {
 	CommandBase::wedgeSubsystem->sendValuesToSmartDashboard();
 	CommandBase::intakeSubsystem->sendValuesToSmartDashboard();
 
+	dashboardTime = GetRTC() - start;
 	// make red button force kill the auto command and centering, if they are running
 	if (mp_operatorInterface->getSecondControllerRawButton(28)) {
 		printf("Canceling centering/auto\n");
@@ -268,8 +276,21 @@ void Robot::TeleopInit() {
 }
 
 void Robot::TeleopPeriodic() {
+	inbetweenTime = GetRTC() - inbetweenStart;
+	double totalStart = GetRTC();
+
 	AlwaysPeriodic();
+	double start = GetRTC();
 	Scheduler::GetInstance()->Run();
+	schedulerTime = GetRTC() - start;
+
+	double totalTime = GetRTC() - totalStart;
+	double sum = totalTime + inbetweenTime;
+	if(ticks % 50 == 0){
+		printf("dashboard: %f, vision: %f, scheduler: %f, in loop: %f, in between: %f, sum: %f\n",
+				dashboardTime, visionTime, schedulerTime, totalTime, inbetweenTime, sum);
+	}
+	inbetweenStart = GetRTC();
 }
 
 void Robot::TestPeriodic() {
