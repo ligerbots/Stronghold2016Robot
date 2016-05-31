@@ -29,5 +29,5 @@ bool DemoLimits::IsManualShootingAllowed(){
 }
 
 bool DemoLimits::IsManualIntakeAllowed(){
-	return Preferences::GetInstance()->GetBoolean("DemoLimits Manual Intake", true);
+	return Preferences::GetInstance()->GetBoolean("Demo Limits Manual Intake", true);
 }

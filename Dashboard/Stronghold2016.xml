@@ -35,9 +35,6 @@
 		<width>561</width>
 		<height>296</height>
 	</static-widget>
-	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.WebcamViewerExtension">
-		<location x="506" y="0"/>
-	</static-widget>
 	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.RobotPreferences">
 		<location x="205" y="3"/>
 		<height>193</height>
