@@ -1,5 +1,35 @@
 <xml version="1.0">
 <dashboard>
+	<widget field="AngleToTarget" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="255" y="0"/>
+	</widget>
+	<widget field="VisionTickUpdate" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="506" y="168"/>
+	</widget>
+	<widget field="Angle" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="506" y="147"/>
+	</widget>
+	<widget field="Y" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="506" y="126"/>
+	</widget>
+	<widget field="X" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="506" y="105"/>
+	</widget>
+	<widget field="Small (10 degree) angle" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="506" y="84"/>
+	</widget>
+	<widget field="NewVision Target Angle" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="506" y="63"/>
+	</widget>
+	<widget field="NewVision Target Distance" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="506" y="42"/>
+	</widget>
+	<widget field="TargetDistance" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="506" y="21"/>
+	</widget>
+	<widget field="SafeToDrive" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="506" y="0"/>
+	</widget>
 	<widget field="CenterOnTargetCommand" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
 		<location x="206" y="561"/>
 	</widget>
@@ -35,12 +65,10 @@
 		<width>561</width>
 		<height>296</height>
 	</static-widget>
-	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.WebcamViewerExtension">
-		<location x="506" y="0"/>
-	</static-widget>
 	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.RobotPreferences">
-		<location x="205" y="3"/>
-		<height>193</height>
+		<location x="801" y="53"/>
+		<width>445</width>
+		<height>431</height>
 	</static-widget>
 	<widget field="Target Y Pos" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="0" y="472"/>

@@ -84,6 +84,7 @@ void i2cReceive(int numBytes) {
 
   if (currentMode == SHOOT) {
     shootStartTicks = ticks;
+    ticks = 0;
     preShootMode = previousMode;
   }
 }
@@ -140,7 +141,7 @@ void animation_SHOOT() {
     stripLeft.setPixelColor(i, color);
     stripRight.setPixelColor(i, color);
   }
-  if((ticks - shootStartTicks) > LEDS_PER_STRIP * 3){
+  if((ticks) > LEDS_PER_STRIP * 3){
     currentMode = preShootMode;
   }
 }
