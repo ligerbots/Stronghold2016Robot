@@ -41,6 +41,8 @@ void ShootCommand::Initialize() {
 
 void ShootCommand::Execute() {
 	m_ticks++;
+	Robot::instance->mp_operatorInterface->mp_XboxController->SetRumble(Joystick::RumbleType::kLeftRumble, m_ticks < 15);
+	Robot::instance->mp_operatorInterface->mp_XboxController->SetRumble(Joystick::RumbleType::kRightRumble, m_ticks < 15);
 	if (/*wedgeSubsystem->isWedgeDown() &&*/ intakeSubsystem->isIntakeArmUp()
 			&& m_ticks == 1) {
 		printf("ShooterCommand: firing\n");
@@ -60,6 +62,8 @@ bool ShootCommand::IsFinished() {
 
 void ShootCommand::End() {
 	shooterSubsystem->retractPiston(); // retract piston once the ball is shot (1/2 second after fire)
+	Robot::instance->mp_operatorInterface->mp_XboxController->SetRumble(Joystick::RumbleType::kLeftRumble, 0);
+	Robot::instance->mp_operatorInterface->mp_XboxController->SetRumble(Joystick::RumbleType::kRightRumble, 0);
 
 	if(DriverStation::GetInstance().IsOperatorControl() && this->GetGroup() == NULL)
 		CommandBase::intakeRollerCommand->Start();
@@ -67,4 +71,6 @@ void ShootCommand::End() {
 
 void ShootCommand::Interrupted() {
 	//NO
+	Robot::instance->mp_operatorInterface->mp_XboxController->SetRumble(Joystick::RumbleType::kLeftRumble, 0);
+	Robot::instance->mp_operatorInterface->mp_XboxController->SetRumble(Joystick::RumbleType::kRightRumble, 0);
 }
