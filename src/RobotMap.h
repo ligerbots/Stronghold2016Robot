@@ -46,8 +46,8 @@ public:
 
 	static constexpr int PCM_SHIFTER_LOW_GEAR = 1;
 	static constexpr int PCM_SHIFTER_HIGH_GEAR = 0;
-	static constexpr int PCM_INTAKE_UP = 5;
-	static constexpr int PCM_INTAKE_DOWN = 4;
+	static constexpr int PCM_INTAKE_UP = 4;
+	static constexpr int PCM_INTAKE_DOWN = 5;
 	static constexpr int PCM_WEDGES_UP = 3;
 	static constexpr int PCM_WEDGES_DOWN = 2;
 
