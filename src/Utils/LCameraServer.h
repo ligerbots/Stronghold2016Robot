@@ -7,10 +7,11 @@
 
 #pragma once
 
-#include "USBCamera.h"
 #include "ErrorBase.h"
-#include "nivision.h"
-#include "NIIMAQdx.h"
+#include "Vision/nivision.h"
+#include "Vision/NIIMAQdx.h"
+#include "Vision/USBCamera.h"
+using namespace nivision;
 
 #include "HAL/cpp/priority_mutex.h"
 #include <thread>

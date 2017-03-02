@@ -5,7 +5,7 @@
 //**************************************************************************
 #ifndef IMAGEPROCESSING_TASK_INCLUDE
 #define IMAGEPROCESSING_TASK_INCLUDE
-#include <nivision.h>
+#include <Vision/nivision.h>
 #ifdef __cplusplus
 	extern "C" {
 #endif

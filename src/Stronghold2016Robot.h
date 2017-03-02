@@ -3,8 +3,8 @@
 #include <math.h>
 #include <exception>
 #include <algorithm>
-#include <NIIMAQdx.h>
-#include <nivision.h>
+#include <Vision/nivision.h>
+#include <Vision/NIIMAQdx.h>
 #include <stdio.h>
 #include <limits.h>
 #include <string.h>
@@ -76,3 +76,5 @@
 #include "Utils/Parameter.h"
 #include "Vision/Camera.h"
 #include "Vision/ImageProcessing.h"
+
+using namespace frc;

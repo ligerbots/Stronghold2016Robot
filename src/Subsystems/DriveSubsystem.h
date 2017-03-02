@@ -3,6 +3,7 @@
 #include "Commands/Subsystem.h"
 #include "WPILib.h"
 #include "Robot.h"
+#include "CANTalon.h"
 
 class DriveSubsystem: public Subsystem {
 protected:

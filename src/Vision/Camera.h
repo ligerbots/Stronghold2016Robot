@@ -6,8 +6,8 @@
  */
 
 #pragma once
-#include <NIIMAQdx.h>
-#include <nivision.h>
+#include <Vision/NIIMAQdx.h>
+#include <Vision/nivision.h>
 
 class Camera {
 private:

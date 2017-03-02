@@ -5,6 +5,8 @@
 #include <Utils/Parameter.h>
 #include <pthread.h>
 #include "DriveSubsystem.h"
+#include <Vision/nivision.h>
+#include <Vision/NIIMAQdx.h>
 
 // We believe the "float" color in the imaqDraw calls is BGR (Blue Green Red)
 // with ranges of 0.0 to just under 256.0 for each color

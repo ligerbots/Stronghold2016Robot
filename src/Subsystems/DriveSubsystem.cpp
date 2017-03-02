@@ -5,7 +5,6 @@ DriveSubsystem::DriveSubsystem() :
 		m_pos({ 0.0, 0.0, 0.0 })
 {
 	printf("DriveSubsystem: initialize\n");
-	turnPIDOutput.reset(new DriveTurnPIDOutput(*this));
 	// create all the CANTalon objects we need
 	// we'll check if we can use them later
 	printf("\tMaster talons\n");

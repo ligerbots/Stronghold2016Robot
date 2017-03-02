@@ -1,5 +1,6 @@
 #include <DemoLimits.h>
 #include <WPILib.h>
+using namespace frc;
 
 void DemoLimits::Init(){
 	if(!Preferences::GetInstance()->ContainsKey("Demo Limits Speed")){

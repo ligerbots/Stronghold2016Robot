@@ -1,90 +1,357 @@
 <xml version="1.0">
 <dashboard>
-	<widget field="CenterOnTargetCommand" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
-		<location x="206" y="561"/>
+	<widget field="ManualControl_STIRRER_SERVO" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
+		<location x="1014" y="102"/>
 	</widget>
-	<widget field="Auto Target" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
-		<location x="145" y="0"/>
+	<widget field="Auto gear lift position" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
+		<location x="475" y="504"/>
 	</widget>
-	<widget field="XPos" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="145" y="629"/>
+	<widget field="ManualControl_GEAR_SERVO" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
+		<location x="1014" y="68"/>
 	</widget>
-	<widget field="FlapCommandPositionLeft" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="160" y="197"/>
+	<widget field="ManualControl_DRIVE_THROTTLE" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
+		<location x="1014" y="34"/>
 	</widget>
-	<widget field="Auto Position" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
-		<location x="93" y="0"/>
+	<widget field="FeederBackOutCommand" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
+		<location x="1014" y="0"/>
 	</widget>
-	<widget field="DriveDistanceIMUCommand_1.000000_0.700000" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
-		<location x="0" y="595"/>
+	<widget field="DrivePathCommand" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
+		<location x="841" y="0"/>
 	</widget>
-	<widget field="Command_7Command" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
-		<location x="21" y="561"/>
+	<widget field="ForceOverrideShooterFault" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
+		<location x="661" y="529"/>
 	</widget>
-	<widget field="Auto Defense" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
-		<location x="0" y="561"/>
+	<widget field="TurnCommand_45.0" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
+		<location x="636" y="495"/>
 	</widget>
-	<widget field="FlapCommandPositionRight" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="0" y="493"/>
+	<widget field="AlignBoilerAndShootCommand" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
+		<location x="670" y="461"/>
 	</widget>
-	<widget field="RotateIMUCommand_90.000000" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
-		<location x="0" y="527"/>
+	<widget field="ZeroSensors" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
+		<location x="531" y="461"/>
 	</widget>
-	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.WebcamViewerExtension">
-		<location x="223" y="230"/>
-		<width>561</width>
-		<height>296</height>
-	</static-widget>
-	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.RobotPreferences">
-		<location x="205" y="3"/>
-		<height>193</height>
-	</static-widget>
-	<widget field="Target Y Pos" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="0" y="472"/>
+	<widget field="DriveByUltrasonicCommand_3.0" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
+		<location x="661" y="427"/>
 	</widget>
-	<widget field="Target X Pos" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="0" y="449"/>
+	<widget field="Auto mode" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
+		<location x="1066" y="194"/>
 	</widget>
-	<widget field="TargetsDetected" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="0" y="426"/>
+	<widget field="ManualControl_SHOOTER_RPM" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
+		<location x="708" y="393"/>
 	</widget>
-	<widget field="CamerasOpen" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="0" y="403"/>
+	<widget field="Auto Calculations" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
+		<location x="546" y="393"/>
 	</widget>
-	<widget field="CamerasEnabled" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="0" y="380"/>
+	<widget field="ManualControl_DRIVE_TURN" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
+		<location x="661" y="359"/>
 	</widget>
-	<widget field="CamerasCount" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+	<widget field="Scheduler" type="Scheduler" class="edu.wpi.first.smartdashboard.gui.elements.Scheduler">
+		<location x="0" y="567"/>
+	</widget>
+	<widget field="DriveToGearCommand" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
+		<location x="649" y="325"/>
+	</widget>
+	<widget field="CameraFeedCommand_TOGGLE" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
+		<location x="662" y="291"/>
+	</widget>
+	<widget field="ManualControl_INTAKE" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
+		<location x="636" y="257"/>
+	</widget>
+	<widget field="Auto start position" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
+		<location x="162" y="168"/>
+	</widget>
+	<widget field="ManualControl_FEEDER" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
+		<location x="650" y="223"/>
+	</widget>
+	<widget field="DriveDistanceCommand_60.0" type="Command" class="edu.wpi.first.smartdashboard.gui.elements.Command">
+		<location x="661" y="189"/>
+	</widget>
+	<widget field="Displacement_Y" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="478" y="357"/>
+	</widget>
+	<widget field="Feeder_Present" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="485" y="336"/>
+	</widget>
+	<widget field="Gearmech_Position_Open" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="636" y="168"/>
+	</widget>
+	<widget field="Shooter_PID_error" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="678" y="147"/>
+	</widget>
+	<widget field="Encoder_Right" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="505" y="294"/>
+	</widget>
+	<widget field="Intake_On" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="475" y="252"/>
+	</widget>
+	<widget field="Proximity_Sensor_Distance" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="636" y="126"/>
+	</widget>
+	<widget field="IMU_CompassHeading" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="636" y="105"/>
+	</widget>
+	<widget field="Gearmech_Open_Degrees" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="636" y="84"/>
+	</widget>
+	<widget field="IMU_TotalYaw" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="522" y="147"/>
+	</widget>
+	<widget field="Left_Master_Failure" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="642" y="63"/>
+	</widget>
+	<widget field="IMU_Byte_Count" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="636" y="42"/>
+	</widget>
+	<widget field="Velocity_Y" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="514" y="231"/>
+	</widget>
+	<widget field="Velocity_X" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="518" y="189"/>
+	</widget>
+	<widget field="Right_Slave_Power" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="661" y="21"/>
+	</widget>
+	<widget field="IMU_FusedHeading" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="636" y="0"/>
+	</widget>
+	<widget field="Right_Master_OverTemp" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="368" y="525"/>
+	</widget>
+	<widget field="Feeder_Failure" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="483" y="63"/>
+	</widget>
+	<widget field="IMU_YawRateDPS" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="313" y="546"/>
+	</widget>
+	<widget field="VisionBoiler" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="329" y="504"/>
+	</widget>
+	<widget field="Climb_Switch" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="481" y="42"/>
+	</widget>
+	<widget field="Feeder_Power" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="504" y="21"/>
+	</widget>
+	<widget field="TotalPower" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="168" y="399"/>
+	</widget>
+	<widget field="RawGyro_Z" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="162" y="357"/>
+	</widget>
+	<widget field="RawGyro_Y" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="162" y="147"/>
+	</widget>
+	<widget field="RawGyro_X" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="225" y="525"/>
+	</widget>
+	<widget field="Feeder_OverTemp" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="329" y="483"/>
+	</widget>
+	<widget field="IMU_Update_Count" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="329" y="462"/>
+	</widget>
+	<widget field="wpilibOverhead" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="475" y="0"/>
+	</widget>
+	<widget field="Encoder_Left" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="162" y="546"/>
+	</widget>
+	<widget field="Shooter_RPM_Requested" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="321" y="441"/>
+	</widget>
+	<widget field="RawMag_Y" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="189" y="504"/>
+	</widget>
+	<widget field="RawMag_Z" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="189" y="483"/>
+	</widget>
+	<widget field="RawMag_X" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="189" y="462"/>
+	</widget>
+	<widget field="Gearmech_Closed_Degrees" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="317" y="420"/>
+	</widget>
+	<widget field="IMU_Yaw" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="189" y="441"/>
+	</widget>
+	<widget field="IMU_IsMoving" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="162" y="420"/>
+	</widget>
+	<widget field="Shooter_Test_Rpm" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="309" y="399"/>
+	</widget>
+	<widget field="ShooterFeederCommand_state" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="309" y="378"/>
+	</widget>
+	<widget field="YawAxisDirection" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="309" y="357"/>
+	</widget>
+	<widget field="Left_Slave_Failure" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="309" y="336"/>
+	</widget>
+	<widget field="AlignBoilerAndShootCommand_state" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="309" y="315"/>
+	</widget>
+	<widget field="Right_Slave_Failure" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="323" y="294"/>
+	</widget>
+	<widget field="Shooter_Master_Talon_Power" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="313" y="273"/>
+	</widget>
+	<widget field="IMU_Connected" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="309" y="252"/>
+	</widget>
+	<widget field="Intake_Present" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="162" y="294"/>
+	</widget>
+	<widget field="Shooter_RPM_Real" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="335" y="231"/>
+	</widget>
+	<widget field="Left_Master_OverTemp" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="354" y="210"/>
+	</widget>
+	<widget field="ourTime" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="229" y="210"/>
+	</widget>
+	<widget field="Left_Master_Power" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="337" y="189"/>
+	</widget>
+	<widget field="PCM_Blacklist" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="162" y="273"/>
+	</widget>
+	<widget field="Shooter_Fault" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="180" y="231"/>
+	</widget>
+	<widget field="Intake_Failure" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="181" y="189"/>
+	</widget>
+	<widget field="Shooter_Master_OverTemp" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="314" y="168"/>
+	</widget>
+	<widget field="LED_On" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="189" y="168"/>
+	</widget>
+	<widget field="Shooter_Slave_OverTemp" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="309" y="147"/>
+	</widget>
+	<widget field="Shooter_Slave_Talon_Power" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="314" y="126"/>
+	</widget>
+	<widget field="VisionGearLift" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="162" y="126"/>
+	</widget>
+	<widget field="Shift_Voltage_Sticky_Fault" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="314" y="105"/>
+	</widget>
+	<widget field="Compressor_Closed_Loop" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="326" y="84"/>
+	</widget>
+	<widget field="Auto Selector" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="162" y="105"/>
+	</widget>
+	<widget field="cycleMillis" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="194" y="84"/>
+	</widget>
+	<widget field="Intake_OverTemp" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="309" y="63"/>
+	</widget>
+	<widget field="IMU_IsCalibrating" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="309" y="42"/>
+	</widget>
+	<widget field="Shooter_Slave_Failure" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="309" y="21"/>
+	</widget>
+	<widget field="FirmwareVersion" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="309" y="0"/>
+	</widget>
+	<widget field="QuaternionY" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="162" y="42"/>
+	</widget>
+	<widget field="QuaternionZ" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="162" y="21"/>
+	</widget>
+	<widget field="QuaternionX" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="162" y="0"/>
+	</widget>
+	<widget field="QuaternionW" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="546"/>
+	</widget>
+	<widget field="DriveToGearCommand_state" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="525"/>
+	</widget>
+	<widget field="IMU_Accel_Y" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="504"/>
+	</widget>
+	<widget field="IMU_Accel_X" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="483"/>
+	</widget>
+	<widget field="Right_Master_Power" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="462"/>
+	</widget>
+	<widget field="Left_Slave_Power" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="441"/>
+	</widget>
+	<widget field="Temperature" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="420"/>
+	</widget>
+	<widget field="VisionBoiler_data" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="399"/>
+	</widget>
+	<widget field="Right_Slave_OverTemp" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="378"/>
+	</widget>
+	<widget field="YawAxis" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="0" y="357"/>
 	</widget>
-	<widget field="LED" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="21" y="334"/>
+	<widget field="Gear_Mechanism_Open" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="336"/>
 	</widget>
-	<widget field="Auto Modes" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
-		<location x="0" y="334"/>
+	<widget field="Shooter_Master_Failure" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="315"/>
 	</widget>
-	<widget field="CenterOnTargetPID" type="PIDController" class="edu.wpi.first.smartdashboard.gui.elements.PIDEditor">
-		<location x="0" y="161"/>
+	<widget field="Intake_Power" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="294"/>
 	</widget>
-	<widget field="Wedge_Clear" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="0" y="138"/>
+	<widget field="IMU_IsRotating" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="273"/>
 	</widget>
-	<widget field="Exposure Max" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="0" y="115"/>
+	<widget field="Gearmech_Position_Closed" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="252"/>
 	</widget>
-	<widget field="Exposure Min" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="0" y="92"/>
+	<widget field="VisionGearLift_data" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="231"/>
 	</widget>
-	<widget field="RightFlapAngle" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="0" y="69"/>
+	<widget field="Compressor_Pressure_Switch" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="210"/>
 	</widget>
-	<widget field="LeftFlapAngle" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="0" y="46"/>
+	<widget field="Shift_Voltage_Fault" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="189"/>
 	</widget>
-	<widget field="y" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="0" y="23"/>
+	<widget field="IMU_Temp_C" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="168"/>
 	</widget>
-	<widget field="x" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+	<widget field="RawAccel_Z" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="147"/>
+	</widget>
+	<widget field="RawAccel_Y" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="126"/>
+	</widget>
+	<widget field="RawAccel_X" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="105"/>
+	</widget>
+	<widget field="Left_Slave_OverTemp" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="84"/>
+	</widget>
+	<widget field="Right_Master_Failure" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="63"/>
+	</widget>
+	<widget field="IMU_Roll" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="42"/>
+	</widget>
+	<widget field="IMU_Pitch" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="21"/>
+	</widget>
+	<widget field="Displacement_X" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="0" y="0"/>
 	</widget>
 </dashboard>

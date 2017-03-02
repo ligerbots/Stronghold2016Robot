@@ -3,8 +3,8 @@
 #include <math.h>
 #include <exception>
 #include <algorithm>
-#include <NIIMAQdx.h>
-#include <nivision.h>
+#include <Vision/NIIMAQdx.h>
+#include <Vision/nivision.h>
 #include <stdio.h>
 #include <limits.h>
 #include <string.h>
@@ -20,3 +20,4 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
+using namespace frc;

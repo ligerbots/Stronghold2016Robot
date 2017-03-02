@@ -14,14 +14,31 @@
 // up the robot 180 degrees from the usual position, we keep track of
 // that in m_yawOffset and always add m_yawOffset to our results
 
-class NavXSubsystem: public Subsystem, public AHRS  {
+class NavXSubsystem: public Subsystem  {
 private:
 	double m_yawOffset;
 public:
 	explicit NavXSubsystem(SPI::Port);
 	void InitDefaultCommand();
-	float GetYaw();
+	float GetYaw() {
+		return 0;
+	};
+	float GetRoll() {
+		return 0;
+	}
+	void ResetDisplacement() {
+
+	};
 	void zeroYaw(double yawOffset = 0.0);
+	float GetDisplacementX() {
+		return 0;
+	}
+	float GetDisplacementY() {
+		return 0;
+	}
+	float GetDisplacementZ() {
+		return 0;
+	}
 	void sendValuesToSmartDashboard();
 	bool isRobotAboutToTip(float maxPitchAngle);
 

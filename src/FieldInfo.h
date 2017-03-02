@@ -30,10 +30,6 @@ public:
 	double GetInitialOrientation();
 	void initSelectors();
 
-	SendableChooser *mp_position;
-	SendableChooser *mp_defense;
-	SendableChooser *mp_target;
-
 	static constexpr double RobotLength = 32.0;
 
 	// The back of our robot must start out touching the center starting tape

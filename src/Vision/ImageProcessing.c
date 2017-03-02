@@ -3,7 +3,7 @@
 //* WARNING: This file was automatically generated.  Any changes you make  *
 //*          to this file will be lost if you generate the file again.     *
 //**************************************************************************
-#include <nivision.h>
+#include <Vision/nivision.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
